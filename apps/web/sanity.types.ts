@@ -2713,6 +2713,64 @@ export type NAV_CATEGORIES_QUERY_RESULT = Array<{
   }>;
 }>;
 
+// Source: ../web/sanity/queries/shop.ts
+// Variable: SHOP_COUNT_QUERY
+// Query: count(*[  _type == "product" && status == "active" && count(variants[price > 0]) > 0  && ($brand == "" || brand->slug.current == $brand)  && (count($cats) == 0 || count((categories[]._ref)[@ in $cats]) > 0)  && ($q == "" || [title, brand->title] match $q)])
+export type SHOP_COUNT_QUERY_RESULT = number;
+
+// Source: ../web/sanity/queries/shop.ts
+// Variable: CATEGORY_BY_SLUG_QUERY
+// Query: *[_type == "category" && slug.current == $slug][0]{    _id, title, "slug": slug.current, description, seo {   title,  description,  noindex,  image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    "parent": parent->{ title, "slug": slug.current },    "ids": [_id] + *[_type == "category" && parent._ref == ^._id]._id  }
+export type CATEGORY_BY_SLUG_QUERY_RESULT = {
+  _id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  seo: {
+    title: string | null;
+    description: string | null;
+    noindex: boolean | null;
+    image: {
+      _type: "image";
+      asset: {
+        _id: string;
+        url: string;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number;
+            height: number;
+            aspectRatio: number;
+          } | null;
+        } | null;
+      } | null;
+      alt: null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+    } | null;
+  } | null;
+  parent: {
+    title: string;
+    slug: string;
+  } | null;
+  ids: Array<string>;
+} | null;
+
+// Source: ../web/sanity/queries/shop.ts
+// Variable: BRAND_BY_SLUG_QUERY
+// Query: *[_type == "brand" && slug.current == $slug][0]{ title, "slug": slug.current }
+export type BRAND_BY_SLUG_QUERY_RESULT = {
+  title: string;
+  slug: string;
+} | null;
+
+// Source: ../web/sanity/queries/shop.ts
+// Variable: CATEGORY_SLUGS_QUERY
+// Query: *[_type == "category" && defined(slug.current)]{ "slug": slug.current }
+export type CATEGORY_SLUGS_QUERY_RESULT = Array<{
+  slug: string;
+}>;
+
 // Query TypeMap
 declare global {
   interface SanityQueries {
@@ -2723,6 +2781,10 @@ declare global {
     '\n  *[_id == "siteSettings"][0]{\n    mainMenu[]{\n      _key, label, dropdown,\n      link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n      "subcategories": select(\n        dropdown == "children" => *[_type == "category" && parent._ref == ^.link.internal._ref && showInNav != false]\n          | order(order asc, title asc){ _id, title, "slug": slug.current }\n      ),\n      children[]{ _key, label, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } }\n    },\n    footerColumns[]{ _key, title, links[]{ _key, label, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } } },\n    legalLinks[]{ _key, label, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } },\n    social,\n    contact,\n    announcement{ active, text, button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } },\n    delivery,\n    autoship,\n    taxRatePercent\n  }\n': SETTINGS_QUERY_RESULT;
     '\n  *[_type == "brand" && count(*[_type == "product" && status == "active" && references(^._id)]) > 0]\n    | order(lower(title) asc){ _id, title, "slug": slug.current }\n': NAV_BRANDS_QUERY_RESULT;
     '\n  *[_type == "category" && !defined(parent) && showInNav != false] | order(order asc, title asc){\n    _id, title, "slug": slug.current,\n    "children": *[_type == "category" && parent._ref == ^._id && showInNav != false] | order(order asc, title asc){\n      _id, title, "slug": slug.current\n    }\n  }\n': NAV_CATEGORIES_QUERY_RESULT;
+    'count(*[\n  _type == "product" && status == "active" && count(variants[price > 0]) > 0\n  && ($brand == "" || brand->slug.current == $brand)\n  && (count($cats) == 0 || count((categories[]._ref)[@ in $cats]) > 0)\n  && ($q == "" || [title, brand->title] match $q)\n])': SHOP_COUNT_QUERY_RESULT;
+    '\n  *[_type == "category" && slug.current == $slug][0]{\n    _id, title, "slug": slug.current, description, seo { \n  title,\n  description,\n  noindex,\n  image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    "parent": parent->{ title, "slug": slug.current },\n    "ids": [_id] + *[_type == "category" && parent._ref == ^._id]._id\n  }\n': CATEGORY_BY_SLUG_QUERY_RESULT;
+    '\n  *[_type == "brand" && slug.current == $slug][0]{ title, "slug": slug.current }\n': BRAND_BY_SLUG_QUERY_RESULT;
+    '*[_type == "category" && defined(slug.current)]{ "slug": slug.current }': CATEGORY_SLUGS_QUERY_RESULT;
   }
 }
 // Lets @sanity/client releases that predate the global registry read it too
