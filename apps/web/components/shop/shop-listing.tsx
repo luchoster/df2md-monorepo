@@ -114,13 +114,10 @@ export async function ShopListing({
         <div className="hidden lg:block">{sidebar}</div>
         <div>
           {products.length ? (
-            <ul className="grid gap-x-5 gap-y-12 sm:grid-cols-2 xl:grid-cols-3">
+            <ul className="grid grid-cols-2 gap-x-3 gap-y-8 md:gap-x-5 xl:grid-cols-3">
               {products.map((p) => (
-                <li
-                  key={p._id}
-                  className="rounded-xl border bg-card py-6 transition-shadow hover:shadow-md"
-                >
-                  <ProductCard product={p} imageClassName="h-[180px] md:h-[220px]" />
+                <li key={p._id}>
+                  <ProductCard product={p} />
                 </li>
               ))}
             </ul>

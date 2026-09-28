@@ -5,6 +5,7 @@ import { stegaClean } from 'next-sanity'
 import { ButtonLink } from '@/components/button-link'
 import { PortableTextRenderer } from '@/components/portable-text-renderer'
 import { SanityImage } from '@/components/sanity-image'
+import { CarouselArrows, CarouselDots } from '@/components/ui/carousel-controls'
 import { useAutoplay, useDots } from '@/components/ui/use-autoplay'
 import { cn } from '@/lib/utils'
 import type { BlockOf } from '../types'
@@ -74,20 +75,20 @@ export default function HeroSlider({ slides, autoplay, intervalMs }: BlockOf<'he
         </div>
       </div>
       {count > 1 && (
-        <div className="hidden justify-center gap-3 py-3 md:flex">
-          {Array.from({ length: count }, (_, i) => (
-            <button
-              key={i}
-              onClick={() => api?.scrollTo(i)}
-              aria-label={`Go to slide ${i + 1}`}
-              aria-current={i === selected}
-              className={cn(
-                'size-1.5 rounded-full bg-black transition-opacity',
-                i === selected ? 'opacity-75' : 'opacity-25'
-              )}
-            />
-          ))}
-        </div>
+        <>
+          <CarouselArrows
+            api={api}
+            label="slide"
+            className="top-1/2 hidden -translate-y-1/2 px-4 md:flex"
+          />
+          <CarouselDots
+            api={api}
+            selected={selected}
+            count={count}
+            tone="light"
+            className="absolute inset-x-0 bottom-4"
+          />
+        </>
       )}
     </section>
   )
