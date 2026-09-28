@@ -1,4 +1,4 @@
-import { StarIcon } from '@sanity/icons'
+import { StarIcon } from '@sanity/icons/Star'
 import { defineField, defineType } from 'sanity'
 import { imageField } from '../objects/image'
 import { legacyGroup } from '../objects/legacy'

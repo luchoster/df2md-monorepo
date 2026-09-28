@@ -1,4 +1,7 @@
-import { CogIcon, FolderIcon, HomeIcon, PackageIcon } from '@sanity/icons'
+import { CogIcon } from '@sanity/icons/Cog'
+import { FolderIcon } from '@sanity/icons/Folder'
+import { HomeIcon } from '@sanity/icons/Home'
+import { PackageIcon } from '@sanity/icons/Package'
 import { orderableDocumentListDeskItem } from '@sanity/orderable-document-list'
 import type { StructureResolver } from 'sanity/structure'
 import { API_VERSION } from './lib/constants'

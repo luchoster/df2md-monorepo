@@ -1,4 +1,4 @@
-import { BlockContentIcon } from '@sanity/icons'
+import { BlockContentIcon } from '@sanity/icons/BlockContent'
 import { defineField, defineType } from 'sanity'
 import { backgroundField, paddingField } from '../shared'
 

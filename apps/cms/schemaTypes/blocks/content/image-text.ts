@@ -1,4 +1,4 @@
-import { SplitHorizontalIcon } from '@sanity/icons'
+import { SplitHorizontalIcon } from '@sanity/icons/SplitHorizontal'
 import { defineField, defineType } from 'sanity'
 import { imageField } from '../../objects/image'
 import { backgroundField, paddingField, ptToText } from '../shared'

@@ -1,4 +1,4 @@
-import { FolderIcon } from '@sanity/icons'
+import { FolderIcon } from '@sanity/icons/Folder'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 import { paddingField } from '../shared'
 

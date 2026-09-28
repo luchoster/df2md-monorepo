@@ -1,4 +1,4 @@
-import { LinkIcon } from '@sanity/icons'
+import { LinkIcon } from '@sanity/icons/Link'
 import { defineField, defineType } from 'sanity'
 import { BUTTON_VARIANTS } from '../../lib/constants'
 

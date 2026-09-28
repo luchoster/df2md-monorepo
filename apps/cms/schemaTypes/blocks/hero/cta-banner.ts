@@ -1,4 +1,4 @@
-import { BulbOutlineIcon } from '@sanity/icons'
+import { BulbOutlineIcon } from '@sanity/icons/BulbOutline'
 import { defineField, defineType } from 'sanity'
 import { imageField } from '../../objects/image'
 import { backgroundField, paddingField, ptToText } from '../shared'

@@ -1,4 +1,4 @@
-import { DocumentIcon } from '@sanity/icons'
+import { DocumentIcon } from '@sanity/icons/Document'
 import { orderRankField, orderRankOrdering } from '@sanity/orderable-document-list'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 import { blocksField } from '../blocks'
