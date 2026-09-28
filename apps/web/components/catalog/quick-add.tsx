@@ -42,7 +42,8 @@ function useQuickAdd(product: CardProduct) {
             .bg('ffffff')
             .url()
         : null,
-      autoship
+      autoship,
+      noDiscounts: !!product.noDiscounts
     })
   return { autoship, setAutoship, addVariant }
 }

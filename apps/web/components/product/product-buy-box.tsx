@@ -200,7 +200,8 @@ export function ProductBuyBox({
                       .bg('ffffff')
                       .url()
                   : null,
-                autoship: purchase === 'autoship'
+                autoship: purchase === 'autoship',
+                noDiscounts: !!product.noDiscounts
               },
               quantity
             )

@@ -1,6 +1,8 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+@custom-variant dark (&:is(.dark *));
+
 /* Design tokens ported from df_web/src/style/_variables.scss — see docs/design/DESIGN-TOKENS.md */
 
 @font-face {
@@ -158,6 +160,24 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
+  --animate-slide-down: slideDown 100ms ease-out;
+  --animate-slide-up: slideUp 100ms ease-out;
+  @keyframes slideDown {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-collapsible-content-height);
+    }
+  }
+  @keyframes slideUp {
+    from {
+      height: var(--radix-collapsible-content-height);
+    }
+    to {
+      height: 0;
+    }
+  }
 }
 
 /* Bootstrap-style centered container: 540 / 720 / 960 / 1140 (+1610 at 1900) with 15px gutters */
