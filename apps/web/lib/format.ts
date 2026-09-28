@@ -13,3 +13,9 @@ export function formatPriceRange(prices: (number | null)[] | null | undefined): 
 
 export const formatPhoneHref = (phone: string) =>
   `tel:+1${phone.replace(/\D/g, '').replace(/^1/, '')}`
+
+/** "702-971-2484" → "(702) 971-2484" */
+export function formatPhone(phone: string) {
+  const d = phone.replace(/\D/g, '').replace(/^1(?=\d{10}$)/, '')
+  return d.length === 10 ? `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6)}` : phone
+}

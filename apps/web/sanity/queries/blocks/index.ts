@@ -1,4 +1,4 @@
-import { contactMapFragment, reviewsEmbedFragment, zipCheckFragment } from './contact'
+import { contactMapFragment, reviewsEmbedFragment } from './contact'
 import { faqListFragment, imageTextFragment, richContentFragment } from './content'
 import { ctaBannerFragment, heroSliderFragment } from './hero'
 import { brandStripFragment, categoryGridFragment, productGridFragment } from './shop'
@@ -14,6 +14,5 @@ export const blocksFragment = /* groq */ `
   ${categoryGridFragment},
   ${brandStripFragment},
   ${contactMapFragment},
-  ${zipCheckFragment},
   ${reviewsEmbedFragment}
 `

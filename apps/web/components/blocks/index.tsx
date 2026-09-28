@@ -1,7 +1,6 @@
 import type { ComponentType } from 'react'
 import ContactMap from './contact/contact-map'
 import ReviewsEmbed from './contact/reviews-embed'
-import ZipCheck from './contact/zip-check'
 import FaqList from './content/faq-list'
 import ImageText from './content/image-text'
 import RichContentBlock from './content/rich-content-block'
@@ -23,7 +22,6 @@ const componentMap: Record<Block['_type'], ComponentType<any>> = {
   'category-grid': CategoryGrid,
   'brand-strip': BrandStrip,
   'contact-map': ContactMap,
-  'zip-check': ZipCheck,
   'reviews-embed': ReviewsEmbed
 }
 

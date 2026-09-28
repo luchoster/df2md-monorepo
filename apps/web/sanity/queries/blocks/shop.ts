@@ -1,4 +1,5 @@
 import { imageFragment } from '../shared/image'
+import { linkFragment } from '../shared/link'
 import { productCardFragment } from '../shared/product-card'
 
 /**
@@ -8,6 +9,7 @@ import { productCardFragment } from '../shared/product-card'
 export const productGridFragment = /* groq */ `
   _type == "product-grid" => {
     _type, _key, heading, source, limit, layout, padding,
+    viewAllLink { ${linkFragment} },
     "products": select(
       source == "manual" => products[]->{ ${productCardFragment} },
       source == "category" => *[_type == "product" && status == "active" && ^.category._ref in categories[]._ref]

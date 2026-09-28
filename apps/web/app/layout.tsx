@@ -1,4 +1,8 @@
 import type { Metadata, Viewport } from 'next'
+import { AddedNotice } from '@/components/cart/added-notice'
+import { CartProvider } from '@/components/cart/cart-provider'
+import { Footer } from '@/components/layout/footer'
+import { Header } from '@/components/layout/header'
 import { SITE_NAME } from '@/sanity/lib/metadata'
 import './globals.css'
 
@@ -14,9 +18,14 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
   return (
     <html lang="en">
       <body className="flex min-h-dvh flex-col">
-        <main id="content" className="flex-1">
-          {children}
-        </main>
+        <CartProvider>
+          <Header />
+          <main id="content" className="flex-1">
+            {children}
+          </main>
+          <Footer />
+          <AddedNotice />
+        </CartProvider>
       </body>
     </html>
   )

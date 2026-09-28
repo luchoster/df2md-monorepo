@@ -10,7 +10,7 @@ export const heroSliderFragment = /* groq */ `
 
 export const ctaBannerFragment = /* groq */ `
   _type == "cta-banner" => {
-    _type, _key, text, background, padding,
+    _type, _key, text, background, decoration, size, padding,
     button { ${linkFragment} },
     image { ${imageFragment} }
   }

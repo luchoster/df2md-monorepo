@@ -1,14 +1,14 @@
 import { imageFragment } from './image'
 
-/** What a product card needs; used by the shop grid and the product-grid block. */
+/** What a product card needs (it carries the size picker and Add to Cart, as on the old site). */
 export const productCardFragment = /* groq */ `
   _id,
   title,
   "slug": slug.current,
   "brand": brand->title,
-  featured,
   mainImage { ${imageFragment} },
-  "prices": variants[price > 0].price,
-  "compareAt": variants[defined(compareAtPrice)].compareAtPrice,
-  "inStock": count(variants[inStock != false]) > 0
+  optionName,
+  defaultVariantKey,
+  autoshipEligible,
+  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock }
 `
