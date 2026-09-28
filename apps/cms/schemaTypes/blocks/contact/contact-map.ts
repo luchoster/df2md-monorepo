@@ -27,6 +27,27 @@ export default defineType({
       type: 'url',
       validation: (rule) => rule.uri({ scheme: ['https'] })
     }),
+    defineField({
+      name: 'showForm',
+      title: 'Show contact form',
+      description: 'Name, email and question, emailed to the shop',
+      type: 'boolean',
+      initialValue: false
+    }),
+    defineField({
+      name: 'formHeading',
+      type: 'string',
+      initialValue: 'Ask us anything',
+      hidden: ({ parent }) => !parent?.showForm
+    }),
+    defineField({
+      name: 'recipientEmail',
+      title: 'Send questions to',
+      description: 'Empty = Site settings → Contact email',
+      type: 'string',
+      validation: (rule) => rule.email(),
+      hidden: ({ parent }) => !parent?.showForm
+    }),
     paddingField
   ],
   preview: {

@@ -2,7 +2,11 @@ import { EnvelopeIcon } from '@sanity/icons/Envelope'
 import { defineField, defineType } from 'sanity'
 import { backgroundField, paddingField } from '../shared'
 
-/** Replaces zipcode-form.js + zipcode.php. The zip list lives in Site settings. */
+/**
+ * Replaces zipcode-form.js + zipcode.php: name, email, phone, a zip dropdown (Site settings →
+ * Delivery zip codes, plus "Other") and a message. Every submission is emailed to the shop; the
+ * visitor sees the in-area message for a listed zip and the outside-area message for "Other".
+ */
 export default defineType({
   name: 'zip-check',
   title: 'Delivery zip check',
@@ -11,21 +15,23 @@ export default defineType({
   fields: [
     defineField({ name: 'heading', type: 'string', initialValue: 'Do we deliver to you?' }),
     defineField({ name: 'text', type: 'simple-content' }),
-    defineField({ name: 'submitLabel', type: 'string', initialValue: 'Check' }),
+    defineField({ name: 'submitLabel', type: 'string', initialValue: 'Check my zip code' }),
     defineField({
-      name: 'successMessage',
+      name: 'inAreaMessage',
       title: 'Message when we deliver',
-      type: 'simple-content'
+      type: 'simple-content',
+      description: 'Shown after submitting with one of the listed zip codes'
     }),
     defineField({
       name: 'outsideAreaMessage',
       title: 'Message when outside the area',
-      type: 'simple-content'
+      type: 'simple-content',
+      description: 'Shown after submitting with "Other" (a delivery request)'
     }),
     defineField({
       name: 'recipientEmail',
-      title: 'Notify this email',
-      description: 'Every submission is emailed here. Empty = Site settings contact email.',
+      title: 'Send requests to',
+      description: 'Empty = Site settings → Contact email',
       type: 'string',
       validation: (rule) => rule.email()
     }),

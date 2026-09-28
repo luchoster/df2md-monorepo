@@ -48,6 +48,12 @@ export default defineType({
           validation: (rule) => rule.email()
         }),
         defineField({ name: 'address', type: 'text', rows: 3 }),
+        defineField({
+          name: 'mapUrl',
+          title: 'Map link',
+          description: 'Google Maps link for "View map"',
+          type: 'url'
+        }),
         defineField({ name: 'hours', type: 'text', rows: 3 })
       ]
     }),
@@ -60,6 +66,13 @@ export default defineType({
       group: 'delivery',
       of: [defineArrayMember({ type: 'string', validation: (rule) => rule.regex(/^\d{5}$/) })],
       options: { layout: 'tags' }
+    }),
+    defineField({
+      name: 'deliveryAreaLabel',
+      title: 'Delivery area (text)',
+      type: 'string',
+      group: 'delivery',
+      initialValue: 'Henderson, Las Vegas and Boulder City'
     }),
     defineField({
       name: 'autoship',
