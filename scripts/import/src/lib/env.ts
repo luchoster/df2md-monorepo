@@ -1,13 +1,34 @@
+import { existsSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-/** Environment for the import pipeline. Bun loads the repo-root .env automatically. */
+export const ROOT = join(import.meta.dir, '..', '..')
+const REPO_ROOT = join(ROOT, '..', '..')
+
+/**
+ * Bun only auto-loads the .env of the directory it runs in (scripts/import), so load the
+ * repo-root .env explicitly. Variables already set in the shell win.
+ */
+function loadRootEnv() {
+  const path = join(REPO_ROOT, '.env')
+  if (!existsSync(path)) return
+  for (const line of readFileSync(path, 'utf8').split(/\r?\n/)) {
+    const m = /^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)?\s*$/.exec(line)
+    if (!m) continue
+    let value = (m[2] ?? '').trim()
+    if (/^(['"]).*\1$/.test(value)) value = value.slice(1, -1)
+    else value = value.replace(/\s+#.*$/, '')
+    if (process.env[m[1]!] === undefined) process.env[m[1]!] = value
+  }
+}
+loadRootEnv()
+
+/** Environment for the import pipeline. */
 function required(name: string): string {
   const value = process.env[name]
   if (!value) throw new Error(`Missing env var ${name} (see .env.example)`)
   return value
 }
 
-export const ROOT = join(import.meta.dir, '..', '..')
 export const OUT_DIR = join(ROOT, 'out')
 export const UPLOADS_DIR = process.env.WP_UPLOADS_DIR ?? join(ROOT, 'uploads')
 /** ~/Sites/dogfood/backups sits next to the repo, not inside it. */
