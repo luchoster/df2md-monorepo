@@ -2,8 +2,11 @@ import { defineField } from 'sanity'
 import contactMap from './contact/contact-map'
 import reviewsEmbed from './contact/reviews-embed'
 import faqList from './content/faq-list'
+import featureGrid from './content/feature-grid'
+import featureSplit from './content/feature-split'
 import imageText from './content/image-text'
 import richContentBlock from './content/rich-content-block'
+import steps from './content/steps'
 import ctaBanner from './hero/cta-banner'
 import heroSlider from './hero/hero-slider'
 import brandStrip from './shop/brand-strip'
@@ -17,6 +20,9 @@ export const blocks = [
   richContentBlock,
   imageText,
   faqList,
+  featureGrid,
+  featureSplit,
+  steps,
   productGrid,
   categoryGrid,
   brandStrip,
@@ -26,7 +32,11 @@ export const blocks = [
 
 const groups = [
   { name: 'hero', title: 'Hero', of: ['hero-slider', 'cta-banner'] },
-  { name: 'content', title: 'Content', of: ['rich-content-block', 'image-text', 'faq-list'] },
+  {
+    name: 'content',
+    title: 'Content',
+    of: ['rich-content-block', 'feature-grid', 'feature-split', 'steps', 'image-text', 'faq-list']
+  },
   { name: 'shop', title: 'Shop', of: ['product-grid', 'category-grid', 'brand-strip'] },
   { name: 'contact', title: 'Contact', of: ['contact-map', 'reviews-embed'] }
 ]

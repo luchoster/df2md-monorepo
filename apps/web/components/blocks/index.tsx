@@ -2,8 +2,11 @@ import type { ComponentType } from 'react'
 import ContactMap from './contact/contact-map'
 import ReviewsEmbed from './contact/reviews-embed'
 import FaqList from './content/faq-list'
+import FeatureGrid from './content/feature-grid'
+import FeatureSplit from './content/feature-split'
 import ImageText from './content/image-text'
 import RichContentBlock from './content/rich-content-block'
+import Steps from './content/steps'
 import CtaBanner from './hero/cta-banner'
 import HeroSlider from './hero/hero-slider'
 import BrandStrip from './shop/brand-strip'
@@ -18,6 +21,9 @@ const componentMap: Record<Block['_type'], ComponentType<any>> = {
   'rich-content-block': RichContentBlock,
   'image-text': ImageText,
   'faq-list': FaqList,
+  'feature-grid': FeatureGrid,
+  'feature-split': FeatureSplit,
+  steps: Steps,
   'product-grid': ProductGrid,
   'category-grid': CategoryGrid,
   'brand-strip': BrandStrip,

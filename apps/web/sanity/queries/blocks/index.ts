@@ -1,5 +1,12 @@
 import { contactMapFragment, reviewsEmbedFragment } from './contact'
-import { faqListFragment, imageTextFragment, richContentFragment } from './content'
+import {
+  faqListFragment,
+  featureGridFragment,
+  featureSplitFragment,
+  imageTextFragment,
+  richContentFragment,
+  stepsFragment
+} from './content'
 import { ctaBannerFragment, heroSliderFragment } from './hero'
 import { brandStripFragment, categoryGridFragment, productGridFragment } from './shop'
 
@@ -10,6 +17,9 @@ export const blocksFragment = /* groq */ `
   ${richContentFragment},
   ${imageTextFragment},
   ${faqListFragment},
+  ${featureGridFragment},
+  ${featureSplitFragment},
+  ${stepsFragment},
   ${productGridFragment},
   ${categoryGridFragment},
   ${brandStripFragment},
