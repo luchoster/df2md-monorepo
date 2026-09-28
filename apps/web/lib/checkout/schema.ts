@@ -71,7 +71,7 @@ export type CheckoutQuote = {
 }
 
 export type CheckoutResponse =
-  | { ok: true; url: string }
+  | { ok: true; clientSecret: string; quote: CheckoutQuote }
   | { ok: false; error: 'invalid'; issues: { path: string; message: string }[] }
   | { ok: false; error: 'cart_changed'; message: string; problems: string[] }
   | { ok: false; error: 'payments_not_configured'; quote: CheckoutQuote }

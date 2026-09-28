@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertTriangle, Lock, MapPin, Repeat, Store, Truck } from 'lucide-react'
+import { AlertTriangle, Lock, MapPin, Pencil, Repeat, Store, Truck } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -24,6 +24,7 @@ import { formatDeliveryDate, formatSlot, timeSlots } from '@/lib/delivery'
 import { formatPrice } from '@/lib/format'
 import { computeTotals, describeSchedule, fromCents, toCents } from '@/lib/pricing'
 import { cn } from '@/lib/utils'
+import { PaymentStep } from './payment-step'
 
 export type CheckoutSettings = {
   discountPercent: number
@@ -51,6 +52,8 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
   const [verified, setVerified] = useState<CheckoutQuote | null>(null)
   const [message, setMessage] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  /** Set once the server has verified the order and created the Stripe session */
+  const [clientSecret, setClientSecret] = useState<string | null>(null)
 
   if (!ready) return <CartSkeleton />
   if (!items.length)
@@ -122,7 +125,11 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
       })
       const data = (await res.json()) as CheckoutResponse
       if (data.ok) {
-        window.location.assign(data.url)
+        setVerified(data.quote)
+        setClientSecret(data.clientSecret)
+        requestAnimationFrame(() =>
+          document.getElementById('payment')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        )
         return
       }
       if (data.error === 'invalid') {
@@ -150,7 +157,7 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
           <div className="space-y-8 lg:col-span-2">
             <h1 className="text-3xl md:text-4xl">Checkout</h1>
 
-            <Panel title="Contact">
+            <Panel title="Contact" disabled={!!clientSecret}>
               <div className="grid gap-4 sm:grid-cols-2">
                 <Text
                   name="name"
@@ -176,7 +183,7 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
               </div>
             </Panel>
 
-            <Panel title="Delivery">
+            <Panel title="Delivery" disabled={!!clientSecret}>
               <RadioGroup
                 value={method}
                 onValueChange={(v) => setMethod(v as 'delivery' | 'pickup')}
@@ -275,16 +282,31 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
               </div>
             </Panel>
 
-            <Panel title="Payment">
-              <p className="flex items-start gap-3 text-sm">
-                <Lock className="mt-0.5 size-4 shrink-0 text-primary" />
-                <span>
-                  You'll pay securely with Stripe on the next step. Returning customers see their
-                  saved cards there.
-                  {hasAutoship &&
-                    ' Your card is saved for Autoship deliveries; you can pause or cancel anytime.'}
-                </span>
-              </p>
+            <Panel title="Payment" id="payment">
+              {clientSecret ? (
+                <>
+                  <PaymentStep clientSecret={clientSecret} />
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="mt-3 text-muted-foreground"
+                    onClick={() => setClientSecret(null)}
+                  >
+                    <Pencil /> Edit details
+                  </Button>
+                </>
+              ) : (
+                <p className="flex items-start gap-3 text-sm">
+                  <Lock className="mt-0.5 size-4 shrink-0 text-primary" />
+                  <span>
+                    Continue to payment and the secure card form appears right here. Payments are
+                    processed by Stripe; returning customers can use their saved cards.
+                    {hasAutoship &&
+                      ' Your card is saved for Autoship deliveries; you can pause or cancel anytime.'}
+                  </span>
+                </p>
+              )}
             </Panel>
           </div>
 
@@ -367,9 +389,15 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
               )}
               {message && <Notice>{message}</Notice>}
 
-              <Button type="submit" size="lg" className="w-full text-base" disabled={submitting}>
-                {submitting ? 'Checking your order…' : 'Continue to payment'}
-              </Button>
+              {clientSecret ? (
+                <p className="rounded-lg bg-accent px-3 py-2 text-center text-sm font-semibold text-accent-foreground">
+                  Order verified. Complete your payment below.
+                </p>
+              ) : (
+                <Button type="submit" size="lg" className="w-full text-base" disabled={submitting}>
+                  {submitting ? 'Checking your order…' : 'Continue to payment'}
+                </Button>
+              )}
               <p className="text-center text-xs text-muted-foreground">
                 By placing your order you agree to our{' '}
                 <Link href="/terms-conditions" className="underline">
@@ -385,9 +413,23 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
   )
 }
 
-function Panel({ title, children }: { title: string; children: React.ReactNode }) {
+function Panel({
+  title,
+  children,
+  disabled,
+  id
+}: {
+  title: string
+  children: React.ReactNode
+  disabled?: boolean
+  id?: string
+}) {
   return (
-    <fieldset className="rounded-xl border bg-accent/40 p-4 sm:p-6">
+    <fieldset
+      id={id}
+      disabled={disabled}
+      className="scroll-mt-6 rounded-xl border bg-accent/40 p-4 transition-opacity disabled:opacity-60 sm:p-6"
+    >
       <legend className="sr-only">{title}</legend>
       <h2 className="mb-5 text-xl">{title}</h2>
       {children}

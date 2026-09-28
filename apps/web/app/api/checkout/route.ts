@@ -9,8 +9,10 @@ const reply = (body: CheckoutResponse, status = 200) => NextResponse.json(body, 
 
 /**
  * Validates the checkout form, re-prices the cart from Sanity and creates a Stripe Checkout
- * Session (subscription mode when anything is on Autoship; one-time items ride on the first
- * invoice). Without STRIPE_SECRET_KEY it returns the verified quote and "payments_not_configured".
+ * Session in `elements` UI mode: the Payment Element renders on our /checkout page (no redirect
+ * to Stripe). Subscription mode when anything is on Autoship; one-time items ride on the first
+ * invoice. Returns the session's client secret. Without STRIPE_SECRET_KEY or the publishable key
+ * it returns the verified quote and "payments_not_configured".
  */
 export async function POST(req: NextRequest) {
   const parsed = checkoutRequestSchema.safeParse(await req.json().catch(() => null))
@@ -35,7 +37,8 @@ export async function POST(req: NextRequest) {
         { ok: false, error: 'cart_changed', message: 'Some items in your cart changed.', problems },
         409
       )
-    if (!stripe) return reply({ ok: false, error: 'payments_not_configured', quote }, 503)
+    if (!stripe || !process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
+      return reply({ ok: false, error: 'payments_not_configured', quote }, 503)
 
     const origin = process.env.NEXT_PUBLIC_SITE_URL || req.nextUrl.origin
     const hasAutoship = quote.lines.some((l) => l.autoship)
@@ -92,6 +95,7 @@ export async function POST(req: NextRequest) {
         : null
 
     const session = await stripe.checkout.sessions.create({
+      ui_mode: 'elements',
       mode: hasAutoship ? 'subscription' : 'payment',
       line_items: lineItems,
       ...(customer ? { customer: customer.id } : { customer_email: input.customer.email }),
@@ -102,11 +106,11 @@ export async function POST(req: NextRequest) {
       ...(hasAutoship
         ? { subscription_data: { metadata } }
         : { payment_intent_data: { metadata, setup_future_usage: 'off_session' } }),
-      success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${origin}/checkout`
+      // only used when a payment method needs a redirect (e.g. some bank authentications)
+      return_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`
     })
-    if (!session.url) throw new Error('Stripe did not return a checkout URL')
-    return reply({ ok: true, url: session.url })
+    if (!session.client_secret) throw new Error('Stripe did not return a client secret')
+    return reply({ ok: true, clientSecret: session.client_secret, quote })
   } catch (error) {
     console.error('checkout failed', error)
     return reply(
