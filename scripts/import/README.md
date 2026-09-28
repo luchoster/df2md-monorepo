@@ -9,7 +9,7 @@ mkdir -p uploads && tar xzf ../../../backups/restore-clean-2026-09-19.tgz -C upl
 bun run extract     # dump → out/wp.json + out/customers.json    (no MySQL/Docker needed)
 bun run transform   # wp.json → out/documents.json + out/warnings.json   (offline)
 bun run validate    # dry-run load + `sanity documents validate` against the Studio schema (needs `sanity login`)
-bun run load        # → SANITY_DATASET (default staging); add --production for the live dataset
+bun run load        # → SANITY_DATASET (default production; the site isn't live, so there's no staging)
 bun run verify      # GROQ counts, dangling refs, 20 sampled products diffed against wp.json
 ```
 

@@ -1,11 +1,10 @@
 /**
  * Step 5 of the plan (§3): out/documents.json → Sanity.
  *
- *   bun run load [--dry-run] [--offline] [--production] [--fetch-remote]
+ *   bun run load [--dry-run] [--offline] [--fetch-remote]
  *
  * --dry-run       resolve ids and images, write nothing (uploads skipped)
  * --offline       with --dry-run: don't query Sanity either (every document counts as new)
- * --production    required when SANITY_DATASET=production
  * --fetch-remote  download images missing from uploads/ from their original URL
  *
  * Idempotent: documents are matched on their legacy key (`legacy.wpId`, `legacy.termId`,

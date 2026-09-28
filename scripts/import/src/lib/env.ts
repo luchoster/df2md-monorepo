@@ -18,7 +18,7 @@ export const TABLE_PREFIX = process.env.WP_TABLE_PREFIX ?? 'df_'
 /** Sanity settings are only read by the steps that talk to Sanity. */
 export const sanityEnv = () => ({
   projectId: required('SANITY_PROJECT_ID'),
-  dataset: process.env.SANITY_DATASET ?? 'staging',
+  dataset: process.env.SANITY_DATASET ?? 'production',
   token: required('SANITY_API_WRITE_TOKEN'),
   apiVersion: '2026-09-01'
 })
