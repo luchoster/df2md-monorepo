@@ -1,0 +1,19 @@
+{
+  "name": "@df2md/import",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "description": "WordPress → Sanity import pipeline (see docs/REBUILD-PLAN.md §3)",
+  "scripts": {
+    "extract": "bun run src/01-extract.ts",
+    "transform": "bun run src/02-transform.ts",
+    "load": "bun run src/03-load.ts",
+    "verify": "bun run src/04-verify.ts",
+    "stripe:sync": "bun run src/05-stripe-sync.ts",
+    "lint": "biome check .",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "bun-types": "^1.4.2"
+  }
+}

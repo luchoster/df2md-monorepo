@@ -1,0 +1,30 @@
+{
+  "name": "dogfood2mydoor",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*",
+    "tooling/*",
+    "scripts/*"
+  ],
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev --parallel",
+    "dev:web": "turbo dev --filter=@df2md/web",
+    "dev:studio": "turbo dev --filter=@df2md/cms",
+    "start:web": "turbo start --filter=@df2md/web",
+    "typegen": "turbo typegen --filter=@df2md/cms",
+    "lint": "turbo lint",
+    "typecheck": "turbo typecheck",
+    "format": "biome format --write .",
+    "check": "biome check --write .",
+    "clean": "git clean -xdf node_modules",
+    "clean:workspaces": "turbo clean"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.14",
+    "turbo": "2.11.5",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "bun@1.2.19"
+}

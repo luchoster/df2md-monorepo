@@ -1,0 +1,37 @@
+# dependencies
+node_modules
+.pnp
+.pnp.js
+
+# builds
+.next/
+out/
+dist/
+build/
+.turbo/
+next-env.d.ts
+*.tsbuildinfo
+
+# sanity
+.sanity/
+apps/cms/schema.json
+
+# env
+.env
+.env.*
+!.env.example
+
+# import pipeline artefacts (large / regenerated)
+scripts/import/out/
+scripts/import/uploads/
+scripts/import/data/*.tgz
+
+# misc
+.DS_Store
+*.pem
+npm-debug.log*
+coverage
+
+# agent guidance lives one level up in ~/Sites/dogfood, not in the repo (turbo/next may regenerate these)
+AGENTS.md
+CLAUDE.md

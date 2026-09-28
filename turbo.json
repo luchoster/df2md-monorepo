@@ -1,0 +1,36 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "globalDependencies": ["**/.env"],
+  "ui": "stream",
+  "tasks": {
+    "topo": { "dependsOn": ["^topo"] },
+    "build": {
+      "env": [
+        "SANITY_PROJECT_ID",
+        "SANITY_DATASET",
+        "SANITY_API_VERSION",
+        "SANITY_API_READ_TOKEN",
+        "SANITY_API_WRITE_TOKEN",
+        "NEXT_PUBLIC_SANITY_PROJECT_ID",
+        "NEXT_PUBLIC_SANITY_DATASET",
+        "STRIPE_SECRET_KEY",
+        "STRIPE_WEBHOOK_SECRET",
+        "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY",
+        "SUPABASE_URL",
+        "SUPABASE_SERVICE_ROLE_KEY",
+        "NEXT_PUBLIC_SUPABASE_URL",
+        "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+        "RESEND_API_KEY"
+      ],
+      "inputs": ["$TURBO_DEFAULT$", ".env"],
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**", "next-env.d.ts", "dist/**"]
+    },
+    "dev": { "inputs": ["$TURBO_DEFAULT$", ".env"], "persistent": true, "cache": false },
+    "start": { "cache": false },
+    "typegen": { "cache": false, "outputs": ["schema.json", "../web/sanity.types.ts"] },
+    "lint": { "dependsOn": ["^topo"] },
+    "typecheck": { "dependsOn": ["^topo"], "outputs": ["node_modules/.cache/tsbuildinfo.json"] },
+    "clean": { "cache": false }
+  }
+}
