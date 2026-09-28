@@ -10,6 +10,7 @@ export const BACKGROUND_COLORS = [
   { title: 'Lime', value: 'brand-lime' },
   { title: 'Navy', value: 'navy' },
   { title: 'Sky blue', value: 'sky' },
+  { title: 'Band blue', value: 'sky-band' },
   { title: 'Teal', value: 'teal' },
   { title: 'Ink (dark blue)', value: 'ink' },
   { title: 'Orange', value: 'accent' },
@@ -19,7 +20,8 @@ export const BACKGROUND_COLORS = [
 
 export const BUTTON_VARIANTS = [
   { title: 'Primary (green)', value: 'default' },
-  { title: 'Secondary (orange)', value: 'secondary' },
+  { title: 'Secondary (navy)', value: 'secondary' },
+  { title: 'Dark green', value: 'dark' },
   { title: 'Outline', value: 'outline' },
   { title: 'Link', value: 'link' }
 ]

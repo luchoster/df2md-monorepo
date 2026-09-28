@@ -7,6 +7,8 @@
  * --offline       with --dry-run: don't query Sanity either (every document counts as new)
  * --fetch-remote  download images missing from uploads/ from their original URL
  * --no-images     import even though uploads/ is missing (documents get no images)
+ * --overwrite-content  also replace pages, the home page and site settings that already exist
+ *                      (by default those are only created, so Studio edits survive a re-import)
  *
  * Idempotent: documents are matched on their legacy key (`legacy.wpId`, `legacy.termId`,
  * `legacy.acfValue`); a match is replaced in place, anything else gets a fresh random `_id`.
@@ -226,10 +228,21 @@ if (dryRun || !client) {
   )
   process.exit(0)
 }
+// Catalog documents mirror WordPress and are replaced; editorial ones are edited in Studio.
+const EDITORIAL = new Set(['page', 'homePage', 'siteSettings'])
+const overwriteContent = argFlag('overwrite-content')
+const skipped = final.filter((d) => EDITORIAL.has(d._type)).length
+if (!overwriteContent)
+  console.log(
+    `${skipped} pages/singletons are created only if missing (--overwrite-content to replace)`
+  )
 const BATCH = 50
 for (let i = 0; i < final.length; i += BATCH) {
   const tx = client.transaction()
-  for (const doc of final.slice(i, i + BATCH)) tx.createOrReplace(doc as any)
+  for (const doc of final.slice(i, i + BATCH)) {
+    if (EDITORIAL.has(doc._type) && !overwriteContent) tx.createIfNotExists(doc as any)
+    else tx.createOrReplace(doc as any)
+  }
   await tx.commit({ visibility: 'async' })
   console.log(`  committed ${Math.min(i + BATCH, final.length)}/${final.length}`)
 }

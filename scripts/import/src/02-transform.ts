@@ -21,6 +21,8 @@ const warnings: Warning[] = []
 const warn = (where: string, message: string) => warnings.push({ where, message })
 const importedAt = new Date().toISOString()
 const key = () => randomUUID().replace(/-/g, '').slice(0, 12)
+const STORE_MAP_EMBED =
+  'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3227.08526055229!2d-115.05681068445038!3d36.018211319023706!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x80c8d19b15fb659d%3A0xd8f1ad3a9ba38e5d!2sDog+Food+2+My+Door!5e0!3m2!1sen!2sus!4v1516563493149'
 
 const slugify = (s: string) =>
   s
@@ -299,6 +301,7 @@ const homeDoc: Doc = {
       _type: 'product-grid',
       _key: key(),
       heading: 'Best Sellers',
+      viewAllLink: { ...linkTo('View All', '/shop'), buttonVariant: 'link' },
       source: 'featured',
       limit: 16,
       layout: 'carousel',
@@ -317,7 +320,24 @@ const homeDoc: Doc = {
           }
         ]
       : []),
-    { _type: 'contact-map', _key: key(), heading: 'Contact Us', padding }
+    {
+      _type: 'contact-map',
+      _key: key(),
+      mapEmbedUrl: STORE_MAP_EMBED,
+      padding: { _type: 'section-padding', top: 'none', bottom: 'none' }
+    },
+    {
+      _type: 'cta-banner',
+      _key: key(),
+      size: 'band',
+      decoration: 'badge',
+      background: 'sky-band',
+      text: textToSimple(
+        'Sign up today and receive 20% off, when you set your automatic shipment!'
+      ),
+      button: linkTo('Sign Up', '/account'),
+      padding: { _type: 'section-padding', top: 'none', bottom: 'none' }
+    }
   ],
   ...(wp.home.seo.title || wp.home.seo.description
     ? { meta: { _type: 'meta', ...wp.home.seo } }
@@ -325,32 +345,116 @@ const homeDoc: Doc = {
 }
 
 // ------------------------------------------------------------------ site settings
-const menuItems = (name: string) =>
-  (wp.menus[name] ?? []).map((m) => ({
-    _type: 'menuItem',
-    _key: key(),
-    label: m.label,
-    link: { ...linkTo(m.label, m.url), target: m.target === '_blank' }
-  }))
+// Mirrors the pre-maintenance header/footer (see docs/design/OLD-APP-SPEC.md §2 and the
+// screenshots): WordPress only had a 4-item menu, the category bar and footer lived in React.
+const categoryLink = (label: string, slug: string) => {
+  const c = wp.categories.find((x) => x.slug === slug)
+  if (!c) {
+    warn('site settings', `category "${slug}" not found for the menu`)
+    return linkTo(label, `/shop/category/${slug}`)
+  }
+  return {
+    ...linkTo(label, ''),
+    linkType: 'internal',
+    href: undefined,
+    internal: ref('category', c.termId)
+  }
+}
+const pageLink = (label: string, slug: string) => {
+  const pg = wp.pages.find((x) => x.slug === slug)
+  if (!pg) return linkTo(label, `/${slug}`)
+  return {
+    ...linkTo(label, ''),
+    linkType: 'internal',
+    href: undefined,
+    internal: ref('page', pg.wpId)
+  }
+}
+const menuLink = (label: string, link: Record<string, unknown>) => ({
+  _type: 'menuLink',
+  _key: key(),
+  label,
+  link
+})
+const navItem = (label: string, link: Record<string, unknown>, dropdown = 'none') => ({
+  _type: 'navItem',
+  _key: key(),
+  label,
+  link,
+  dropdown
+})
 
 const settingsDoc: Doc = {
   _id: 'siteSettings',
   _type: 'siteSettings',
-  mainMenu: menuItems('Main Menu'),
-  footerMenu: menuItems('Footer'),
+  mainMenu: [
+    navItem('Shop by Brand', linkTo('Shop by Brand', '/shop'), 'brands'),
+    navItem('Accessories', categoryLink('Accessories', 'home-accessories')),
+    navItem('Food', categoryLink('Food', 'dog-food'), 'children'),
+    navItem('Kitty Corner', categoryLink('Kitty Corner', 'cat')),
+    navItem('Toys', categoryLink('Toys', 'toys')),
+    navItem('Treats', categoryLink('Treats', 'treats'))
+  ],
+  footerColumns: [
+    {
+      _type: 'footerColumn',
+      _key: key(),
+      title: 'Shop',
+      links: [
+        menuLink('Shop by Brand', linkTo('Shop by Brand', '/shop')),
+        menuLink('Weekly Deals', pageLink('Weekly Deals', 'weekly-deals'))
+      ]
+    },
+    {
+      _type: 'footerColumn',
+      _key: key(),
+      title: 'Account',
+      links: [
+        menuLink('Orders', linkTo('Orders', '/account/orders')),
+        menuLink('My Account', linkTo('My Account', '/account'))
+      ]
+    },
+    {
+      _type: 'footerColumn',
+      _key: key(),
+      title: 'About',
+      links: [
+        menuLink('About Us', pageLink('About Us', 'about')),
+        menuLink('FAQ', pageLink('FAQ', 'faq'))
+      ]
+    }
+  ],
+  legalLinks: [
+    menuLink('Privacy Policy', pageLink('Privacy Policy', 'privacy-policy')),
+    menuLink('Return Policy', pageLink('Return Policy', 'return-policy'))
+  ],
+  social: {
+    instagram: 'https://www.instagram.com/dogfood2mydoor/',
+    facebook: 'https://www.facebook.com/dogfood2mydoor/'
+  },
+  announcement: {
+    active: true,
+    text: textToSimple('SAVE 20% TODAY- First Time Auto Ship.'),
+    button: { ...linkTo('Get Started!', '/shop'), buttonVariant: 'dark' }
+  },
   contact: {
     phone: '702-971-2484',
     email: 'info@dogfood2mydoor.com',
     address: '1550 W. Horizon Ridge Pkwy, Suite N\nHenderson, NV 89012'
   },
-  // The old zipcode-form.js dropdown (plus "Other", which the storefront adds itself)
-  deliveryZipCodes: ['89141', '89044', '89052', '89012', '89074', '89014', '89015', '89002'],
-  autoship: {
-    firstOrderDiscountPercent: 20,
-    intervals: ['day', 'week', 'month'],
-    reminderDaysBefore: 3
+  delivery: {
+    allowTimeRequest: true,
+    timeWindow: { start: '08:00', end: '18:00', slotMinutes: 30 },
+    pickupEnabled: true,
+    pickupNote: 'Your items will be available for pick up in 1 hour or less.',
+    noDeliveryDays: [],
+    holidays: [],
+    // The old checkout zip dropdown (plus "Other"); zip checks are on hold
+    zipCodes: ['89141', '89044', '89052', '89012', '89074', '89014', '89015', '89002'],
+    areaLabel: 'Henderson, Las Vegas and Boulder City'
   },
-  announcement: { active: false }
+  autoship: { firstOrderDiscountPercent: 20, reminderDaysBefore: 3 },
+  taxRatePercent: 8.25
 }
 
 // ------------------------------------------------------------------ write

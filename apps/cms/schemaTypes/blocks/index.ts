@@ -1,7 +1,6 @@
 import { defineField } from 'sanity'
 import contactMap from './contact/contact-map'
 import reviewsEmbed from './contact/reviews-embed'
-import zipCheck from './contact/zip-check'
 import faqList from './content/faq-list'
 import imageText from './content/image-text'
 import richContentBlock from './content/rich-content-block'
@@ -11,6 +10,7 @@ import brandStrip from './shop/brand-strip'
 import categoryGrid from './shop/category-grid'
 import productGrid from './shop/product-grid'
 
+// zip-check (./contact/zip-check.ts) is on hold until the delivery area is confirmed.
 export const blocks = [
   heroSlider,
   ctaBanner,
@@ -21,7 +21,6 @@ export const blocks = [
   categoryGrid,
   brandStrip,
   contactMap,
-  zipCheck,
   reviewsEmbed
 ]
 
@@ -29,7 +28,7 @@ const groups = [
   { name: 'hero', title: 'Hero', of: ['hero-slider', 'cta-banner'] },
   { name: 'content', title: 'Content', of: ['rich-content-block', 'image-text', 'faq-list'] },
   { name: 'shop', title: 'Shop', of: ['product-grid', 'category-grid', 'brand-strip'] },
-  { name: 'contact', title: 'Contact', of: ['contact-map', 'zip-check', 'reviews-embed'] }
+  { name: 'contact', title: 'Contact', of: ['contact-map', 'reviews-embed'] }
 ]
 
 /** The page-builder field shared by `page` and `homePage` (plan §2.5b). */

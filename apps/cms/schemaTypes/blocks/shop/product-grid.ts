@@ -10,6 +10,12 @@ export default defineType({
   fields: [
     defineField({ name: 'heading', type: 'string' }),
     defineField({
+      name: 'viewAllLink',
+      title: '"View all" link',
+      description: 'Shown next to the heading',
+      type: 'link'
+    }),
+    defineField({
       name: 'source',
       type: 'string',
       initialValue: 'featured',
