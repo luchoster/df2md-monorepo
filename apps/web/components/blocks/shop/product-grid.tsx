@@ -27,7 +27,7 @@ export default function ProductGrid({
           <div className="flex flex-wrap items-baseline gap-x-5">
             <h2 className="mb-0 text-[32px] md:text-[40px]">{heading}</h2>
             {viewAll && (
-              <Link href={viewAll} className="text-xl font-normal">
+              <Link href={viewAll} className="text-xl font-normal text-link hover:underline">
                 {viewAllLink?.title || 'View All'}
               </Link>
             )}

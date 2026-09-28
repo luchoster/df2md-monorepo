@@ -1,4 +1,5 @@
 import { Search } from 'lucide-react'
+import { Input } from '@/components/ui/input'
 import { cn } from '@/lib/utils'
 
 /** Plain GET form: works without JS and lands on /shop?q=… (the old site used ?starts_with=). */
@@ -9,12 +10,12 @@ export function SearchForm({ className, id = 'site-search' }: { className?: stri
         <label htmlFor={id} className="sr-only">
           Search products
         </label>
-        <input
+        <Input
           id={id}
           name="q"
           type="search"
           placeholder="Search"
-          className="h-14 w-full rounded-lg border border-white bg-white pr-12 pl-4 text-base font-normal text-ink-900 placeholder:text-body focus:outline-2 focus:outline-sky"
+          className="h-12 rounded-lg border-white bg-white pr-12 pl-4 text-base text-foreground shadow-none md:h-14 md:text-base"
         />
         <button
           type="submit"

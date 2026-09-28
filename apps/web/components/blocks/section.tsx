@@ -28,7 +28,7 @@ export const backgrounds: Record<string, string> = {
   'sky-band': 'bg-sky-band text-white [&_h2]:text-white [&_h3]:text-white [&_a]:text-white',
   teal: 'bg-teal text-white [&_h2]:text-white [&_h3]:text-white [&_a]:text-white',
   ink: 'bg-ink text-white [&_h2]:text-white [&_h3]:text-white [&_a]:text-white',
-  accent: 'bg-accent text-white [&_h2]:text-white [&_h3]:text-white',
+  accent: 'bg-orange text-white [&_h2]:text-white [&_h3]:text-white',
   sun: 'bg-sun text-ink-900',
   'sun-soft': 'bg-sun-soft text-ink-900'
 }

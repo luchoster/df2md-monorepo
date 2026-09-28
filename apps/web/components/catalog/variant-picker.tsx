@@ -5,6 +5,10 @@ import Link from 'next/link'
 import { useId, useState } from 'react'
 import { useCart } from '@/components/cart/cart-provider'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { formatPrice } from '@/lib/format'
 import { cn } from '@/lib/utils'
 import { urlFor } from '@/sanity/lib/image'
@@ -81,11 +85,11 @@ export function VariantPicker({
               onClick={() => setSelectedKey(v._key)}
               aria-pressed={v._key === selectedKey}
               className={cn(
-                'rounded border px-3 py-1.5 font-bold capitalize transition-colors',
+                'rounded-md border px-3 py-1.5 text-sm font-semibold capitalize transition-colors',
                 v._key === selectedKey
-                  ? 'border-sky bg-navy text-white'
-                  : 'border-transparent text-ink-900 hover:border-line',
-                v.inStock === false && 'text-muted line-through'
+                  ? 'border-secondary bg-secondary text-secondary-foreground'
+                  : 'border-border bg-background text-foreground hover:border-secondary',
+                v.inStock === false && 'text-subtle line-through'
               )}
             >
               {v.option}
@@ -98,22 +102,26 @@ export function VariantPicker({
         <div
           className={cn('mt-3 flex items-center gap-2', page ? 'justify-start' : 'justify-center')}
         >
-          <input
+          <Checkbox
             id={`${id}-autoship`}
-            type="checkbox"
             checked={autoship}
-            onChange={(e) => setAutoship(e.target.checked)}
-            className="size-5 accent-sky"
+            onCheckedChange={(v) => setAutoship(v === true)}
+            className="size-5 border-sky data-[state=checked]:border-sky data-[state=checked]:bg-sky"
           />
-          <label
+          <Label
             htmlFor={`${id}-autoship`}
-            className={cn('font-bold text-sky', page ? 'text-3xl' : 'text-xl')}
+            className={cn('font-display font-bold text-sky', page ? 'text-2xl' : 'text-lg')}
           >
             Autoship
-          </label>
-          <Link href="/faq" title="Learn more about autoship benefits" className="text-[#006df0]">
-            <Info className="size-4" aria-label="Learn more about autoship benefits" />
-          </Link>
+          </Label>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Link href="/faq" className="text-sky" aria-label="Learn more about Autoship">
+                <Info className="size-4" />
+              </Link>
+            </TooltipTrigger>
+            <TooltipContent>Save 20% on your first Autoship order. Learn more.</TooltipContent>
+          </Tooltip>
         </div>
       )}
       {autoship && (
@@ -124,17 +132,20 @@ export function VariantPicker({
 
       <div className="mt-3 flex gap-2">
         {showQuantity && (
-          <label className="flex items-center gap-2">
-            <span className="sr-only">Quantity</span>
-            <input
+          <>
+            <Label htmlFor={`${id}-qty`} className="sr-only">
+              Quantity
+            </Label>
+            <Input
+              id={`${id}-qty`}
               type="number"
               min={1}
               max={99}
               value={quantity}
               onChange={(e) => setQuantity(Math.max(1, Math.min(99, Number(e.target.value) || 1)))}
-              className="h-10 w-16 rounded border border-line px-2 text-center"
+              className="h-11 w-16 text-center"
             />
-          </label>
+          </>
         )}
         <Button
           size="block"

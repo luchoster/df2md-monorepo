@@ -17,7 +17,7 @@ export async function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer className="bg-footer">
+    <footer className="content-links bg-footer">
       <div className="grid gap-8 px-6 pt-5 pb-10 sm:grid-cols-2 lg:grid-cols-5">
         {settings?.footerColumns?.map((col) => (
           <div key={col._key}>
@@ -78,7 +78,7 @@ export async function Footer() {
           </ul>
         </div>
       </div>
-      <div className="flex min-h-[100px] items-center bg-footer-bar px-4 text-xs text-muted md:text-base">
+      <div className="flex min-h-[100px] items-center bg-footer-bar px-4 text-xs text-subtle md:text-base">
         <p className="mb-0">
           {year} Dog Food 2 My Door | All Rights Reserved
           {settings?.legalLinks?.map((l) => (

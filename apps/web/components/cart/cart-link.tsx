@@ -22,7 +22,7 @@ export function CartLink({
       <ShoppingCart className="size-5" fill="currentColor" aria-hidden />
       {showLabel && <span>Cart</span>}
       {count > 0 && (
-        <span className="grid min-w-5 place-items-center rounded-full bg-accent px-1 text-xs font-bold leading-5 text-white">
+        <span className="grid min-w-5 place-items-center rounded-full bg-orange px-1 text-xs font-bold leading-5 text-white">
           {count}
         </span>
       )}

@@ -1,7 +1,7 @@
 import { stegaClean } from 'next-sanity'
+import { ButtonLink } from '@/components/button-link'
 import { PortableTextRenderer } from '@/components/portable-text-renderer'
 import { SanityImage } from '@/components/sanity-image'
-import { ButtonLink } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { Section } from '../section'
 import type { BlockOf } from '../types'

@@ -70,7 +70,7 @@ export function ProductCarousel({ products }: { products: CardProduct[] }) {
               onClick={() => api?.scrollTo(i)}
               aria-label={`Go to product ${i + 1}`}
               aria-current={i === selected}
-              className={cn('size-5', i === selected ? 'bg-accent' : 'bg-sky')}
+              className={cn('size-5', i === selected ? 'bg-orange' : 'bg-sky')}
             />
           ))}
         </div>

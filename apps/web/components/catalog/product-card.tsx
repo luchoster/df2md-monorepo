@@ -26,7 +26,7 @@ export function ProductCard({
               className="h-full w-auto max-w-full object-contain"
             />
           ) : (
-            <div className="grid h-full w-full place-items-center rounded bg-footer text-sm text-muted">
+            <div className="grid h-full w-full place-items-center rounded bg-footer text-sm text-subtle">
               No image
             </div>
           )}

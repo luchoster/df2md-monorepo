@@ -1,74 +1,64 @@
 import { cva, type VariantProps } from 'class-variance-authority'
-import Link from 'next/link'
-import type { ComponentProps } from 'react'
-import { hrefFor, isExternal, type LinkValue } from '@/lib/links'
+import { Slot } from 'radix-ui'
+import type * as React from 'react'
 import { cn } from '@/lib/utils'
 
-/** Bootstrap 4 `.btn` as the old site styled it: 4px radius, 6×12 padding, bold 16px. */
-export const buttonVariants = cva(
-  'inline-flex items-center justify-center gap-2 rounded border px-3 py-1.5 font-sans text-base font-bold leading-normal no-underline transition-colors duration-150 ease-in-out hover:no-underline disabled:pointer-events-none disabled:opacity-65',
+const buttonVariants = cva(
+  "inline-flex shrink-0 items-center justify-center gap-2 rounded-md text-sm font-semibold whitespace-nowrap transition-all outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {
-        default: 'border-brand bg-brand text-white hover:border-brand-dark hover:bg-brand-dark',
-        secondary: 'border-sky bg-navy text-white hover:bg-sky',
-        dark: 'border-brand-dark bg-brand-dark uppercase text-white hover:bg-brand',
-        outline: 'border-brand bg-transparent text-brand hover:bg-brand hover:text-white',
-        link: 'border-transparent bg-transparent px-0 text-link underline-offset-4 hover:underline'
+        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        destructive:
+          'bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:bg-destructive/60 dark:focus-visible:ring-destructive/40',
+        outline:
+          'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:border-input dark:bg-input/30 dark:hover:bg-input/50',
+        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        ghost: 'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
+        link: 'text-primary underline-offset-4 hover:underline',
+        // brand: the old site's dark green (.home-notice .btn-primary)
+        dark: 'bg-brand-dark text-white hover:bg-brand-dark/90'
       },
       size: {
-        default: '',
-        lg: 'px-4 py-2 text-xl',
-        sm: 'px-2 py-1 text-sm',
-        block: 'w-full'
+        default: 'h-9 px-4 py-2 has-[>svg]:px-3',
+        xs: "h-6 gap-1 rounded-md px-2 text-xs has-[>svg]:px-1.5 [&_svg:not([class*='size-'])]:size-3",
+        sm: 'h-8 gap-1.5 rounded-md px-3 has-[>svg]:px-2.5',
+        lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
+        icon: 'size-9',
+        'icon-xs': "size-6 rounded-md [&_svg:not([class*='size-'])]:size-3",
+        'icon-sm': 'size-8',
+        'icon-lg': 'size-10',
+        block: 'h-11 w-full px-4 text-base'
       }
     },
-    defaultVariants: { variant: 'default', size: 'default' }
+    defaultVariants: {
+      variant: 'default',
+      size: 'default'
+    }
   }
 )
 
-type Variant = VariantProps<typeof buttonVariants>['variant']
-const VARIANTS = new Set(['default', 'secondary', 'dark', 'outline', 'link'])
-export const toVariant = (value: string | null | undefined): Variant =>
-  value && VARIANTS.has(value) ? (value as Variant) : 'default'
-
-export function Button({
+function Button({
   className,
-  variant,
-  size,
+  variant = 'default',
+  size = 'default',
+  asChild = false,
   ...props
-}: ComponentProps<'button'> & VariantProps<typeof buttonVariants>) {
-  return <button className={cn(buttonVariants({ variant, size }), className)} {...props} />
-}
+}: React.ComponentProps<'button'> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean
+  }) {
+  const Comp = asChild ? Slot.Root : 'button'
 
-/** Renders a Sanity `link` object as a button (or nothing when it has no destination). */
-export function ButtonLink({
-  link,
-  children,
-  className,
-  size
-}: { link: LinkValue; children?: React.ReactNode; className?: string } & Pick<
-  VariantProps<typeof buttonVariants>,
-  'size'
->) {
-  const href = hrefFor(link)
-  if (!href) return null
-  const classes = cn(buttonVariants({ variant: toVariant(link?.buttonVariant), size }), className)
-  const label = children ?? link?.title
-  if (isExternal(href) || link?.target)
-    return (
-      <a
-        href={href}
-        className={classes}
-        target={link?.target ? '_blank' : undefined}
-        rel="noopener"
-      >
-        {label}
-      </a>
-    )
   return (
-    <Link href={href} className={classes}>
-      {label}
-    </Link>
+    <Comp
+      data-slot="button"
+      data-variant={variant}
+      data-size={size}
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    />
   )
 }
+
+export { Button, buttonVariants }

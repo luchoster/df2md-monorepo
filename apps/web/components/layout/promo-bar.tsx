@@ -1,6 +1,6 @@
 import { PortableText } from '@portabletext/react'
 import type { PortableTextBlock } from '@portabletext/types'
-import { ButtonLink } from '@/components/ui/button'
+import { ButtonLink } from '@/components/button-link'
 import type { Settings } from './nav-types'
 
 /** The blue "SAVE 20% TODAY" bar. Edited in Site settings → Promo bar. */

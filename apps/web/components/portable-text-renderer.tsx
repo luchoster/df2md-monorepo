@@ -59,10 +59,10 @@ function Table({ value }: { value: TableValue }) {
 
 const components: PortableTextComponents = {
   block: {
-    normal: ({ children }) => <p>{children}</p>,
-    h2: ({ children }) => <h2 className="mt-8 first:mt-0">{children}</h2>,
-    h3: ({ children }) => <h3 className="mt-6 first:mt-0">{children}</h3>,
-    h4: ({ children }) => <h4 className="mt-5 first:mt-0">{children}</h4>,
+    normal: ({ children }) => <p className="mb-4">{children}</p>,
+    h2: ({ children }) => <h2 className="mt-8 mb-3 first:mt-0">{children}</h2>,
+    h3: ({ children }) => <h3 className="mt-6 mb-2 first:mt-0">{children}</h3>,
+    h4: ({ children }) => <h4 className="mt-5 mb-2 first:mt-0">{children}</h4>,
     blockquote: ({ children }) => (
       <blockquote className="my-6 border-l-4 border-brand pl-4 italic">{children}</blockquote>
     )
@@ -107,7 +107,7 @@ export function PortableTextRenderer({
 }) {
   if (!value?.length) return null
   return (
-    <div className={cn('[&>*:last-child]:mb-0', className)}>
+    <div className={cn('content-links [&>*:last-child]:mb-0', className)}>
       <PortableText value={value} components={components} />
     </div>
   )

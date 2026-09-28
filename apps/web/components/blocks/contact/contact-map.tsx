@@ -32,10 +32,10 @@ export default async function ContactMap(props: BlockOf<'contact-map'> & { isFir
   const Heading = isFirst ? 'h1' : 'h2'
 
   return (
-    <Section padding={padding}>
+    <Section padding={padding} className="content-links">
       <div className="container grid gap-8 md:grid-cols-2">
         <div>
-          {heading && <Heading>{heading}</Heading>}
+          {heading && <Heading className="mb-4">{heading}</Heading>}
           <PortableTextRenderer value={text as never} className="mb-4" />
           <ul className="space-y-3">
             {address && (
