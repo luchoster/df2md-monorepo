@@ -1,5 +1,10 @@
 {
   "extends": "@df2md/typescript/base.json",
-  "compilerOptions": { "types": ["bun-types"] },
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "types": ["bun-types"],
+    "noEmit": true
+  },
   "include": ["src"]
 }

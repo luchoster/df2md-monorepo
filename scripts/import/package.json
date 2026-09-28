@@ -3,17 +3,27 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "description": "WordPress → Sanity import pipeline (see docs/REBUILD-PLAN.md §3)",
+  "description": "WordPress dump \u2192 Sanity import pipeline (REBUILD-PLAN \u00a73)",
   "scripts": {
     "extract": "bun run src/01-extract.ts",
     "transform": "bun run src/02-transform.ts",
     "load": "bun run src/03-load.ts",
+    "load:dry": "bun run src/03-load.ts --dry-run",
     "verify": "bun run src/04-verify.ts",
-    "stripe:sync": "bun run src/05-stripe-sync.ts",
+    "import": "bun run extract && bun run transform && bun run load && bun run verify",
+    "validate": "bun run src/03-load.ts --dry-run --offline && node -e \"const d=require('./out/final.json');require('fs').writeFileSync('out/final.ndjson',d.map(x=>JSON.stringify(x)).join('\\n'))\" && cd ../../apps/cms && sanity documents validate --file ../../scripts/import/out/final.ndjson --level error -y",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit"
   },
   "devDependencies": {
-    "bun-types": "^1.4.2"
+    "@types/jsdom": "^30.0.0",
+    "bun-types": "^1.4.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "@portabletext/block-tools": "^6.0.2",
+    "@sanity/client": "^8.7.0",
+    "@sanity/schema": "^6.16.0",
+    "jsdom": "^30.1.1"
   }
 }
