@@ -82,11 +82,13 @@ function SizeButtons({
 function AutoshipToggle({
   checked,
   onChange,
-  id
+  id,
+  discount = true
 }: {
   checked: boolean
   onChange: (v: boolean) => void
   id: string
+  discount?: boolean
 }) {
   return (
     <div className="flex items-center justify-center gap-2">
