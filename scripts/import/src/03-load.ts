@@ -6,6 +6,7 @@
  * --dry-run       resolve ids and images, write nothing (uploads skipped)
  * --offline       with --dry-run: don't query Sanity either (every document counts as new)
  * --fetch-remote  download images missing from uploads/ from their original URL
+ * --no-images     import even though uploads/ is missing (documents get no images)
  *
  * Idempotent: documents are matched on their legacy key (`legacy.wpId`, `legacy.termId`,
  * `legacy.acfValue`); a match is replaced in place, anything else gets a fresh random `_id`.
@@ -62,6 +63,13 @@ for (const doc of docs) {
 console.log(`${docs.length} documents: ${docs.length - created} update, ${created} create`)
 
 // ------------------------------------------------------------------ 2. images
+if (!existsSync(UPLOADS_DIR) && !argFlag('no-images') && !offline) {
+  console.error(
+    `No uploads folder at ${UPLOADS_DIR}. Unpack the WordPress media first (see README), ` +
+      'set WP_UPLOADS_DIR, or pass --no-images to import without images.'
+  )
+  process.exit(1)
+}
 const assetCachePath = join(OUT_DIR, 'assets.json')
 const assetCache: Record<string, string | null> = existsSync(assetCachePath)
   ? JSON.parse(readFileSync(assetCachePath, 'utf8'))
@@ -102,7 +110,7 @@ async function readImage(img: WpImage): Promise<{ data: Buffer; filename: string
 
 let uploaded = 0
 let missing = 0
-const pending = [...uniqueImages].filter(([k]) => !(k in assetCache))
+const pending = [...uniqueImages].filter(([k]) => !assetCache[k])
 console.log(`${uniqueImages.size} images, ${pending.length} not yet uploaded`)
 for (let i = 0; i < pending.length; i += 6) {
   await Promise.all(
@@ -111,7 +119,6 @@ for (let i = 0; i < pending.length; i += 6) {
       if (!file) {
         missing++
         problems.push({ where: k, message: `image not found (${img.file ?? img.src})` })
-        if (!dryRun) assetCache[k] = null
         return
       }
       if (dryRun || !client) return
@@ -124,6 +131,14 @@ for (let i = 0; i < pending.length; i += 6) {
   if (i && i % 60 === 0) console.log(`  images ${i}/${pending.length}`)
 }
 console.log(`images: ${uploaded} uploaded, ${missing} missing`)
+if (!dryRun && !argFlag('no-images') && missing > uniqueImages.size * 0.1) {
+  writeFileSync(join(OUT_DIR, 'load-problems.json'), JSON.stringify(problems, null, 1))
+  console.error(
+    `${missing} of ${uniqueImages.size} images are missing, so nothing was written. Check ${UPLOADS_DIR} ` +
+      'and out/load-problems.json, or pass --no-images.'
+  )
+  process.exit(1)
+}
 
 // ------------------------------------------------------------------ 3. rewrite placeholders
 const REMOVE = Symbol('remove')

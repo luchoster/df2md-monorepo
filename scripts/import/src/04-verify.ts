@@ -38,7 +38,9 @@ const q = `{
   "danglingCategory": *[_type == "product" && count(categories[!defined(@->_id)]) > 0].legacy.wpId,
   "danglingParent": *[_type == "category" && defined(parent) && !defined(parent->_id)].legacy.termId,
   "unpriced": *[_type == "product" && status == "active" && count(variants[price > 0]) == 0].legacy.wpId,
-  "brokenImages": count(*[_type == "product" && defined(mainImage) && !defined(mainImage.asset->_id)])
+  "brokenImages": count(*[_type == "product" && defined(mainImage) && !defined(mainImage.asset->_id)]),
+  "withImage": count(*[_type == "product" && defined(mainImage.asset)]),
+  "imageAssets": count(*[_type == "sanity.imageAsset"])
 }`
 const r = await client.fetch(q)
 
@@ -61,6 +63,11 @@ check(
 )
 check(!r.unpriced.length, `active products without a price: ${r.unpriced.join(', ') || 0}`)
 check(r.brokenImages === 0, `products whose image asset is missing: ${r.brokenImages}`)
+const wpWithImage = wp.products.filter((p) => p.thumbnailId).length
+check(
+  r.withImage >= wpWithImage * 0.95,
+  `products with a main image: ${r.withImage} / ${wpWithImage} (image assets: ${r.imageAssets})`
+)
 
 // Sample 20 products and diff against WordPress
 const sample = [...wp.products].sort(() => Math.random() - 0.5).slice(0, 20)

@@ -18,7 +18,10 @@ bun run verify      # GROQ counts, dangling refs, 20 sampled products diffed aga
 | `01-extract` | Streams `backup-2026-09-19-db.sql.gz` directly (`--dump <path>` or `WP_DUMP`). Column names come from the dump's `CREATE TABLE`; MySQL escapes are decoded properly (the old `parse_dump.py` turned `\r\n` into `rn`). Fails if counts drift from the inventory (`--allow-drift` to override, `--include-drafts` to add the 535 drafts). |
 | `02-transform` | HTML → Portable Text through `@portabletext/block-tools`, validated against the Studio's own `block-content` type. WPBakery shortcodes expanded (`vc_custom_heading`, `vc_btn`, `vc_single_image`, `vc_raw_html`) or stripped; `wpautop` applied; `<table>` → native `table` blocks with `headerRows`. References are `legacy:<type>:<key>` placeholders, images `_wpImage` placeholders. |
 | `03-load` | Resolves legacy keys to existing `_id`s (`legacy.wpId` / `termId` / `acfValue`), new documents get random ids. Uploads images from `uploads/` (cache: `out/assets.json`); brand-site hotlinks are fetched from their URL, `--fetch-remote` does the same for WP images missing locally. Keeps `variants[].stripe` already written by the Stripe sync. 50 mutations per transaction. |
-| `04-verify` | Exit 1 on any mismatch. |
+| `04-verify` | Exit 1 on any mismatch, including when fewer than 95% of products got their main image. |
+
+If `uploads/` is missing the load stops before writing anything (`--no-images` overrides). Images that
+couldn't be found are not cached, so fixing the folder and re-running `bun run load` picks them up.
 
 ## Findings from the dump (vs. the plan's inventory)
 

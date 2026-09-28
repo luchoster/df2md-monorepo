@@ -338,8 +338,13 @@ const settingsDoc: Doc = {
   _type: 'siteSettings',
   mainMenu: menuItems('Main Menu'),
   footerMenu: menuItems('Footer'),
-  contact: { phone: '702-971-2484', email: 'info@dogfood2mydoor.com' },
-  deliveryZipCodes: [],
+  contact: {
+    phone: '702-971-2484',
+    email: 'info@dogfood2mydoor.com',
+    address: '1550 W. Horizon Ridge Pkwy, Suite N\nHenderson, NV 89012'
+  },
+  // The old zipcode-form.js dropdown (plus "Other", which the storefront adds itself)
+  deliveryZipCodes: ['89141', '89044', '89052', '89012', '89074', '89014', '89015', '89002'],
   autoship: {
     firstOrderDiscountPercent: 20,
     intervals: ['day', 'week', 'month'],
