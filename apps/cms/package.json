@@ -9,7 +9,7 @@
     "start": "sanity start",
     "build": "sanity build",
     "deploy": "sanity deploy",
-    "typegen": "rm -f schema.json && sanity schema extract && sanity typegen generate",
+    "typegen": "sanity schemas extract --enforce-required-fields --force && sanity typegen generate",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist .sanity node_modules"

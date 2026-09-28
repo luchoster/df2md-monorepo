@@ -7,5 +7,11 @@ export default defineCliConfig({
   },
   deployment: {
     autoUpdates: true
+  },
+  typegen: {
+    path: '../web/{app,components,lib,sanity}/**/*.{ts,tsx}',
+    schema: 'schema.json',
+    generates: '../web/sanity.types.ts',
+    overloadClientMethods: true
   }
 })

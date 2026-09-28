@@ -1,0 +1,44 @@
+import type { ComponentType } from 'react'
+import ContactMap from './contact/contact-map'
+import ReviewsEmbed from './contact/reviews-embed'
+import ZipCheck from './contact/zip-check'
+import FaqList from './content/faq-list'
+import ImageText from './content/image-text'
+import RichContentBlock from './content/rich-content-block'
+import CtaBanner from './hero/cta-banner'
+import HeroSlider from './hero/hero-slider'
+import BrandStrip from './shop/brand-strip'
+import CategoryGrid from './shop/category-grid'
+import ProductGrid from './shop/product-grid'
+import type { Block } from './types'
+
+// Each component receives its own block type; the map is keyed by _type.
+const componentMap: Record<Block['_type'], ComponentType<any>> = {
+  'hero-slider': HeroSlider,
+  'cta-banner': CtaBanner,
+  'rich-content-block': RichContentBlock,
+  'image-text': ImageText,
+  'faq-list': FaqList,
+  'product-grid': ProductGrid,
+  'category-grid': CategoryGrid,
+  'brand-strip': BrandStrip,
+  'contact-map': ContactMap,
+  'zip-check': ZipCheck,
+  'reviews-embed': ReviewsEmbed
+}
+
+/** Renders a page-builder array. Heading levels come from position: the first block owns the h1. */
+export default function Blocks({ blocks }: { blocks: Block[] | null | undefined }) {
+  return (
+    <>
+      {blocks?.map((block, index) => {
+        const Component = componentMap[block._type]
+        if (!Component) {
+          console.warn(`No component for block type "${block._type}"`)
+          return <div key={block._key} data-type={block._type} />
+        }
+        return <Component key={block._key} {...block} isFirst={index === 0} />
+      })}
+    </>
+  )
+}
