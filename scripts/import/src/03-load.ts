@@ -110,6 +110,37 @@ async function readImage(img: WpImage): Promise<{ data: Buffer; filename: string
 
 let uploaded = 0
 let missing = 0
+let rejected = 0
+
+/**
+ * Uploads one image. Files Sanity can't read (corrupt/truncated, 4xx) are logged and skipped so
+ * one bad file doesn't abort the run; network and 5xx errors are retried twice.
+ */
+async function upload(sanity: SanityClient, file: { data: Buffer; filename: string }, k: string) {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      const asset = await sanity.assets.upload('image', file.data, { filename: file.filename })
+      return asset._id
+    } catch (error: any) {
+      const status: number | undefined = error?.statusCode
+      if (status && status < 500) {
+        problems.push({
+          where: k,
+          message: `image rejected by Sanity (${status}): ${file.filename} – ${error.message}`
+        })
+        return null
+      }
+      if (attempt >= 3) {
+        problems.push({
+          where: k,
+          message: `upload failed after 3 attempts: ${file.filename} – ${error?.message}`
+        })
+        return null
+      }
+      await Bun.sleep(1000 * attempt)
+    }
+  }
+}
 const pending = [...uniqueImages].filter(([k]) => !assetCache[k])
 console.log(`${uniqueImages.size} images, ${pending.length} not yet uploaded`)
 for (let i = 0; i < pending.length; i += 6) {
@@ -122,19 +153,25 @@ for (let i = 0; i < pending.length; i += 6) {
         return
       }
       if (dryRun || !client) return
-      const asset = await client.assets.upload('image', file.data, { filename: file.filename })
-      assetCache[k] = asset._id
+      const assetId = await upload(client, file, k)
+      if (!assetId) {
+        rejected++
+        return
+      }
+      assetCache[k] = assetId
       uploaded++
     })
   )
   if (!dryRun) writeFileSync(assetCachePath, JSON.stringify(assetCache, null, 1))
   if (i && i % 60 === 0) console.log(`  images ${i}/${pending.length}`)
 }
-console.log(`images: ${uploaded} uploaded, ${missing} missing`)
-if (!dryRun && !argFlag('no-images') && missing > uniqueImages.size * 0.1) {
+console.log(
+  `images: ${uploaded} uploaded, ${missing} missing, ${rejected} rejected (see out/load-problems.json)`
+)
+if (!dryRun && !argFlag('no-images') && missing + rejected > uniqueImages.size * 0.1) {
   writeFileSync(join(OUT_DIR, 'load-problems.json'), JSON.stringify(problems, null, 1))
   console.error(
-    `${missing} of ${uniqueImages.size} images are missing, so nothing was written. Check ${UPLOADS_DIR} ` +
+    `${missing + rejected} of ${uniqueImages.size} images are missing or unreadable, so no documents were written. Check ${UPLOADS_DIR} ` +
       'and out/load-problems.json, or pass --no-images.'
   )
   process.exit(1)
