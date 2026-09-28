@@ -12,7 +12,7 @@ export const PRODUCT_QUERY = defineQuery(`
     "primaryCategory": primaryCategory->{ title, "slug": slug.current, "parent": parent->{ title, "slug": slug.current } },
     mainImage { ${imageFragment} },
     gallery[]{ _key, ${imageFragment} },
-    optionName, defaultVariantKey, autoshipEligible, showAdditionalInfo, tags,
+    optionName, defaultVariantKey, autoshipEligible, noDiscounts, showAdditionalInfo, tags,
     "variants": variants[price > 0]{ _key, option, sku, price, compareAtPrice, inStock, weightLbs,
       image { ${imageFragment} } },
     description[]{ ${bodyFragment} },

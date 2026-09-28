@@ -44,7 +44,8 @@ export function ProductBuyBox({
     variant.price != null &&
     variant.compareAtPrice > variant.price
   const price = variant.price ?? 0
-  const autoshipPrice = Math.round(price * (100 - discountPercent)) / 100
+  const discount = product.noDiscounts ? 0 : discountPercent
+  const autoshipPrice = Math.round(price * (100 - discount)) / 100
 
   return (
     <div className="space-y-6">
@@ -142,8 +143,9 @@ export function ProductBuyBox({
                   <Repeat className="size-4" /> Autoship
                 </span>
                 <span className="text-sm text-muted-foreground">
-                  {formatPrice(autoshipPrice)} on your first Autoship order ({discountPercent}%
-                  off).{' '}
+                  {discount > 0
+                    ? `${formatPrice(autoshipPrice)} on your first Autoship order (${discount}% off). `
+                    : 'Delivered on your schedule. This brand is excluded from discounts. '}
                   <Link href="/faq" className="text-link underline-offset-2 hover:underline">
                     How it works
                   </Link>

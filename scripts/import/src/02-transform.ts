@@ -212,6 +212,10 @@ const productDocs: Doc[] = wp.products.map((p) => {
     variants,
     ...(defaultVariant ? { defaultVariantKey: defaultVariant._key } : {}),
     autoshipEligible: true,
+    // Copy like "*This item is not eligible for discounts" (e.g. ACANA's pricing policy)
+    noDiscounts: /not eligible for (any )?discounts?/i.test(
+      [p.content, p.excerpt, p.nutritionalInfo, p.feedingInstructions].join(' ')
+    ),
     ...(p.tags.length ? { tags: p.tags } : {}),
     ...(p.seo.title || p.seo.description ? { seo: { _type: 'meta', ...p.seo } } : {}),
     legacy: { wpId: p.wpId, wpSlug: p.slug, importedAt }

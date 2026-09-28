@@ -18,5 +18,6 @@ export type CardProduct = {
   optionName: string | null
   defaultVariantKey: string | null
   autoshipEligible: boolean | null
+  noDiscounts?: boolean | null
   variants: CardVariant[] | null
 }

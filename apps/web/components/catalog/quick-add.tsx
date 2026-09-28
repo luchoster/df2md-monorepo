@@ -97,7 +97,7 @@ function AutoshipToggle({
         className="data-[state=checked]:bg-sky"
       />
       <Label htmlFor={id} className="flex items-center gap-1 text-xs font-semibold text-sky">
-        <Repeat className="size-3.5" /> Autoship &amp; save 20%
+        <Repeat className="size-3.5" /> {discount ? 'Autoship & save 20%' : 'Autoship'}
       </Label>
     </div>
   )
@@ -116,7 +116,12 @@ export function QuickAddPanel({ product }: { product: CardProduct }) {
       </p>
       <SizeButtons variants={variants} onPick={addVariant} />
       {product.autoshipEligible !== false && (
-        <AutoshipToggle id={id} checked={autoship} onChange={setAutoship} />
+        <AutoshipToggle
+          id={id}
+          checked={autoship}
+          onChange={setAutoship}
+          discount={!product.noDiscounts}
+        />
       )}
     </div>
   )
@@ -170,7 +175,12 @@ export function QuickAddDrawer({ product }: { product: CardProduct }) {
             ))}
           </div>
           {product.autoshipEligible !== false && (
-            <AutoshipToggle id={id} checked={autoship} onChange={setAutoship} />
+            <AutoshipToggle
+              id={id}
+              checked={autoship}
+              onChange={setAutoship}
+              discount={!product.noDiscounts}
+            />
           )}
         </div>
       </DrawerContent>

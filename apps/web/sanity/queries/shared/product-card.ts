@@ -10,5 +10,6 @@ export const productCardFragment = /* groq */ `
   optionName,
   defaultVariantKey,
   autoshipEligible,
+  noDiscounts,
   "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock }
 `

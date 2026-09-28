@@ -127,6 +127,15 @@ export default defineType({
         })
     }),
     defineField({
+      name: 'noDiscounts',
+      title: 'Excluded from discounts',
+      description:
+        'No first-Autoship or other discounts (e.g. brands with minimum advertised pricing). Autoship itself is still allowed.',
+      type: 'boolean',
+      group: 'variants',
+      initialValue: false
+    }),
+    defineField({
       name: 'autoshipEligible',
       title: 'Available for Autoship',
       type: 'boolean',
