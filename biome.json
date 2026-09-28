@@ -72,7 +72,7 @@
   },
   "overrides": [
     {
-      "includes": ["apps/web/components/ui/**"],
+      "includes": ["apps/web/components/ui/**", "apps/web/components/shadcnblocks/**"],
       "linter": {
         "enabled": false
       },

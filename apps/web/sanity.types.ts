@@ -2480,6 +2480,444 @@ export type PAGE_REDIRECTS_QUERY_RESULT = Array<{
   oldUrls: Array<string> | null;
 }>;
 
+// Source: ../web/sanity/queries/product.ts
+// Variable: PRODUCT_QUERY
+// Query: *[_type == "product" && slug.current == $slug && status != "archived"][0]{    _id, title, "slug": slug.current, status, featured, shortDescription,    "brand": brand->{ title, "slug": slug.current },    "categories": categories[]->{ _id, title, "slug": slug.current, "parent": parent->{ title, "slug": slug.current } },    "primaryCategory": primaryCategory->{ title, "slug": slug.current, "parent": parent->{ title, "slug": slug.current } },    mainImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },    gallery[]{ _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },    optionName, defaultVariantKey, autoshipEligible, showAdditionalInfo, tags,    "variants": variants[price > 0]{ _key, option, sku, price, compareAtPrice, inStock, weightLbs,      image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    description[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    nutritionalInfo[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    feedingInstructions[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    ingredientsAndUse[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    seo {   title,  description,  noindex,  image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    "related": *[_type == "product" && status == "active" && _id != ^._id      && count((categories[]._ref)[@ in ^.^.categories[]._ref]) > 0      && count(variants[price > 0]) > 0] | order(featured desc, lower(title) asc)[0...10]{   _id,  title,  "slug": slug.current,  "brand": brand->title,  mainImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },  optionName,  defaultVariantKey,  autoshipEligible,  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock } }  }
+export type PRODUCT_QUERY_RESULT = {
+  _id: string;
+  title: string;
+  slug: string;
+  status: "active" | "archived" | "draft";
+  featured: boolean | null;
+  shortDescription: string | null;
+  brand: {
+    title: string;
+    slug: string;
+  };
+  categories: Array<{
+    _id: string;
+    title: string;
+    slug: string;
+    parent: {
+      title: string;
+      slug: string;
+    } | null;
+  }>;
+  primaryCategory: {
+    title: string;
+    slug: string;
+    parent: {
+      title: string;
+      slug: string;
+    } | null;
+  } | null;
+  mainImage: {
+    _type: "image";
+    asset: {
+      _id: string;
+      url: string;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number;
+          height: number;
+          aspectRatio: number;
+        } | null;
+      } | null;
+    } | null;
+    alt: string | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+  } | null;
+  gallery: Array<{
+    _key: string;
+    _type: "image";
+    asset: {
+      _id: string;
+      url: string;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number;
+          height: number;
+          aspectRatio: number;
+        } | null;
+      } | null;
+    } | null;
+    alt: string | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+  }> | null;
+  optionName: "Color" | "Flavor" | "Size" | null;
+  defaultVariantKey: string | null;
+  autoshipEligible: boolean | null;
+  showAdditionalInfo: boolean | null;
+  tags: Array<string> | null;
+  variants: Array<{
+    _key: string;
+    option: string;
+    sku: string | null;
+    price: number;
+    compareAtPrice: number | null;
+    inStock: boolean | null;
+    weightLbs: number | null;
+    image: {
+      _type: "image";
+      asset: {
+        _id: string;
+        url: string;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number;
+            height: number;
+            aspectRatio: number;
+          } | null;
+        } | null;
+      } | null;
+      alt: string | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+    } | null;
+  }>;
+  description: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: "span";
+          _key: string;
+        }>;
+        style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+        listItem?: "bullet" | "number";
+        markDefs?: Array<{
+          href: string;
+          openInNewTab?: boolean;
+          _type: "link";
+          _key: string;
+        }>;
+        level?: number;
+        _type: "block";
+        _key: string;
+      }
+    | {
+        asset: {
+          _id: string;
+          url: string;
+          metadata: {
+            lqip: string | null;
+            dimensions: {
+              width: number;
+              height: number;
+              aspectRatio: number;
+            } | null;
+          } | null;
+        } | null;
+        media?: unknown;
+        hotspot: SanityImageHotspot | null;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+        _type: "image";
+        _key: string;
+      }
+    | {
+        _key: string;
+        _type: "table";
+        headerRows?: number;
+        rows?: Array<{
+          cells?: Array<{
+            value?: Array<{
+              children?: Array<{
+                marks?: Array<string>;
+                text?: string;
+                _type: "span";
+                _key: string;
+              }>;
+              style?: "normal";
+              listItem?: never;
+              markDefs?: null;
+              level?: number;
+              _type: "block";
+              _key: string;
+            }>;
+            _type: "cell";
+            _key: string;
+          }>;
+          _type: "row";
+          _key: string;
+        }>;
+      }
+  > | null;
+  nutritionalInfo: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: "span";
+          _key: string;
+        }>;
+        style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+        listItem?: "bullet" | "number";
+        markDefs?: Array<{
+          href: string;
+          openInNewTab?: boolean;
+          _type: "link";
+          _key: string;
+        }>;
+        level?: number;
+        _type: "block";
+        _key: string;
+      }
+    | {
+        asset: {
+          _id: string;
+          url: string;
+          metadata: {
+            lqip: string | null;
+            dimensions: {
+              width: number;
+              height: number;
+              aspectRatio: number;
+            } | null;
+          } | null;
+        } | null;
+        media?: unknown;
+        hotspot: SanityImageHotspot | null;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+        _type: "image";
+        _key: string;
+      }
+    | {
+        _key: string;
+        _type: "table";
+        headerRows?: number;
+        rows?: Array<{
+          cells?: Array<{
+            value?: Array<{
+              children?: Array<{
+                marks?: Array<string>;
+                text?: string;
+                _type: "span";
+                _key: string;
+              }>;
+              style?: "normal";
+              listItem?: never;
+              markDefs?: null;
+              level?: number;
+              _type: "block";
+              _key: string;
+            }>;
+            _type: "cell";
+            _key: string;
+          }>;
+          _type: "row";
+          _key: string;
+        }>;
+      }
+  > | null;
+  feedingInstructions: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: "span";
+          _key: string;
+        }>;
+        style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+        listItem?: "bullet" | "number";
+        markDefs?: Array<{
+          href: string;
+          openInNewTab?: boolean;
+          _type: "link";
+          _key: string;
+        }>;
+        level?: number;
+        _type: "block";
+        _key: string;
+      }
+    | {
+        asset: {
+          _id: string;
+          url: string;
+          metadata: {
+            lqip: string | null;
+            dimensions: {
+              width: number;
+              height: number;
+              aspectRatio: number;
+            } | null;
+          } | null;
+        } | null;
+        media?: unknown;
+        hotspot: SanityImageHotspot | null;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+        _type: "image";
+        _key: string;
+      }
+    | {
+        _key: string;
+        _type: "table";
+        headerRows?: number;
+        rows?: Array<{
+          cells?: Array<{
+            value?: Array<{
+              children?: Array<{
+                marks?: Array<string>;
+                text?: string;
+                _type: "span";
+                _key: string;
+              }>;
+              style?: "normal";
+              listItem?: never;
+              markDefs?: null;
+              level?: number;
+              _type: "block";
+              _key: string;
+            }>;
+            _type: "cell";
+            _key: string;
+          }>;
+          _type: "row";
+          _key: string;
+        }>;
+      }
+  > | null;
+  ingredientsAndUse: Array<
+    | {
+        children?: Array<{
+          marks?: Array<string>;
+          text?: string;
+          _type: "span";
+          _key: string;
+        }>;
+        style?: "blockquote" | "h2" | "h3" | "h4" | "normal";
+        listItem?: "bullet" | "number";
+        markDefs?: Array<{
+          href: string;
+          openInNewTab?: boolean;
+          _type: "link";
+          _key: string;
+        }>;
+        level?: number;
+        _type: "block";
+        _key: string;
+      }
+    | {
+        asset: {
+          _id: string;
+          url: string;
+          metadata: {
+            lqip: string | null;
+            dimensions: {
+              width: number;
+              height: number;
+              aspectRatio: number;
+            } | null;
+          } | null;
+        } | null;
+        media?: unknown;
+        hotspot: SanityImageHotspot | null;
+        crop: SanityImageCrop | null;
+        alt: string | null;
+        _type: "image";
+        _key: string;
+      }
+    | {
+        _key: string;
+        _type: "table";
+        headerRows?: number;
+        rows?: Array<{
+          cells?: Array<{
+            value?: Array<{
+              children?: Array<{
+                marks?: Array<string>;
+                text?: string;
+                _type: "span";
+                _key: string;
+              }>;
+              style?: "normal";
+              listItem?: never;
+              markDefs?: null;
+              level?: number;
+              _type: "block";
+              _key: string;
+            }>;
+            _type: "cell";
+            _key: string;
+          }>;
+          _type: "row";
+          _key: string;
+        }>;
+      }
+  > | null;
+  seo: {
+    title: string | null;
+    description: string | null;
+    noindex: boolean | null;
+    image: {
+      _type: "image";
+      asset: {
+        _id: string;
+        url: string;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number;
+            height: number;
+            aspectRatio: number;
+          } | null;
+        } | null;
+      } | null;
+      alt: null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+    } | null;
+  } | null;
+  related: Array<{
+    _id: string;
+    title: string;
+    slug: string;
+    brand: string;
+    mainImage: {
+      _type: "image";
+      asset: {
+        _id: string;
+        url: string;
+        metadata: {
+          lqip: string | null;
+          dimensions: {
+            width: number;
+            height: number;
+            aspectRatio: number;
+          } | null;
+        } | null;
+      } | null;
+      alt: string | null;
+      hotspot: SanityImageHotspot | null;
+      crop: SanityImageCrop | null;
+    } | null;
+    optionName: "Color" | "Flavor" | "Size" | null;
+    defaultVariantKey: string | null;
+    autoshipEligible: boolean | null;
+    variants: Array<{
+      _key: string;
+      option: string;
+      price: number;
+      compareAtPrice: number | null;
+      inStock: boolean | null;
+    }>;
+  }>;
+} | null;
+
+// Source: ../web/sanity/queries/product.ts
+// Variable: PRODUCT_SLUGS_QUERY
+// Query: *[_type == "product" && status == "active" && defined(slug.current)]{ "slug": slug.current }
+export type PRODUCT_SLUGS_QUERY_RESULT = Array<{
+  slug: string;
+}>;
+
 // Source: ../web/sanity/queries/settings.ts
 // Variable: SETTINGS_QUERY
 // Query: *[_id == "siteSettings"][0]{    mainMenu[]{      _key, label, dropdown,      link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } },      "subcategories": select(        dropdown == "children" => *[_type == "category" && parent._ref == ^.link.internal._ref && showInNav != false]          | order(order asc, title asc){ _id, title, "slug": slug.current }      ),      children[]{ _key, label, link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } } }    },    footerColumns[]{ _key, title, links[]{ _key, label, link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } } } },    legalLinks[]{ _key, label, link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } } },    social,    contact,    announcement{ active, text, button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } } },    delivery,    autoship,    taxRatePercent  }
@@ -2778,6 +3216,8 @@ declare global {
     '\n  *[_type == "page" && defined(slug.current)]{ "slug": slug.current }\n': PAGES_SLUGS_QUERY_RESULT;
     '\n  *[_id == "homePage"][0]{\n    _id, _type,\n    blocks[]{ \n  \n  _type == "hero-slider" => {\n    _type, _key, autoplay, intervalMs, padding,\n    slides[]{ _key, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }, title, text, buttonText, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }, textPosition, textBackground }\n  }\n,\n  \n  _type == "cta-banner" => {\n    _type, _key, text, background, decoration, size, padding,\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n    image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n  }\n,\n  \n  _type == "rich-content-block" => {\n    _type, _key, title, backgroundColor, textAlign, showLink, padding,\n    content[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "image-text" => {\n    _type, _key, title, content, imageSide, background, padding,\n    image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    cta { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "faq-list" => { _type, _key, heading, padding, items[]{ _key, question, answer } }\n,\n  \n  _type == "product-grid" => {\n    _type, _key, heading, source, limit, layout, padding,\n    viewAllLink { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n    "products": select(\n      source == "manual" => products[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock }\n },\n      source == "category" => *[_type == "product" && status == "active" && ^.category._ref in categories[]._ref]\n        | order(featured desc, title asc)[0...48]{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock }\n },\n      *[_type == "product" && status == "active" && featured == true] | order(title asc)[0...48]{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock }\n }\n    )\n  }\n,\n  \n  _type == "category-grid" => {\n    _type, _key, heading, columns, padding,\n    "categories": select(\n      showAllTopLevel == true => *[_type == "category" && !defined(parent) && showInNav != false] | order(order asc){\n        _id, title, "slug": slug.current, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n      },\n      categories[]->{ _id, title, "slug": slug.current, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n } }\n    )\n  }\n,\n  \n  _type == "brand-strip" => {\n    _type, _key, heading, linkToShop, padding,\n    "brands": select(\n      showAll == true => *[_type == "brand" && featured == true] | order(title asc){\n        _id, title, "slug": slug.current, logo { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n      },\n      brands[]->{ _id, title, "slug": slug.current, logo { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n } }\n    )\n  }\n,\n  \n  _type == "contact-map" => {\n    _type, _key, heading, text, phone, email, address, hours, mapEmbedUrl,\n    showForm, formHeading, padding\n  }\n,\n  \n  _type == "reviews-embed" => {\n    _type, _key, heading, provider, embedUrl, padding, reviews[]{ _key, author, rating, text }\n  }\n\n },\n    meta { \n  title,\n  description,\n  noindex,\n  image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n }\n  }\n': HOME_PAGE_QUERY_RESULT;
     '\n  *[_type == "page" && count(oldUrls) > 0]{ "slug": slug.current, oldUrls }\n': PAGE_REDIRECTS_QUERY_RESULT;
+    '\n  *[_type == "product" && slug.current == $slug && status != "archived"][0]{\n    _id, title, "slug": slug.current, status, featured, shortDescription,\n    "brand": brand->{ title, "slug": slug.current },\n    "categories": categories[]->{ _id, title, "slug": slug.current, "parent": parent->{ title, "slug": slug.current } },\n    "primaryCategory": primaryCategory->{ title, "slug": slug.current, "parent": parent->{ title, "slug": slug.current } },\n    mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    gallery[]{ _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    optionName, defaultVariantKey, autoshipEligible, showAdditionalInfo, tags,\n    "variants": variants[price > 0]{ _key, option, sku, price, compareAtPrice, inStock, weightLbs,\n      image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n } },\n    description[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    nutritionalInfo[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    feedingInstructions[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    ingredientsAndUse[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    seo { \n  title,\n  description,\n  noindex,\n  image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    "related": *[_type == "product" && status == "active" && _id != ^._id\n      && count((categories[]._ref)[@ in ^.^.categories[]._ref]) > 0\n      && count(variants[price > 0]) > 0] | order(featured desc, lower(title) asc)[0...10]{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock }\n }\n  }\n': PRODUCT_QUERY_RESULT;
+    '\n  *[_type == "product" && status == "active" && defined(slug.current)]{ "slug": slug.current }\n': PRODUCT_SLUGS_QUERY_RESULT;
     '\n  *[_id == "siteSettings"][0]{\n    mainMenu[]{\n      _key, label, dropdown,\n      link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n      "subcategories": select(\n        dropdown == "children" => *[_type == "category" && parent._ref == ^.link.internal._ref && showInNav != false]\n          | order(order asc, title asc){ _id, title, "slug": slug.current }\n      ),\n      children[]{ _key, label, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } }\n    },\n    footerColumns[]{ _key, title, links[]{ _key, label, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } } },\n    legalLinks[]{ _key, label, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } },\n    social,\n    contact,\n    announcement{ active, text, button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } },\n    delivery,\n    autoship,\n    taxRatePercent\n  }\n': SETTINGS_QUERY_RESULT;
     '\n  *[_type == "brand" && count(*[_type == "product" && status == "active" && references(^._id)]) > 0]\n    | order(lower(title) asc){ _id, title, "slug": slug.current }\n': NAV_BRANDS_QUERY_RESULT;
     '\n  *[_type == "category" && !defined(parent) && showInNav != false] | order(order asc, title asc){\n    _id, title, "slug": slug.current,\n    "children": *[_type == "category" && parent._ref == ^._id && showInNav != false] | order(order asc, title asc){\n      _id, title, "slug": slug.current\n    }\n  }\n': NAV_CATEGORIES_QUERY_RESULT;

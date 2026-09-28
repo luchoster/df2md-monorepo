@@ -1,6 +1,7 @@
 import { cache } from 'react'
 import type { CardProduct } from '@/components/catalog/types'
 import { HOME_PAGE_QUERY, PAGE_QUERY, PAGES_SLUGS_QUERY } from '../queries/page'
+import { PRODUCT_QUERY, PRODUCT_SLUGS_QUERY } from '../queries/product'
 import { NAV_BRANDS_QUERY, NAV_CATEGORIES_QUERY, SETTINGS_QUERY } from '../queries/settings'
 import {
   BRAND_BY_SLUG_QUERY,
@@ -71,3 +72,14 @@ export const getBrand = cache((slug: string) =>
 
 export const getCategorySlugs = () =>
   client.withConfig({ useCdn: false }).fetch(CATEGORY_SLUGS_QUERY)
+
+export const getProduct = cache((slug: string) =>
+  sanityFetch({
+    query: PRODUCT_QUERY,
+    params: { slug },
+    tags: ['product', 'brand', 'category'],
+    revalidate: 300
+  })
+)
+
+export const getProductSlugs = () => client.withConfig({ useCdn: false }).fetch(PRODUCT_SLUGS_QUERY)

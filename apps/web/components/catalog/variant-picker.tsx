@@ -161,7 +161,7 @@ export function VariantPicker({
                 option: variant.option ?? '',
                 price: variant.price ?? 0,
                 imageUrl: product.mainImage?.asset
-                  ? urlFor(product.mainImage as never)
+                  ? urlFor(product.mainImage.asset as never)
                       .width(160)
                       .height(160)
                       .fit('fill')
