@@ -1,7 +1,8 @@
 import { cache } from 'react'
 import type { CardProduct } from '@/components/catalog/types'
+import type { PRODUCT_THUMBS_QUERY_RESULT } from '@/sanity.types'
 import { HOME_PAGE_QUERY, PAGE_QUERY, PAGES_SLUGS_QUERY } from '../queries/page'
-import { PRODUCT_QUERY, PRODUCT_SLUGS_QUERY } from '../queries/product'
+import { PRODUCT_QUERY, PRODUCT_SLUGS_QUERY, PRODUCT_THUMBS_QUERY } from '../queries/product'
 import { NAV_BRANDS_QUERY, NAV_CATEGORIES_QUERY, SETTINGS_QUERY } from '../queries/settings'
 import {
   BRAND_BY_SLUG_QUERY,
@@ -83,3 +84,16 @@ export const getProduct = cache((slug: string) =>
 )
 
 export const getProductSlugs = () => client.withConfig({ useCdn: false }).fetch(PRODUCT_SLUGS_QUERY)
+
+export const getProductThumbs = cache(async (ids: string[]) => {
+  const unique = [...new Set(ids.filter(Boolean))]
+  if (!unique.length) return new Map<string, ProductThumb>()
+  const rows = await sanityFetch({
+    query: PRODUCT_THUMBS_QUERY,
+    params: { ids: unique },
+    tags: ['product']
+  })
+  return new Map(rows.map((row) => [row._id, row]))
+})
+
+export type ProductThumb = PRODUCT_THUMBS_QUERY_RESULT[number]

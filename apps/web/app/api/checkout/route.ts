@@ -1,5 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import type Stripe from 'stripe'
+import { getProfile, getUser } from '@/lib/account/session'
+import { getStripeCustomerId } from '@/lib/account/stripe-customer'
 import { quoteCart } from '@/lib/checkout/quote'
 import { type CheckoutResponse, checkoutRequestSchema } from '@/lib/checkout/schema'
 import { clampSchedule, describeSchedule } from '@/lib/pricing'
@@ -29,7 +31,16 @@ export async function POST(req: NextRequest) {
   const schedule = clampSchedule(input.schedule)
 
   try {
-    const customer = stripe ? await findCustomer(stripe, input.customer.email) : null
+    // Signed in: the account's own Stripe customer (created if needed), whatever email is typed.
+    // Guest: a returning customer with the same email keeps their Autoship history.
+    const user = await getUser()
+    const accountCustomerId =
+      stripe && user ? await getStripeCustomerId(user, await getProfile(), { create: true }) : null
+    const customer = !stripe
+      ? null
+      : accountCustomerId
+        ? await stripe.customers.retrieve(accountCustomerId).then((c) => (c.deleted ? null : c))
+        : await findCustomer(stripe, input.customer.email)
     const firstAutoship = customer?.metadata?.[FIRST_AUTOSHIP_FLAG] !== 'true'
     const { quote, problems } = await quoteCart(input, { firstAutoship })
     if (problems.length)
@@ -63,7 +74,8 @@ export async function POST(req: NextRequest) {
         : {}),
       notes: f.notes ?? '',
       ...(hasAutoship ? { autoship_schedule: describeSchedule(schedule) } : {}),
-      first_autoship_discount: quote.discount > 0 ? 'true' : 'false'
+      first_autoship_discount: quote.discount > 0 ? 'true' : 'false',
+      ...(user ? { user_id: user.id } : {})
     }
 
     const lineItems: Stripe.Checkout.SessionCreateParams.LineItem[] = quote.lines.map((l) => ({

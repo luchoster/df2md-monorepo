@@ -3,9 +3,11 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { ClearCart } from '@/components/checkout/clear-cart'
 import { Button } from '@/components/ui/button'
+import { getUser } from '@/lib/account/session'
 import { formatDeliveryDate } from '@/lib/delivery'
 import { formatPrice } from '@/lib/format'
 import { stripe } from '@/lib/stripe'
+import { accountsEnabled } from '@/lib/supabase/env'
 
 export const metadata: Metadata = { title: 'Thank you', robots: { index: false } }
 
@@ -21,6 +23,7 @@ export default async function CheckoutSuccessPage({
       : null
   const paid = session?.status === 'complete'
   const pickup = session?.metadata?.fulfillment === 'pickup'
+  const user = await getUser()
 
   return (
     <section className="container max-w-2xl py-16 text-center md:py-24">
@@ -64,9 +67,28 @@ export default async function CheckoutSuccessPage({
           at (702) 971-2484.
         </p>
       )}
-      <Button asChild size="lg">
-        <Link href="/shop">Continue shopping</Link>
-      </Button>
+      {paid && accountsEnabled && !user && (
+        <div className="mb-8 rounded-xl bg-footer p-5 text-sm">
+          <p className="font-semibold">Track this order and manage your Autoship</p>
+          <p className="mt-1 text-muted-foreground">
+            Create an account with {session?.customer_details?.email ?? 'the same email'} and this
+            order shows up automatically.
+          </p>
+          <Button asChild variant="outline" size="sm" className="mt-3">
+            <Link href="/register?next=/account/orders">Create an account</Link>
+          </Button>
+        </div>
+      )}
+      <div className="flex flex-wrap justify-center gap-3">
+        {paid && user && (
+          <Button asChild size="lg" variant="outline">
+            <Link href="/account/orders">View my orders</Link>
+          </Button>
+        )}
+        <Button asChild size="lg">
+          <Link href="/shop">Continue shopping</Link>
+        </Button>
+      </div>
     </section>
   )
 }

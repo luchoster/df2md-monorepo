@@ -4627,6 +4627,33 @@ export type PRODUCT_SLUGS_QUERY_RESULT = Array<{
   slug: string;
 }>;
 
+// Source: ../web/sanity/queries/product.ts
+// Variable: PRODUCT_THUMBS_QUERY
+// Query: *[_type == "product" && _id in $ids]{ _id, title, "slug": slug.current, mainImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } }
+export type PRODUCT_THUMBS_QUERY_RESULT = Array<{
+  _id: string;
+  title: string;
+  slug: string;
+  mainImage: {
+    _type: "image";
+    asset: {
+      _id: string;
+      url: string;
+      metadata: {
+        lqip: string | null;
+        dimensions: {
+          width: number;
+          height: number;
+          aspectRatio: number;
+        } | null;
+      } | null;
+    } | null;
+    alt: string | null;
+    hotspot: SanityImageHotspot | null;
+    crop: SanityImageCrop | null;
+  } | null;
+}>;
+
 // Source: ../web/sanity/queries/settings.ts
 // Variable: SETTINGS_QUERY
 // Query: *[_id == "siteSettings"][0]{    mainMenu[]{      _key, label, dropdown,      link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } },      "subcategories": select(        dropdown == "children" => *[_type == "category" && parent._ref == ^.link.internal._ref && showInNav != false]          | order(order asc, title asc){ _id, title, "slug": slug.current }      ),      children[]{ _key, label, link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } } }    },    footerColumns[]{ _key, title, links[]{ _key, label, link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } } } },    legalLinks[]{ _key, label, link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } } },    social,    contact,    announcement{ active, text, button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } } },    delivery,    autoship,    taxRatePercent  }
@@ -4928,6 +4955,7 @@ declare global {
     '\n  *[_type == "page" && count(oldUrls) > 0]{ "slug": slug.current, oldUrls }\n': PAGE_REDIRECTS_QUERY_RESULT;
     '\n  *[_type == "product" && slug.current == $slug && status != "archived"][0]{\n    _id, title, "slug": slug.current, status, featured, shortDescription,\n    "brand": brand->{ title, "slug": slug.current },\n    "categories": categories[]->{ _id, title, "slug": slug.current, "parent": parent->{ title, "slug": slug.current } },\n    "primaryCategory": primaryCategory->{ title, "slug": slug.current, "parent": parent->{ title, "slug": slug.current } },\n    mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    gallery[]{ _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    optionName, defaultVariantKey, autoshipEligible, noDiscounts, showAdditionalInfo, tags,\n    "variants": variants[price > 0]{ _key, option, sku, price, compareAtPrice, inStock, weightLbs,\n      image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n } },\n    description[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    nutritionalInfo[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    feedingInstructions[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    ingredientsAndUse[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    seo { \n  title,\n  description,\n  noindex,\n  image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    "related": *[_type == "product" && status == "active" && _id != ^._id\n      && count((categories[]._ref)[@ in ^.^.categories[]._ref]) > 0\n      && count(variants[price > 0]) > 0] | order(featured desc, lower(title) asc)[0...10]{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  noDiscounts,\n  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock }\n }\n  }\n': PRODUCT_QUERY_RESULT;
     '\n  *[_type == "product" && status == "active" && defined(slug.current)]{ "slug": slug.current }\n': PRODUCT_SLUGS_QUERY_RESULT;
+    '\n  *[_type == "product" && _id in $ids]{ _id, title, "slug": slug.current, mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n } }\n': PRODUCT_THUMBS_QUERY_RESULT;
     '\n  *[_id == "siteSettings"][0]{\n    mainMenu[]{\n      _key, label, dropdown,\n      link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n      "subcategories": select(\n        dropdown == "children" => *[_type == "category" && parent._ref == ^.link.internal._ref && showInNav != false]\n          | order(order asc, title asc){ _id, title, "slug": slug.current }\n      ),\n      children[]{ _key, label, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } }\n    },\n    footerColumns[]{ _key, title, links[]{ _key, label, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } } },\n    legalLinks[]{ _key, label, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } },\n    social,\n    contact,\n    announcement{ active, text, button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } },\n    delivery,\n    autoship,\n    taxRatePercent\n  }\n': SETTINGS_QUERY_RESULT;
     '\n  *[_type == "brand" && count(*[_type == "product" && status == "active" && references(^._id)]) > 0]\n    | order(lower(title) asc){ _id, title, "slug": slug.current }\n': NAV_BRANDS_QUERY_RESULT;
     '\n  *[_type == "category" && !defined(parent) && showInNav != false] | order(order asc, title asc){\n    _id, title, "slug": slug.current,\n    "children": *[_type == "category" && parent._ref == ^._id && showInNav != false] | order(order asc, title asc){\n      _id, title, "slug": slug.current\n    }\n  }\n': NAV_CATEGORIES_QUERY_RESULT;

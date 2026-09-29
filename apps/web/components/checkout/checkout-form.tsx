@@ -37,13 +37,33 @@ export type CheckoutSettings = {
   timeWindow: { start: string; end: string; slotMinutes: number }
 }
 
+/** Prefill from the signed-in customer's profile (null for guests). */
+export type CheckoutCustomer = {
+  name: string
+  email: string
+  phone: string
+  line1: string
+  line2: string
+  city: string
+  postalCode: string
+  notes: string
+}
+
 type Errors = Record<string, string>
 
 /**
  * shadcnblocks Checkout 10 layout (details + delivery on the left, cart summary on the right),
  * posting to /api/checkout which re-prices everything server-side and hands off to Stripe.
  */
-export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
+export function CheckoutForm({
+  settings,
+  customer,
+  accountsEnabled
+}: {
+  settings: CheckoutSettings
+  customer: CheckoutCustomer | null
+  accountsEnabled: boolean
+}) {
   const { ready, items, schedule } = useCart()
   const [method, setMethod] = useState<'delivery' | 'pickup'>('delivery')
   const [time, setTime] = useState('any')
@@ -155,7 +175,21 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
       <form onSubmit={onSubmit} noValidate>
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
           <div className="space-y-8 lg:col-span-2">
-            <h1 className="text-3xl md:text-4xl">Checkout</h1>
+            <div className="flex flex-wrap items-end justify-between gap-2">
+              <h1 className="text-3xl md:text-4xl">Checkout</h1>
+              {accountsEnabled && !customer && (
+                <p className="text-sm text-muted-foreground">
+                  Have an account?{' '}
+                  <Link
+                    href="/login?next=/checkout"
+                    className="font-medium text-brand hover:underline"
+                  >
+                    Sign in
+                  </Link>{' '}
+                  for faster checkout.
+                </p>
+              )}
+            </div>
 
             <Panel title="Contact" disabled={!!clientSecret}>
               <div className="grid gap-4 sm:grid-cols-2">
@@ -163,6 +197,7 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                   name="name"
                   label="Full name"
                   autoComplete="name"
+                  defaultValue={customer?.name}
                   error={errors.name}
                   className="sm:col-span-2"
                 />
@@ -171,6 +206,8 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                   label="Email"
                   type="email"
                   autoComplete="email"
+                  defaultValue={customer?.email}
+                  readOnly={!!customer}
                   error={errors.email}
                 />
                 <Text
@@ -178,6 +215,7 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                   label="Phone"
                   type="tel"
                   autoComplete="tel"
+                  defaultValue={customer?.phone}
                   error={errors.phone}
                 />
               </div>
@@ -211,6 +249,7 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                     name="line1"
                     label="Street address"
                     autoComplete="address-line1"
+                    defaultValue={customer?.line1}
                     error={errors.line1}
                     className="sm:col-span-4"
                   />
@@ -218,12 +257,14 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                     name="line2"
                     label="Apt / suite (optional)"
                     autoComplete="address-line2"
+                    defaultValue={customer?.line2}
                     className="sm:col-span-2"
                   />
                   <Text
                     name="city"
                     label="City"
                     autoComplete="address-level2"
+                    defaultValue={customer?.city}
                     error={errors.city}
                     list="df2md-cities"
                     className="sm:col-span-3"
@@ -237,6 +278,7 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                     label="ZIP code"
                     autoComplete="postal-code"
                     inputMode="numeric"
+                    defaultValue={customer?.postalCode}
                     error={errors.postalCode}
                     className="sm:col-span-2"
                   />
@@ -277,6 +319,7 @@ export function CheckoutForm({ settings }: { settings: CheckoutSettings }) {
                   name="notes"
                   rows={2}
                   placeholder="Gate code, leave at the side door, frozen items…"
+                  defaultValue={customer?.notes}
                   className="bg-background"
                 />
               </div>

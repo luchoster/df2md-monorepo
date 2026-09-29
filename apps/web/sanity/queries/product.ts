@@ -29,3 +29,8 @@ export const PRODUCT_QUERY = defineQuery(`
 export const PRODUCT_SLUGS_QUERY = defineQuery(`
   *[_type == "product" && status == "active" && defined(slug.current)]{ "slug": slug.current }
 `)
+
+/** Thumbnails and links for order history and Autoship lines. */
+export const PRODUCT_THUMBS_QUERY = defineQuery(`
+  *[_type == "product" && _id in $ids]{ _id, title, "slug": slug.current, mainImage { ${imageFragment} } }
+`)
