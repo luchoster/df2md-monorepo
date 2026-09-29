@@ -45,3 +45,36 @@ export const featureSplitFragment = /* groq */ `
     button { ${linkFragment} }
   }
 `
+
+export const featureRowsFragment = /* groq */ `
+  _type == "feature-rows" => {
+    _type, _key, heading, subheading, firstImageSide, background, padding,
+    rows[]{ _key, title, description, image { ${imageFragment} }, link { ${linkFragment} } }
+  }
+`
+
+export const featurePhotoFragment = /* groq */ `
+  _type == "feature-photo" => {
+    _type, _key, badge, heading, description, imageSide, chip, overlayHeading, background, padding,
+    button { ${linkFragment} },
+    image { ${imageFragment} },
+    chipImage { ${imageFragment} },
+    overlayLink { ${linkFragment} }
+  }
+`
+
+export const faqSearchFragment = /* groq */ `
+  _type == "faq-search" => {
+    _type, _key, label, heading, description, searchPlaceholder, emptyText, padding,
+    items[]{ _key, question, answer, "answerText": pt::text(answer) },
+    "email": *[_id == "siteSettings"][0].contact.email
+  }
+`
+
+export const aboutIntroFragment = /* groq */ `
+  _type == "about-intro" => {
+    _type, _key, heading, description, background, padding,
+    button { ${linkFragment} },
+    images[]{ _key, ${imageFragment} }
+  }
+`

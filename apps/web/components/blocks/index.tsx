@@ -1,8 +1,12 @@
 import type { ComponentType } from 'react'
 import ContactMap from './contact/contact-map'
 import ReviewsEmbed from './contact/reviews-embed'
+import AboutIntro from './content/about-intro'
 import FaqList from './content/faq-list'
+import FaqSearch from './content/faq-search'
 import FeatureGrid from './content/feature-grid'
+import FeaturePhoto from './content/feature-photo'
+import FeatureRows from './content/feature-rows'
 import FeatureSplit from './content/feature-split'
 import ImageText from './content/image-text'
 import RichContentBlock from './content/rich-content-block'
@@ -21,6 +25,10 @@ const componentMap: Record<Block['_type'], ComponentType<any>> = {
   'rich-content-block': RichContentBlock,
   'image-text': ImageText,
   'faq-list': FaqList,
+  'faq-search': FaqSearch,
+  'feature-rows': FeatureRows,
+  'feature-photo': FeaturePhoto,
+  'about-intro': AboutIntro,
   'feature-grid': FeatureGrid,
   'feature-split': FeatureSplit,
   steps: Steps,

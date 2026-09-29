@@ -48,6 +48,15 @@ export type SlideImage = {
   _type: "image";
 };
 
+export type FeatureRowImage = {
+  asset?: SanityImageAssetReference;
+  media?: unknown; // Unable to locate the referenced type "featureRow.image.media" in schema
+  hotspot?: SanityImageHotspot;
+  crop?: SanityImageCrop;
+  alt?: string;
+  _type: "image";
+};
+
 export type ReviewsEmbed = {
   _type: "reviews-embed";
   heading?: string;
@@ -169,6 +178,110 @@ export type Steps = {
   padding?: SectionPadding;
 };
 
+export type AboutIntro = {
+  _type: "about-intro";
+  heading: string;
+  description?: string;
+  button?: Link;
+  images?: Array<{
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+    _key: string;
+  }>;
+  background?:
+    | "white"
+    | "surface"
+    | "brand"
+    | "brand-light"
+    | "brand-lime"
+    | "navy"
+    | "sky"
+    | "sky-band"
+    | "teal"
+    | "ink"
+    | "accent"
+    | "sun"
+    | "sun-soft";
+  padding?: SectionPadding;
+};
+
+export type FeaturePhoto = {
+  _type: "feature-photo";
+  badge?: string;
+  heading: string;
+  description?: string;
+  button?: Link;
+  image: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  imageSide?: "left" | "right";
+  chip?: string;
+  chipImage?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  overlayHeading?: string;
+  overlayLink?: Link;
+  background?:
+    | "white"
+    | "surface"
+    | "brand"
+    | "brand-light"
+    | "brand-lime"
+    | "navy"
+    | "sky"
+    | "sky-band"
+    | "teal"
+    | "ink"
+    | "accent"
+    | "sun"
+    | "sun-soft";
+  padding?: SectionPadding;
+};
+
+export type FeatureRows = {
+  _type: "feature-rows";
+  heading?: string;
+  subheading?: string;
+  rows?: Array<{
+    title: string;
+    description?: string;
+    image: FeatureRowImage;
+    link?: Link;
+    _type: "featureRow";
+    _key: string;
+  }>;
+  firstImageSide?: "left" | "right";
+  background?:
+    | "white"
+    | "surface"
+    | "brand"
+    | "brand-light"
+    | "brand-lime"
+    | "navy"
+    | "sky"
+    | "sky-band"
+    | "teal"
+    | "ink"
+    | "accent"
+    | "sun"
+    | "sun-soft";
+  padding?: SectionPadding;
+};
+
 export type FeatureSplit = {
   _type: "feature-split";
   heading: string;
@@ -247,6 +360,22 @@ export type FeatureGrid = {
     | "accent"
     | "sun"
     | "sun-soft";
+  padding?: SectionPadding;
+};
+
+export type FaqSearch = {
+  _type: "faq-search";
+  label?: string;
+  heading: string;
+  description?: string;
+  searchPlaceholder?: string;
+  items?: Array<{
+    question: string;
+    answer: SimpleContent;
+    _type: "faq";
+    _key: string;
+  }>;
+  emptyText?: string;
   padding?: SectionPadding;
 };
 
@@ -533,10 +662,22 @@ export type Page = {
       } & FaqList)
     | ({
         _key: string;
+      } & FaqSearch)
+    | ({
+        _key: string;
       } & FeatureGrid)
     | ({
         _key: string;
       } & FeatureSplit)
+    | ({
+        _key: string;
+      } & FeatureRows)
+    | ({
+        _key: string;
+      } & FeaturePhoto)
+    | ({
+        _key: string;
+      } & AboutIntro)
     | ({
         _key: string;
       } & Steps)
@@ -815,10 +956,22 @@ export type HomePage = {
       } & FaqList)
     | ({
         _key: string;
+      } & FaqSearch)
+    | ({
+        _key: string;
       } & FeatureGrid)
     | ({
         _key: string;
       } & FeatureSplit)
+    | ({
+        _key: string;
+      } & FeatureRows)
+    | ({
+        _key: string;
+      } & FeaturePhoto)
+    | ({
+        _key: string;
+      } & AboutIntro)
     | ({
         _key: string;
       } & Steps)
@@ -970,6 +1123,7 @@ export type AllSanitySchemaTypes =
   | Lightspeed
   | SanityImageAssetReference
   | SlideImage
+  | FeatureRowImage
   | ReviewsEmbed
   | ContactMap
   | BrandReference
@@ -979,8 +1133,12 @@ export type AllSanitySchemaTypes =
   | ProductReference
   | ProductGrid
   | Steps
+  | AboutIntro
+  | FeaturePhoto
+  | FeatureRows
   | FeatureSplit
   | FeatureGrid
+  | FaqSearch
   | FaqList
   | ImageText
   | RichContentBlock
@@ -1034,13 +1192,80 @@ export type CHECKOUT_PRODUCTS_QUERY_RESULT = Array<{
 
 // Source: ../web/sanity/queries/page.ts
 // Variable: PAGE_QUERY
-// Query: *[_type == "page" && slug.current == $slug][0]{    _id, _type, title, "slug": slug.current,    blocks[]{     _type == "hero-slider" => {    _type, _key, autoplay, intervalMs, padding,    slides[]{ _key, image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop }, title, text, buttonText, link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }, textPosition, textBackground }  },    _type == "cta-banner" => {    _type, _key, text, background, decoration, size, padding,    button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } },    image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop }  },    _type == "rich-content-block" => {    _type, _key, title, backgroundColor, textAlign, showLink, padding,    content[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "image-text" => {    _type, _key, title, content, imageSide, background, padding,    image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },    cta {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "faq-list" => { _type, _key, heading, padding, items[]{ _key, question, answer } },    _type == "feature-grid" => {    _type, _key, label, heading, background, padding,    features[]{ _key, icon, title, description },    button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "feature-split" => {    _type, _key, heading, description, checklist, imageSide, background, padding,    image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },    button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "steps" => {    _type, _key, heading, description, background, padding,    steps[]{ _key, title, description },    button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "product-grid" => {    _type, _key, heading, source, limit, layout, padding,    viewAllLink {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } },    "products": select(      source == "manual" => products[]->{   _id,  title,  "slug": slug.current,  "brand": brand->title,  mainImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },  optionName,  defaultVariantKey,  autoshipEligible,  noDiscounts,  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock } },      source == "category" => *[_type == "product" && status == "active" && ^.category._ref in categories[]._ref]        | order(featured desc, title asc)[0...48]{   _id,  title,  "slug": slug.current,  "brand": brand->title,  mainImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },  optionName,  defaultVariantKey,  autoshipEligible,  noDiscounts,  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock } },      *[_type == "product" && status == "active" && featured == true] | order(title asc)[0...48]{   _id,  title,  "slug": slug.current,  "brand": brand->title,  mainImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },  optionName,  defaultVariantKey,  autoshipEligible,  noDiscounts,  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock } }    )  },    _type == "category-grid" => {    _type, _key, heading, columns, padding,    "categories": select(      showAllTopLevel == true => *[_type == "category" && !defined(parent) && showInNav != false] | order(order asc){        _id, title, "slug": slug.current, image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop }      },      categories[]->{ _id, title, "slug": slug.current, image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } }    )  },    _type == "brand-strip" => {    _type, _key, heading, linkToShop, padding,    "brands": select(      showAll == true => *[_type == "brand" && featured == true] | order(title asc){        _id, title, "slug": slug.current, logo {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop }      },      brands[]->{ _id, title, "slug": slug.current, logo {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } }    )  },    _type == "contact-map" => {    _type, _key, heading, text, phone, email, address, hours, mapEmbedUrl,    showForm, formHeading, padding  },    _type == "reviews-embed" => {    _type, _key, heading, provider, embedUrl, padding, reviews[]{ _key, author, rating, text }  } },    meta {   title,  description,  noindex,  image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } }  }
+// Query: *[_type == "page" && slug.current == $slug][0]{    _id, _type, title, "slug": slug.current,    blocks[]{     _type == "hero-slider" => {    _type, _key, autoplay, intervalMs, padding,    slides[]{ _key, image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop }, title, text, buttonText, link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }, textPosition, textBackground }  },    _type == "cta-banner" => {    _type, _key, text, background, decoration, size, padding,    button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } },    image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop }  },    _type == "rich-content-block" => {    _type, _key, title, backgroundColor, textAlign, showLink, padding,    content[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "image-text" => {    _type, _key, title, content, imageSide, background, padding,    image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },    cta {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "faq-list" => { _type, _key, heading, padding, items[]{ _key, question, answer } },    _type == "faq-search" => {    _type, _key, label, heading, description, searchPlaceholder, emptyText, padding,    items[]{ _key, question, answer, "answerText": pt::text(answer) },    "email": *[_id == "siteSettings"][0].contact.email  },    _type == "feature-grid" => {    _type, _key, label, heading, background, padding,    features[]{ _key, icon, title, description },    button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "feature-split" => {    _type, _key, heading, description, checklist, imageSide, background, padding,    image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },    button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "feature-rows" => {    _type, _key, heading, subheading, firstImageSide, background, padding,    rows[]{ _key, title, description, image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop }, link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } } }  },    _type == "feature-photo" => {    _type, _key, badge, heading, description, imageSide, chip, overlayHeading, background, padding,    button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } },    image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },    chipImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },    overlayLink {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "about-intro" => {    _type, _key, heading, description, background, padding,    button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } },    images[]{ _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop }  },    _type == "steps" => {    _type, _key, heading, description, background, padding,    steps[]{ _key, title, description },    button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "product-grid" => {    _type, _key, heading, source, limit, layout, padding,    viewAllLink {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } },    "products": select(      source == "manual" => products[]->{   _id,  title,  "slug": slug.current,  "brand": brand->title,  mainImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },  optionName,  defaultVariantKey,  autoshipEligible,  noDiscounts,  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock } },      source == "category" => *[_type == "product" && status == "active" && ^.category._ref in categories[]._ref]        | order(featured desc, title asc)[0...48]{   _id,  title,  "slug": slug.current,  "brand": brand->title,  mainImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },  optionName,  defaultVariantKey,  autoshipEligible,  noDiscounts,  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock } },      *[_type == "product" && status == "active" && featured == true] | order(title asc)[0...48]{   _id,  title,  "slug": slug.current,  "brand": brand->title,  mainImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },  optionName,  defaultVariantKey,  autoshipEligible,  noDiscounts,  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock } }    )  },    _type == "category-grid" => {    _type, _key, heading, columns, padding,    "categories": select(      showAllTopLevel == true => *[_type == "category" && !defined(parent) && showInNav != false] | order(order asc){        _id, title, "slug": slug.current, image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop }      },      categories[]->{ _id, title, "slug": slug.current, image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } }    )  },    _type == "brand-strip" => {    _type, _key, heading, linkToShop, padding,    "brands": select(      showAll == true => *[_type == "brand" && featured == true] | order(title asc){        _id, title, "slug": slug.current, logo {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop }      },      brands[]->{ _id, title, "slug": slug.current, logo {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } }    )  },    _type == "contact-map" => {    _type, _key, heading, text, phone, email, address, hours, mapEmbedUrl,    showForm, formHeading, padding  },    _type == "reviews-embed" => {    _type, _key, heading, provider, embedUrl, padding, reviews[]{ _key, author, rating, text }  } },    meta {   title,  description,  noindex,  image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } }  }
 export type PAGE_QUERY_RESULT = {
   _id: string;
   _type: "page";
   title: string;
   slug: string;
   blocks: Array<
+    | {
+        _type: "about-intro";
+        _key: string;
+        heading: string;
+        description: string | null;
+        background:
+          | "accent"
+          | "brand-light"
+          | "brand-lime"
+          | "brand"
+          | "ink"
+          | "navy"
+          | "sky-band"
+          | "sky"
+          | "sun-soft"
+          | "sun"
+          | "surface"
+          | "teal"
+          | "white"
+          | null;
+        padding: SectionPadding | null;
+        button: {
+          title: string;
+          linkType: "href" | "internal" | null;
+          href: string | null;
+          target: boolean | null;
+          buttonVariant:
+            "dark" | "default" | "link" | "outline" | "secondary" | null;
+          internal:
+            | {
+                _type: "brand";
+                slug: string;
+              }
+            | {
+                _type: "category";
+                slug: string;
+              }
+            | {
+                _type: "page";
+                slug: string;
+              }
+            | {
+                _type: "product";
+                slug: string;
+              }
+            | null;
+        } | null;
+        images: Array<{
+          _key: string;
+          _type: "image";
+          asset: {
+            _id: string;
+            url: string;
+            metadata: {
+              lqip: string | null;
+              dimensions: {
+                width: number;
+                height: number;
+                aspectRatio: number;
+              } | null;
+            } | null;
+          } | null;
+          alt: string | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+        }> | null;
+      }
     | {
         _type: "brand-strip";
         _key: string;
@@ -1194,6 +1419,23 @@ export type PAGE_QUERY_RESULT = {
         }> | null;
       }
     | {
+        _type: "faq-search";
+        _key: string;
+        label: string | null;
+        heading: string;
+        description: string | null;
+        searchPlaceholder: string | null;
+        emptyText: string | null;
+        padding: SectionPadding | null;
+        items: Array<{
+          _key: string;
+          question: string;
+          answer: SimpleContent;
+          answerText: string;
+        }> | null;
+        email: null | string;
+      }
+    | {
         _type: "feature-grid";
         _key: string;
         label: string | null;
@@ -1267,6 +1509,192 @@ export type PAGE_QUERY_RESULT = {
               }
             | null;
         } | null;
+      }
+    | {
+        _type: "feature-photo";
+        _key: string;
+        badge: string | null;
+        heading: string;
+        description: string | null;
+        imageSide: "left" | "right" | null;
+        chip: string | null;
+        overlayHeading: string | null;
+        background:
+          | "accent"
+          | "brand-light"
+          | "brand-lime"
+          | "brand"
+          | "ink"
+          | "navy"
+          | "sky-band"
+          | "sky"
+          | "sun-soft"
+          | "sun"
+          | "surface"
+          | "teal"
+          | "white"
+          | null;
+        padding: SectionPadding | null;
+        button: {
+          title: string;
+          linkType: "href" | "internal" | null;
+          href: string | null;
+          target: boolean | null;
+          buttonVariant:
+            "dark" | "default" | "link" | "outline" | "secondary" | null;
+          internal:
+            | {
+                _type: "brand";
+                slug: string;
+              }
+            | {
+                _type: "category";
+                slug: string;
+              }
+            | {
+                _type: "page";
+                slug: string;
+              }
+            | {
+                _type: "product";
+                slug: string;
+              }
+            | null;
+        } | null;
+        image: {
+          _type: "image";
+          asset: {
+            _id: string;
+            url: string;
+            metadata: {
+              lqip: string | null;
+              dimensions: {
+                width: number;
+                height: number;
+                aspectRatio: number;
+              } | null;
+            } | null;
+          } | null;
+          alt: string | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+        };
+        chipImage: {
+          _type: "image";
+          asset: {
+            _id: string;
+            url: string;
+            metadata: {
+              lqip: string | null;
+              dimensions: {
+                width: number;
+                height: number;
+                aspectRatio: number;
+              } | null;
+            } | null;
+          } | null;
+          alt: string | null;
+          hotspot: SanityImageHotspot | null;
+          crop: SanityImageCrop | null;
+        } | null;
+        overlayLink: {
+          title: string;
+          linkType: "href" | "internal" | null;
+          href: string | null;
+          target: boolean | null;
+          buttonVariant:
+            "dark" | "default" | "link" | "outline" | "secondary" | null;
+          internal:
+            | {
+                _type: "brand";
+                slug: string;
+              }
+            | {
+                _type: "category";
+                slug: string;
+              }
+            | {
+                _type: "page";
+                slug: string;
+              }
+            | {
+                _type: "product";
+                slug: string;
+              }
+            | null;
+        } | null;
+      }
+    | {
+        _type: "feature-rows";
+        _key: string;
+        heading: string | null;
+        subheading: string | null;
+        firstImageSide: "left" | "right" | null;
+        background:
+          | "accent"
+          | "brand-light"
+          | "brand-lime"
+          | "brand"
+          | "ink"
+          | "navy"
+          | "sky-band"
+          | "sky"
+          | "sun-soft"
+          | "sun"
+          | "surface"
+          | "teal"
+          | "white"
+          | null;
+        padding: SectionPadding | null;
+        rows: Array<{
+          _key: string;
+          title: string;
+          description: string | null;
+          image: {
+            _type: "image";
+            asset: {
+              _id: string;
+              url: string;
+              metadata: {
+                lqip: string | null;
+                dimensions: {
+                  width: number;
+                  height: number;
+                  aspectRatio: number;
+                } | null;
+              } | null;
+            } | null;
+            alt: string | null;
+            hotspot: SanityImageHotspot | null;
+            crop: SanityImageCrop | null;
+          };
+          link: {
+            title: string;
+            linkType: "href" | "internal" | null;
+            href: string | null;
+            target: boolean | null;
+            buttonVariant:
+              "dark" | "default" | "link" | "outline" | "secondary" | null;
+            internal:
+              | {
+                  _type: "brand";
+                  slug: string;
+                }
+              | {
+                  _type: "category";
+                  slug: string;
+                }
+              | {
+                  _type: "page";
+                  slug: string;
+                }
+              | {
+                  _type: "product";
+                  slug: string;
+                }
+              | null;
+          } | null;
+        }> | null;
       }
     | {
         _type: "feature-split";
@@ -1751,7 +2179,7 @@ export type PAGES_SLUGS_QUERY_RESULT = Array<{
 
 // Source: ../web/sanity/queries/page.ts
 // Variable: HOME_PAGE_QUERY
-// Query: *[_id == "homePage"][0]{    _id, _type,    blocks[]{     _type == "hero-slider" => {    _type, _key, autoplay, intervalMs, padding,    slides[]{ _key, image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop }, title, text, buttonText, link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }, textPosition, textBackground }  },    _type == "cta-banner" => {    _type, _key, text, background, decoration, size, padding,    button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } },    image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop }  },    _type == "rich-content-block" => {    _type, _key, title, backgroundColor, textAlign, showLink, padding,    content[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "image-text" => {    _type, _key, title, content, imageSide, background, padding,    image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },    cta {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "faq-list" => { _type, _key, heading, padding, items[]{ _key, question, answer } },    _type == "feature-grid" => {    _type, _key, label, heading, background, padding,    features[]{ _key, icon, title, description },    button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "feature-split" => {    _type, _key, heading, description, checklist, imageSide, background, padding,    image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },    button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "steps" => {    _type, _key, heading, description, background, padding,    steps[]{ _key, title, description },    button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "product-grid" => {    _type, _key, heading, source, limit, layout, padding,    viewAllLink {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } },    "products": select(      source == "manual" => products[]->{   _id,  title,  "slug": slug.current,  "brand": brand->title,  mainImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },  optionName,  defaultVariantKey,  autoshipEligible,  noDiscounts,  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock } },      source == "category" => *[_type == "product" && status == "active" && ^.category._ref in categories[]._ref]        | order(featured desc, title asc)[0...48]{   _id,  title,  "slug": slug.current,  "brand": brand->title,  mainImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },  optionName,  defaultVariantKey,  autoshipEligible,  noDiscounts,  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock } },      *[_type == "product" && status == "active" && featured == true] | order(title asc)[0...48]{   _id,  title,  "slug": slug.current,  "brand": brand->title,  mainImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },  optionName,  defaultVariantKey,  autoshipEligible,  noDiscounts,  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock } }    )  },    _type == "category-grid" => {    _type, _key, heading, columns, padding,    "categories": select(      showAllTopLevel == true => *[_type == "category" && !defined(parent) && showInNav != false] | order(order asc){        _id, title, "slug": slug.current, image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop }      },      categories[]->{ _id, title, "slug": slug.current, image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } }    )  },    _type == "brand-strip" => {    _type, _key, heading, linkToShop, padding,    "brands": select(      showAll == true => *[_type == "brand" && featured == true] | order(title asc){        _id, title, "slug": slug.current, logo {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop }      },      brands[]->{ _id, title, "slug": slug.current, logo {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } }    )  },    _type == "contact-map" => {    _type, _key, heading, text, phone, email, address, hours, mapEmbedUrl,    showForm, formHeading, padding  },    _type == "reviews-embed" => {    _type, _key, heading, provider, embedUrl, padding, reviews[]{ _key, author, rating, text }  } },    meta {   title,  description,  noindex,  image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } }  }
+// Query: *[_id == "homePage"][0]{    _id, _type,    blocks[]{     _type == "hero-slider" => {    _type, _key, autoplay, intervalMs, padding,    slides[]{ _key, image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop }, title, text, buttonText, link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }, textPosition, textBackground }  },    _type == "cta-banner" => {    _type, _key, text, background, decoration, size, padding,    button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } },    image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop }  },    _type == "rich-content-block" => {    _type, _key, title, backgroundColor, textAlign, showLink, padding,    content[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "image-text" => {    _type, _key, title, content, imageSide, background, padding,    image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },    cta {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "faq-list" => { _type, _key, heading, padding, items[]{ _key, question, answer } },    _type == "faq-search" => {    _type, _key, label, heading, description, searchPlaceholder, emptyText, padding,    items[]{ _key, question, answer, "answerText": pt::text(answer) },    "email": *[_id == "siteSettings"][0].contact.email  },    _type == "feature-grid" => {    _type, _key, label, heading, background, padding,    features[]{ _key, icon, title, description },    button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "feature-split" => {    _type, _key, heading, description, checklist, imageSide, background, padding,    image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },    button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "feature-rows" => {    _type, _key, heading, subheading, firstImageSide, background, padding,    rows[]{ _key, title, description, image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop }, link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } } }  },    _type == "feature-photo" => {    _type, _key, badge, heading, description, imageSide, chip, overlayHeading, background, padding,    button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } },    image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },    chipImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },    overlayLink {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "about-intro" => {    _type, _key, heading, description, background, padding,    button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } },    images[]{ _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop }  },    _type == "steps" => {    _type, _key, heading, description, background, padding,    steps[]{ _key, title, description },    button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } }  },    _type == "product-grid" => {    _type, _key, heading, source, limit, layout, padding,    viewAllLink {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } },    "products": select(      source == "manual" => products[]->{   _id,  title,  "slug": slug.current,  "brand": brand->title,  mainImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },  optionName,  defaultVariantKey,  autoshipEligible,  noDiscounts,  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock } },      source == "category" => *[_type == "product" && status == "active" && ^.category._ref in categories[]._ref]        | order(featured desc, title asc)[0...48]{   _id,  title,  "slug": slug.current,  "brand": brand->title,  mainImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },  optionName,  defaultVariantKey,  autoshipEligible,  noDiscounts,  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock } },      *[_type == "product" && status == "active" && featured == true] | order(title asc)[0...48]{   _id,  title,  "slug": slug.current,  "brand": brand->title,  mainImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },  optionName,  defaultVariantKey,  autoshipEligible,  noDiscounts,  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock } }    )  },    _type == "category-grid" => {    _type, _key, heading, columns, padding,    "categories": select(      showAllTopLevel == true => *[_type == "category" && !defined(parent) && showInNav != false] | order(order asc){        _id, title, "slug": slug.current, image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop }      },      categories[]->{ _id, title, "slug": slug.current, image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } }    )  },    _type == "brand-strip" => {    _type, _key, heading, linkToShop, padding,    "brands": select(      showAll == true => *[_type == "brand" && featured == true] | order(title asc){        _id, title, "slug": slug.current, logo {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop }      },      brands[]->{ _id, title, "slug": slug.current, logo {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } }    )  },    _type == "contact-map" => {    _type, _key, heading, text, phone, email, address, hours, mapEmbedUrl,    showForm, formHeading, padding  },    _type == "reviews-embed" => {    _type, _key, heading, provider, embedUrl, padding, reviews[]{ _key, author, rating, text }  } },    meta {   title,  description,  noindex,  image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } }  }
 export type HOME_PAGE_QUERY_RESULT =
   | {
       _id: "homePage";
@@ -1769,6 +2197,73 @@ export type HOME_PAGE_QUERY_RESULT =
       _id: "homePage";
       _type: "homePage";
       blocks: Array<
+        | {
+            _type: "about-intro";
+            _key: string;
+            heading: string;
+            description: string | null;
+            background:
+              | "accent"
+              | "brand-light"
+              | "brand-lime"
+              | "brand"
+              | "ink"
+              | "navy"
+              | "sky-band"
+              | "sky"
+              | "sun-soft"
+              | "sun"
+              | "surface"
+              | "teal"
+              | "white"
+              | null;
+            padding: SectionPadding | null;
+            button: {
+              title: string;
+              linkType: "href" | "internal" | null;
+              href: string | null;
+              target: boolean | null;
+              buttonVariant:
+                "dark" | "default" | "link" | "outline" | "secondary" | null;
+              internal:
+                | {
+                    _type: "brand";
+                    slug: string;
+                  }
+                | {
+                    _type: "category";
+                    slug: string;
+                  }
+                | {
+                    _type: "page";
+                    slug: string;
+                  }
+                | {
+                    _type: "product";
+                    slug: string;
+                  }
+                | null;
+            } | null;
+            images: Array<{
+              _key: string;
+              _type: "image";
+              asset: {
+                _id: string;
+                url: string;
+                metadata: {
+                  lqip: string | null;
+                  dimensions: {
+                    width: number;
+                    height: number;
+                    aspectRatio: number;
+                  } | null;
+                } | null;
+              } | null;
+              alt: string | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+            }> | null;
+          }
         | {
             _type: "brand-strip";
             _key: string;
@@ -1922,6 +2417,23 @@ export type HOME_PAGE_QUERY_RESULT =
             }> | null;
           }
         | {
+            _type: "faq-search";
+            _key: string;
+            label: string | null;
+            heading: string;
+            description: string | null;
+            searchPlaceholder: string | null;
+            emptyText: string | null;
+            padding: SectionPadding | null;
+            items: Array<{
+              _key: string;
+              question: string;
+              answer: SimpleContent;
+              answerText: string;
+            }> | null;
+            email: null | string;
+          }
+        | {
             _type: "feature-grid";
             _key: string;
             label: string | null;
@@ -1995,6 +2507,192 @@ export type HOME_PAGE_QUERY_RESULT =
                   }
                 | null;
             } | null;
+          }
+        | {
+            _type: "feature-photo";
+            _key: string;
+            badge: string | null;
+            heading: string;
+            description: string | null;
+            imageSide: "left" | "right" | null;
+            chip: string | null;
+            overlayHeading: string | null;
+            background:
+              | "accent"
+              | "brand-light"
+              | "brand-lime"
+              | "brand"
+              | "ink"
+              | "navy"
+              | "sky-band"
+              | "sky"
+              | "sun-soft"
+              | "sun"
+              | "surface"
+              | "teal"
+              | "white"
+              | null;
+            padding: SectionPadding | null;
+            button: {
+              title: string;
+              linkType: "href" | "internal" | null;
+              href: string | null;
+              target: boolean | null;
+              buttonVariant:
+                "dark" | "default" | "link" | "outline" | "secondary" | null;
+              internal:
+                | {
+                    _type: "brand";
+                    slug: string;
+                  }
+                | {
+                    _type: "category";
+                    slug: string;
+                  }
+                | {
+                    _type: "page";
+                    slug: string;
+                  }
+                | {
+                    _type: "product";
+                    slug: string;
+                  }
+                | null;
+            } | null;
+            image: {
+              _type: "image";
+              asset: {
+                _id: string;
+                url: string;
+                metadata: {
+                  lqip: string | null;
+                  dimensions: {
+                    width: number;
+                    height: number;
+                    aspectRatio: number;
+                  } | null;
+                } | null;
+              } | null;
+              alt: string | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+            };
+            chipImage: {
+              _type: "image";
+              asset: {
+                _id: string;
+                url: string;
+                metadata: {
+                  lqip: string | null;
+                  dimensions: {
+                    width: number;
+                    height: number;
+                    aspectRatio: number;
+                  } | null;
+                } | null;
+              } | null;
+              alt: string | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+            } | null;
+            overlayLink: {
+              title: string;
+              linkType: "href" | "internal" | null;
+              href: string | null;
+              target: boolean | null;
+              buttonVariant:
+                "dark" | "default" | "link" | "outline" | "secondary" | null;
+              internal:
+                | {
+                    _type: "brand";
+                    slug: string;
+                  }
+                | {
+                    _type: "category";
+                    slug: string;
+                  }
+                | {
+                    _type: "page";
+                    slug: string;
+                  }
+                | {
+                    _type: "product";
+                    slug: string;
+                  }
+                | null;
+            } | null;
+          }
+        | {
+            _type: "feature-rows";
+            _key: string;
+            heading: string | null;
+            subheading: string | null;
+            firstImageSide: "left" | "right" | null;
+            background:
+              | "accent"
+              | "brand-light"
+              | "brand-lime"
+              | "brand"
+              | "ink"
+              | "navy"
+              | "sky-band"
+              | "sky"
+              | "sun-soft"
+              | "sun"
+              | "surface"
+              | "teal"
+              | "white"
+              | null;
+            padding: SectionPadding | null;
+            rows: Array<{
+              _key: string;
+              title: string;
+              description: string | null;
+              image: {
+                _type: "image";
+                asset: {
+                  _id: string;
+                  url: string;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: {
+                      width: number;
+                      height: number;
+                      aspectRatio: number;
+                    } | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+                hotspot: SanityImageHotspot | null;
+                crop: SanityImageCrop | null;
+              };
+              link: {
+                title: string;
+                linkType: "href" | "internal" | null;
+                href: string | null;
+                target: boolean | null;
+                buttonVariant:
+                  "dark" | "default" | "link" | "outline" | "secondary" | null;
+                internal:
+                  | {
+                      _type: "brand";
+                      slug: string;
+                    }
+                  | {
+                      _type: "category";
+                      slug: string;
+                    }
+                  | {
+                      _type: "page";
+                      slug: string;
+                    }
+                  | {
+                      _type: "product";
+                      slug: string;
+                    }
+                  | null;
+              } | null;
+            }> | null;
           }
         | {
             _type: "feature-split";
@@ -2486,6 +3184,73 @@ export type HOME_PAGE_QUERY_RESULT =
       _type: "page";
       blocks: Array<
         | {
+            _type: "about-intro";
+            _key: string;
+            heading: string;
+            description: string | null;
+            background:
+              | "accent"
+              | "brand-light"
+              | "brand-lime"
+              | "brand"
+              | "ink"
+              | "navy"
+              | "sky-band"
+              | "sky"
+              | "sun-soft"
+              | "sun"
+              | "surface"
+              | "teal"
+              | "white"
+              | null;
+            padding: SectionPadding | null;
+            button: {
+              title: string;
+              linkType: "href" | "internal" | null;
+              href: string | null;
+              target: boolean | null;
+              buttonVariant:
+                "dark" | "default" | "link" | "outline" | "secondary" | null;
+              internal:
+                | {
+                    _type: "brand";
+                    slug: string;
+                  }
+                | {
+                    _type: "category";
+                    slug: string;
+                  }
+                | {
+                    _type: "page";
+                    slug: string;
+                  }
+                | {
+                    _type: "product";
+                    slug: string;
+                  }
+                | null;
+            } | null;
+            images: Array<{
+              _key: string;
+              _type: "image";
+              asset: {
+                _id: string;
+                url: string;
+                metadata: {
+                  lqip: string | null;
+                  dimensions: {
+                    width: number;
+                    height: number;
+                    aspectRatio: number;
+                  } | null;
+                } | null;
+              } | null;
+              alt: string | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+            }> | null;
+          }
+        | {
             _type: "brand-strip";
             _key: string;
             heading: string | null;
@@ -2638,6 +3403,23 @@ export type HOME_PAGE_QUERY_RESULT =
             }> | null;
           }
         | {
+            _type: "faq-search";
+            _key: string;
+            label: string | null;
+            heading: string;
+            description: string | null;
+            searchPlaceholder: string | null;
+            emptyText: string | null;
+            padding: SectionPadding | null;
+            items: Array<{
+              _key: string;
+              question: string;
+              answer: SimpleContent;
+              answerText: string;
+            }> | null;
+            email: null | string;
+          }
+        | {
             _type: "feature-grid";
             _key: string;
             label: string | null;
@@ -2711,6 +3493,192 @@ export type HOME_PAGE_QUERY_RESULT =
                   }
                 | null;
             } | null;
+          }
+        | {
+            _type: "feature-photo";
+            _key: string;
+            badge: string | null;
+            heading: string;
+            description: string | null;
+            imageSide: "left" | "right" | null;
+            chip: string | null;
+            overlayHeading: string | null;
+            background:
+              | "accent"
+              | "brand-light"
+              | "brand-lime"
+              | "brand"
+              | "ink"
+              | "navy"
+              | "sky-band"
+              | "sky"
+              | "sun-soft"
+              | "sun"
+              | "surface"
+              | "teal"
+              | "white"
+              | null;
+            padding: SectionPadding | null;
+            button: {
+              title: string;
+              linkType: "href" | "internal" | null;
+              href: string | null;
+              target: boolean | null;
+              buttonVariant:
+                "dark" | "default" | "link" | "outline" | "secondary" | null;
+              internal:
+                | {
+                    _type: "brand";
+                    slug: string;
+                  }
+                | {
+                    _type: "category";
+                    slug: string;
+                  }
+                | {
+                    _type: "page";
+                    slug: string;
+                  }
+                | {
+                    _type: "product";
+                    slug: string;
+                  }
+                | null;
+            } | null;
+            image: {
+              _type: "image";
+              asset: {
+                _id: string;
+                url: string;
+                metadata: {
+                  lqip: string | null;
+                  dimensions: {
+                    width: number;
+                    height: number;
+                    aspectRatio: number;
+                  } | null;
+                } | null;
+              } | null;
+              alt: string | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+            };
+            chipImage: {
+              _type: "image";
+              asset: {
+                _id: string;
+                url: string;
+                metadata: {
+                  lqip: string | null;
+                  dimensions: {
+                    width: number;
+                    height: number;
+                    aspectRatio: number;
+                  } | null;
+                } | null;
+              } | null;
+              alt: string | null;
+              hotspot: SanityImageHotspot | null;
+              crop: SanityImageCrop | null;
+            } | null;
+            overlayLink: {
+              title: string;
+              linkType: "href" | "internal" | null;
+              href: string | null;
+              target: boolean | null;
+              buttonVariant:
+                "dark" | "default" | "link" | "outline" | "secondary" | null;
+              internal:
+                | {
+                    _type: "brand";
+                    slug: string;
+                  }
+                | {
+                    _type: "category";
+                    slug: string;
+                  }
+                | {
+                    _type: "page";
+                    slug: string;
+                  }
+                | {
+                    _type: "product";
+                    slug: string;
+                  }
+                | null;
+            } | null;
+          }
+        | {
+            _type: "feature-rows";
+            _key: string;
+            heading: string | null;
+            subheading: string | null;
+            firstImageSide: "left" | "right" | null;
+            background:
+              | "accent"
+              | "brand-light"
+              | "brand-lime"
+              | "brand"
+              | "ink"
+              | "navy"
+              | "sky-band"
+              | "sky"
+              | "sun-soft"
+              | "sun"
+              | "surface"
+              | "teal"
+              | "white"
+              | null;
+            padding: SectionPadding | null;
+            rows: Array<{
+              _key: string;
+              title: string;
+              description: string | null;
+              image: {
+                _type: "image";
+                asset: {
+                  _id: string;
+                  url: string;
+                  metadata: {
+                    lqip: string | null;
+                    dimensions: {
+                      width: number;
+                      height: number;
+                      aspectRatio: number;
+                    } | null;
+                  } | null;
+                } | null;
+                alt: string | null;
+                hotspot: SanityImageHotspot | null;
+                crop: SanityImageCrop | null;
+              };
+              link: {
+                title: string;
+                linkType: "href" | "internal" | null;
+                href: string | null;
+                target: boolean | null;
+                buttonVariant:
+                  "dark" | "default" | "link" | "outline" | "secondary" | null;
+                internal:
+                  | {
+                      _type: "brand";
+                      slug: string;
+                    }
+                  | {
+                      _type: "category";
+                      slug: string;
+                    }
+                  | {
+                      _type: "page";
+                      slug: string;
+                    }
+                  | {
+                      _type: "product";
+                      slug: string;
+                    }
+                  | null;
+              } | null;
+            }> | null;
           }
         | {
             _type: "feature-split";
@@ -3954,9 +4922,9 @@ export type CATEGORY_SLUGS_QUERY_RESULT = Array<{
 declare global {
   interface SanityQueries {
     '\n  *[_type == "product" && _id in $ids]{\n    _id, title, status, autoshipEligible, noDiscounts,\n    variants[]{ _key, option, price, inStock }\n  }\n': CHECKOUT_PRODUCTS_QUERY_RESULT;
-    '\n  *[_type == "page" && slug.current == $slug][0]{\n    _id, _type, title, "slug": slug.current,\n    blocks[]{ \n  \n  _type == "hero-slider" => {\n    _type, _key, autoplay, intervalMs, padding,\n    slides[]{ _key, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }, title, text, buttonText, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }, textPosition, textBackground }\n  }\n,\n  \n  _type == "cta-banner" => {\n    _type, _key, text, background, decoration, size, padding,\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n    image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n  }\n,\n  \n  _type == "rich-content-block" => {\n    _type, _key, title, backgroundColor, textAlign, showLink, padding,\n    content[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "image-text" => {\n    _type, _key, title, content, imageSide, background, padding,\n    image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    cta { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "faq-list" => { _type, _key, heading, padding, items[]{ _key, question, answer } }\n,\n  \n  _type == "feature-grid" => {\n    _type, _key, label, heading, background, padding,\n    features[]{ _key, icon, title, description },\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "feature-split" => {\n    _type, _key, heading, description, checklist, imageSide, background, padding,\n    image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "steps" => {\n    _type, _key, heading, description, background, padding,\n    steps[]{ _key, title, description },\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "product-grid" => {\n    _type, _key, heading, source, limit, layout, padding,\n    viewAllLink { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n    "products": select(\n      source == "manual" => products[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  noDiscounts,\n  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock }\n },\n      source == "category" => *[_type == "product" && status == "active" && ^.category._ref in categories[]._ref]\n        | order(featured desc, title asc)[0...48]{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  noDiscounts,\n  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock }\n },\n      *[_type == "product" && status == "active" && featured == true] | order(title asc)[0...48]{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  noDiscounts,\n  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock }\n }\n    )\n  }\n,\n  \n  _type == "category-grid" => {\n    _type, _key, heading, columns, padding,\n    "categories": select(\n      showAllTopLevel == true => *[_type == "category" && !defined(parent) && showInNav != false] | order(order asc){\n        _id, title, "slug": slug.current, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n      },\n      categories[]->{ _id, title, "slug": slug.current, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n } }\n    )\n  }\n,\n  \n  _type == "brand-strip" => {\n    _type, _key, heading, linkToShop, padding,\n    "brands": select(\n      showAll == true => *[_type == "brand" && featured == true] | order(title asc){\n        _id, title, "slug": slug.current, logo { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n      },\n      brands[]->{ _id, title, "slug": slug.current, logo { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n } }\n    )\n  }\n,\n  \n  _type == "contact-map" => {\n    _type, _key, heading, text, phone, email, address, hours, mapEmbedUrl,\n    showForm, formHeading, padding\n  }\n,\n  \n  _type == "reviews-embed" => {\n    _type, _key, heading, provider, embedUrl, padding, reviews[]{ _key, author, rating, text }\n  }\n\n },\n    meta { \n  title,\n  description,\n  noindex,\n  image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n }\n  }\n': PAGE_QUERY_RESULT;
+    '\n  *[_type == "page" && slug.current == $slug][0]{\n    _id, _type, title, "slug": slug.current,\n    blocks[]{ \n  \n  _type == "hero-slider" => {\n    _type, _key, autoplay, intervalMs, padding,\n    slides[]{ _key, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }, title, text, buttonText, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }, textPosition, textBackground }\n  }\n,\n  \n  _type == "cta-banner" => {\n    _type, _key, text, background, decoration, size, padding,\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n    image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n  }\n,\n  \n  _type == "rich-content-block" => {\n    _type, _key, title, backgroundColor, textAlign, showLink, padding,\n    content[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "image-text" => {\n    _type, _key, title, content, imageSide, background, padding,\n    image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    cta { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "faq-list" => { _type, _key, heading, padding, items[]{ _key, question, answer } }\n,\n  \n  _type == "faq-search" => {\n    _type, _key, label, heading, description, searchPlaceholder, emptyText, padding,\n    items[]{ _key, question, answer, "answerText": pt::text(answer) },\n    "email": *[_id == "siteSettings"][0].contact.email\n  }\n,\n  \n  _type == "feature-grid" => {\n    _type, _key, label, heading, background, padding,\n    features[]{ _key, icon, title, description },\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "feature-split" => {\n    _type, _key, heading, description, checklist, imageSide, background, padding,\n    image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "feature-rows" => {\n    _type, _key, heading, subheading, firstImageSide, background, padding,\n    rows[]{ _key, title, description, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } }\n  }\n,\n  \n  _type == "feature-photo" => {\n    _type, _key, badge, heading, description, imageSide, chip, overlayHeading, background, padding,\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n    image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    chipImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    overlayLink { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "about-intro" => {\n    _type, _key, heading, description, background, padding,\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n    images[]{ _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n  }\n,\n  \n  _type == "steps" => {\n    _type, _key, heading, description, background, padding,\n    steps[]{ _key, title, description },\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "product-grid" => {\n    _type, _key, heading, source, limit, layout, padding,\n    viewAllLink { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n    "products": select(\n      source == "manual" => products[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  noDiscounts,\n  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock }\n },\n      source == "category" => *[_type == "product" && status == "active" && ^.category._ref in categories[]._ref]\n        | order(featured desc, title asc)[0...48]{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  noDiscounts,\n  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock }\n },\n      *[_type == "product" && status == "active" && featured == true] | order(title asc)[0...48]{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  noDiscounts,\n  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock }\n }\n    )\n  }\n,\n  \n  _type == "category-grid" => {\n    _type, _key, heading, columns, padding,\n    "categories": select(\n      showAllTopLevel == true => *[_type == "category" && !defined(parent) && showInNav != false] | order(order asc){\n        _id, title, "slug": slug.current, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n      },\n      categories[]->{ _id, title, "slug": slug.current, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n } }\n    )\n  }\n,\n  \n  _type == "brand-strip" => {\n    _type, _key, heading, linkToShop, padding,\n    "brands": select(\n      showAll == true => *[_type == "brand" && featured == true] | order(title asc){\n        _id, title, "slug": slug.current, logo { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n      },\n      brands[]->{ _id, title, "slug": slug.current, logo { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n } }\n    )\n  }\n,\n  \n  _type == "contact-map" => {\n    _type, _key, heading, text, phone, email, address, hours, mapEmbedUrl,\n    showForm, formHeading, padding\n  }\n,\n  \n  _type == "reviews-embed" => {\n    _type, _key, heading, provider, embedUrl, padding, reviews[]{ _key, author, rating, text }\n  }\n\n },\n    meta { \n  title,\n  description,\n  noindex,\n  image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n }\n  }\n': PAGE_QUERY_RESULT;
     '\n  *[_type == "page" && defined(slug.current)]{ "slug": slug.current }\n': PAGES_SLUGS_QUERY_RESULT;
-    '\n  *[_id == "homePage"][0]{\n    _id, _type,\n    blocks[]{ \n  \n  _type == "hero-slider" => {\n    _type, _key, autoplay, intervalMs, padding,\n    slides[]{ _key, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }, title, text, buttonText, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }, textPosition, textBackground }\n  }\n,\n  \n  _type == "cta-banner" => {\n    _type, _key, text, background, decoration, size, padding,\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n    image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n  }\n,\n  \n  _type == "rich-content-block" => {\n    _type, _key, title, backgroundColor, textAlign, showLink, padding,\n    content[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "image-text" => {\n    _type, _key, title, content, imageSide, background, padding,\n    image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    cta { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "faq-list" => { _type, _key, heading, padding, items[]{ _key, question, answer } }\n,\n  \n  _type == "feature-grid" => {\n    _type, _key, label, heading, background, padding,\n    features[]{ _key, icon, title, description },\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "feature-split" => {\n    _type, _key, heading, description, checklist, imageSide, background, padding,\n    image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "steps" => {\n    _type, _key, heading, description, background, padding,\n    steps[]{ _key, title, description },\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "product-grid" => {\n    _type, _key, heading, source, limit, layout, padding,\n    viewAllLink { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n    "products": select(\n      source == "manual" => products[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  noDiscounts,\n  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock }\n },\n      source == "category" => *[_type == "product" && status == "active" && ^.category._ref in categories[]._ref]\n        | order(featured desc, title asc)[0...48]{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  noDiscounts,\n  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock }\n },\n      *[_type == "product" && status == "active" && featured == true] | order(title asc)[0...48]{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  noDiscounts,\n  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock }\n }\n    )\n  }\n,\n  \n  _type == "category-grid" => {\n    _type, _key, heading, columns, padding,\n    "categories": select(\n      showAllTopLevel == true => *[_type == "category" && !defined(parent) && showInNav != false] | order(order asc){\n        _id, title, "slug": slug.current, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n      },\n      categories[]->{ _id, title, "slug": slug.current, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n } }\n    )\n  }\n,\n  \n  _type == "brand-strip" => {\n    _type, _key, heading, linkToShop, padding,\n    "brands": select(\n      showAll == true => *[_type == "brand" && featured == true] | order(title asc){\n        _id, title, "slug": slug.current, logo { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n      },\n      brands[]->{ _id, title, "slug": slug.current, logo { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n } }\n    )\n  }\n,\n  \n  _type == "contact-map" => {\n    _type, _key, heading, text, phone, email, address, hours, mapEmbedUrl,\n    showForm, formHeading, padding\n  }\n,\n  \n  _type == "reviews-embed" => {\n    _type, _key, heading, provider, embedUrl, padding, reviews[]{ _key, author, rating, text }\n  }\n\n },\n    meta { \n  title,\n  description,\n  noindex,\n  image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n }\n  }\n': HOME_PAGE_QUERY_RESULT;
+    '\n  *[_id == "homePage"][0]{\n    _id, _type,\n    blocks[]{ \n  \n  _type == "hero-slider" => {\n    _type, _key, autoplay, intervalMs, padding,\n    slides[]{ _key, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }, title, text, buttonText, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }, textPosition, textBackground }\n  }\n,\n  \n  _type == "cta-banner" => {\n    _type, _key, text, background, decoration, size, padding,\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n    image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n  }\n,\n  \n  _type == "rich-content-block" => {\n    _type, _key, title, backgroundColor, textAlign, showLink, padding,\n    content[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "image-text" => {\n    _type, _key, title, content, imageSide, background, padding,\n    image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    cta { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "faq-list" => { _type, _key, heading, padding, items[]{ _key, question, answer } }\n,\n  \n  _type == "faq-search" => {\n    _type, _key, label, heading, description, searchPlaceholder, emptyText, padding,\n    items[]{ _key, question, answer, "answerText": pt::text(answer) },\n    "email": *[_id == "siteSettings"][0].contact.email\n  }\n,\n  \n  _type == "feature-grid" => {\n    _type, _key, label, heading, background, padding,\n    features[]{ _key, icon, title, description },\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "feature-split" => {\n    _type, _key, heading, description, checklist, imageSide, background, padding,\n    image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "feature-rows" => {\n    _type, _key, heading, subheading, firstImageSide, background, padding,\n    rows[]{ _key, title, description, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } }\n  }\n,\n  \n  _type == "feature-photo" => {\n    _type, _key, badge, heading, description, imageSide, chip, overlayHeading, background, padding,\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n    image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    chipImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    overlayLink { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "about-intro" => {\n    _type, _key, heading, description, background, padding,\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n    images[]{ _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n  }\n,\n  \n  _type == "steps" => {\n    _type, _key, heading, description, background, padding,\n    steps[]{ _key, title, description },\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "product-grid" => {\n    _type, _key, heading, source, limit, layout, padding,\n    viewAllLink { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n    "products": select(\n      source == "manual" => products[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  noDiscounts,\n  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock }\n },\n      source == "category" => *[_type == "product" && status == "active" && ^.category._ref in categories[]._ref]\n        | order(featured desc, title asc)[0...48]{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  noDiscounts,\n  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock }\n },\n      *[_type == "product" && status == "active" && featured == true] | order(title asc)[0...48]{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  noDiscounts,\n  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock }\n }\n    )\n  }\n,\n  \n  _type == "category-grid" => {\n    _type, _key, heading, columns, padding,\n    "categories": select(\n      showAllTopLevel == true => *[_type == "category" && !defined(parent) && showInNav != false] | order(order asc){\n        _id, title, "slug": slug.current, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n      },\n      categories[]->{ _id, title, "slug": slug.current, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n } }\n    )\n  }\n,\n  \n  _type == "brand-strip" => {\n    _type, _key, heading, linkToShop, padding,\n    "brands": select(\n      showAll == true => *[_type == "brand" && featured == true] | order(title asc){\n        _id, title, "slug": slug.current, logo { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n      },\n      brands[]->{ _id, title, "slug": slug.current, logo { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n } }\n    )\n  }\n,\n  \n  _type == "contact-map" => {\n    _type, _key, heading, text, phone, email, address, hours, mapEmbedUrl,\n    showForm, formHeading, padding\n  }\n,\n  \n  _type == "reviews-embed" => {\n    _type, _key, heading, provider, embedUrl, padding, reviews[]{ _key, author, rating, text }\n  }\n\n },\n    meta { \n  title,\n  description,\n  noindex,\n  image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n }\n  }\n': HOME_PAGE_QUERY_RESULT;
     '\n  *[_type == "page" && count(oldUrls) > 0]{ "slug": slug.current, oldUrls }\n': PAGE_REDIRECTS_QUERY_RESULT;
     '\n  *[_type == "product" && slug.current == $slug && status != "archived"][0]{\n    _id, title, "slug": slug.current, status, featured, shortDescription,\n    "brand": brand->{ title, "slug": slug.current },\n    "categories": categories[]->{ _id, title, "slug": slug.current, "parent": parent->{ title, "slug": slug.current } },\n    "primaryCategory": primaryCategory->{ title, "slug": slug.current, "parent": parent->{ title, "slug": slug.current } },\n    mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    gallery[]{ _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    optionName, defaultVariantKey, autoshipEligible, noDiscounts, showAdditionalInfo, tags,\n    "variants": variants[price > 0]{ _key, option, sku, price, compareAtPrice, inStock, weightLbs,\n      image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n } },\n    description[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    nutritionalInfo[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    feedingInstructions[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    ingredientsAndUse[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    seo { \n  title,\n  description,\n  noindex,\n  image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    "related": *[_type == "product" && status == "active" && _id != ^._id\n      && count((categories[]._ref)[@ in ^.^.categories[]._ref]) > 0\n      && count(variants[price > 0]) > 0] | order(featured desc, lower(title) asc)[0...10]{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  noDiscounts,\n  "variants": variants[price > 0]{ _key, option, price, compareAtPrice, inStock }\n }\n  }\n': PRODUCT_QUERY_RESULT;
     '\n  *[_type == "product" && status == "active" && defined(slug.current)]{ "slug": slug.current }\n': PRODUCT_SLUGS_QUERY_RESULT;
