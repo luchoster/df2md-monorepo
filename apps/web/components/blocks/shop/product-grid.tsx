@@ -36,7 +36,7 @@ export default function ProductGrid({
         {stegaClean(layout) === 'carousel' ? (
           <ProductCarousel products={shown} />
         ) : (
-          <ul className="mt-8 grid grid-cols-2 gap-x-3 gap-y-8 md:gap-x-5 lg:grid-cols-4">
+          <ul className="mt-8 grid grid-cols-2 gap-x-3 gap-y-6 sm:grid-cols-3 md:gap-x-4 lg:grid-cols-5">
             {shown.map((p) => (
               <li key={p._id}>
                 <ProductCard product={p} />

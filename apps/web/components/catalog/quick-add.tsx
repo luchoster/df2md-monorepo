@@ -69,7 +69,7 @@ function SizeButtons({
             size="sm"
             disabled={out}
             onClick={() => onPick(v)}
-            className={cn('min-w-14 font-semibold', out && 'line-through')}
+            className={cn('h-7 min-w-12 px-2 text-xs font-semibold', out && 'line-through')}
             aria-label={`Add ${v.option}${out ? ' (out of stock)' : ''}`}
           >
             {v.option}
@@ -113,7 +113,7 @@ export function QuickAddPanel({ product }: { product: CardProduct }) {
   const variants = product.variants ?? []
   if (!variants.length) return null
   return (
-    <div className="absolute inset-x-2 bottom-2 hidden translate-y-2 space-y-2.5 rounded-lg border bg-background/95 p-3 opacity-0 shadow-lg backdrop-blur transition-all duration-200 group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 lg:block">
+    <div className="absolute inset-x-1.5 bottom-1.5 hidden translate-y-2 space-y-2 rounded-lg border bg-background/95 p-2.5 opacity-0 shadow-lg backdrop-blur transition-all duration-200 group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 lg:block">
       <p className="text-center text-xs font-semibold uppercase tracking-wide text-muted-foreground">
         {variants.length > 1 ? `Quick add · ${product.optionName ?? 'Size'}` : 'Quick add'}
       </p>

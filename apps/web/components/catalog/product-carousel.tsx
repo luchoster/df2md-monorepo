@@ -19,7 +19,7 @@ export function ProductCarousel({ products }: { products: CardProduct[] }) {
           {products.map((p) => (
             <div
               key={p._id}
-              className="min-w-0 shrink-0 grow-0 basis-1/2 px-1.5 md:basis-1/3 lg:basis-1/4 min-[1281px]:basis-1/5"
+              className="min-w-0 shrink-0 grow-0 basis-1/2 px-1.5 sm:basis-1/3 md:basis-1/4 lg:basis-1/5 min-[1281px]:basis-1/6"
             >
               <ProductCard product={p} />
             </div>

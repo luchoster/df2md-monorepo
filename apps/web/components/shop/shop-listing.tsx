@@ -114,7 +114,7 @@ export async function ShopListing({
         <div className="hidden lg:block">{sidebar}</div>
         <div>
           {products.length ? (
-            <ul className="grid grid-cols-2 gap-x-3 gap-y-8 md:gap-x-5 xl:grid-cols-3">
+            <ul className="grid grid-cols-2 gap-x-3 gap-y-6 md:grid-cols-3 md:gap-x-4 xl:grid-cols-4">
               {products.map((p) => (
                 <li key={p._id}>
                   <ProductCard product={p} />
