@@ -1,0 +1,47 @@
+import {
+  BadgePercent,
+  Bone,
+  CalendarCheck,
+  Cat,
+  Clock,
+  Dog,
+  Gift,
+  Heart,
+  Leaf,
+  type LucideIcon,
+  MapPin,
+  Package,
+  PawPrint,
+  Phone,
+  Repeat,
+  ShieldCheck,
+  Sparkles,
+  Star,
+  Store,
+  ThumbsUp,
+  Truck
+} from 'lucide-react'
+
+/** Mirrors apps/cms/lib/icons.ts FEATURE_ICONS. */
+export const featureIcons: Record<string, LucideIcon> = {
+  truck: Truck,
+  clock: Clock,
+  'calendar-check': CalendarCheck,
+  repeat: Repeat,
+  'badge-percent': BadgePercent,
+  'paw-print': PawPrint,
+  dog: Dog,
+  cat: Cat,
+  bone: Bone,
+  heart: Heart,
+  'shield-check': ShieldCheck,
+  store: Store,
+  'map-pin': MapPin,
+  leaf: Leaf,
+  star: Star,
+  gift: Gift,
+  package: Package,
+  phone: Phone,
+  'thumbs-up': ThumbsUp,
+  sparkles: Sparkles
+}

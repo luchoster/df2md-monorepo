@@ -1,26 +1,269 @@
 @import "tailwindcss";
+@import "tw-animate-css";
 
+@custom-variant dark (&:is(.dark *));
+
+/* Design tokens ported from df_web/src/style/_variables.scss — see docs/design/DESIGN-TOKENS.md */
+
+@font-face {
+  font-family: "Trueno";
+  src: url("/fonts/trueno-200.woff2") format("woff2");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Trueno";
+  src: url("/fonts/trueno-300.woff2") format("woff2");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Trueno";
+  src: url("/fonts/trueno-400.woff2") format("woff2");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Trueno";
+  src: url("/fonts/trueno-600.woff2") format("woff2");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Trueno";
+  src: url("/fonts/trueno-700.woff2") format("woff2");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Trueno";
+  src: url("/fonts/trueno-800.woff2") format("woff2");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@theme {
+  /* fonts */
+  --font-sans: "Trueno", ui-sans-serif, system-ui, sans-serif; /* body = weight 300 */
+  --font-display: "Trueno", ui-sans-serif, system-ui, sans-serif; /* headings = weight 600 */
+
+  /* brand */
+  --color-brand: #00ad4c;
+  --color-brand-light: #3db659;
+  --color-brand-lime: #a4cc4a;
+  --color-brand-dark: #006d1f;
+  --color-navy: #005870;
+  --color-sky: #0886c4;
+  --color-sky-band: #0099cf; /* section_bg.png */
+  --color-ink: #0c212d;
+  --color-teal: #00778d;
+  --color-orange: #f7911e;
+  --color-sun: #ffd300;
+  --color-sun-soft: #fde9a4;
+  --color-sale: #ff1617;
+
+  /* neutrals */
+  --color-ink-900: #212121; /* headings */
+  --color-body: #616161; /* body text */
+  --color-link: #00acd2;
+  --color-surface: #ffffff;
+  --color-surface-alt: #333333;
+  --color-footer: #f5f5f5;
+  --color-footer-bar: #eeeeee;
+  --color-subtle: #bdbdbd; /* copyright text, checkout text */
+  --color-rule: #e6e6e6; /* divider */
+  --color-nav: #111111; /* category nav bar */
+  --color-line: rgb(0 0 0 / 0.125);
+  --color-line-soft: rgb(0 0 0 / 0.05);
+
+  /* breakpoints (Bootstrap 4 + custom xxl) */
+  --breakpoint-sm: 576px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 992px;
+  --breakpoint-xl: 1200px;
+  --breakpoint-2xl: 1900px;
+
+  /* shadows */
+  --shadow-bar: 0 2px 2px 0 rgb(0 0 0 / 0.5);
+  --shadow-bar-up: 0 -2px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-arrow: -1px -1px 0 rgb(82 95 127 / 0.4);
+  --shadow-focus: 0 0 0 0.2rem rgb(0 123 255 / 0.25);
+
+  /* fixed dimensions */
+  --spacing-topbar: 50px;
+  --spacing-header: 150px;
+  --spacing-hero: 560px;
+}
+
+/*
+ * shadcn/ui semantic tokens, mapped onto the brand palette. Components from shadcn/ui and
+ * shadcnblocks use these names (bg-primary, text-muted-foreground, border-border, …).
+ */
 :root {
+  --radius: 0.5rem;
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #212121;
+  --card: #ffffff;
+  --card-foreground: #212121;
+  --popover: #ffffff;
+  --popover-foreground: #212121;
+  --primary: #00ad4c;
+  --primary-foreground: #ffffff;
+  --secondary: #005870;
+  --secondary-foreground: #ffffff;
+  --muted: #f5f5f5;
+  --muted-foreground: #616161;
+  --accent: #eef8f2;
+  --accent-foreground: #006d1f;
+  --destructive: #d92d20;
+  --border: rgb(0 0 0 / 0.12);
+  --input: rgb(0 0 0 / 0.18);
+  --ring: #0886c4;
+  --chart-1: #00ad4c;
+  --chart-2: #0886c4;
+  --chart-3: #f7911e;
+  --chart-4: #005870;
+  --chart-5: #a4cc4a;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --animate-slide-down: slideDown 100ms ease-out;
+  --animate-slide-up: slideUp 100ms ease-out;
+  @keyframes slideDown {
+    from {
+      height: 0;
+    }
+    to {
+      height: var(--radix-collapsible-content-height);
+    }
+  }
+  @keyframes slideUp {
+    from {
+      height: var(--radix-collapsible-content-height);
+    }
+    to {
+      height: 0;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Bootstrap-style centered container: 540 / 720 / 960 / 1140 (+1610 at 1900) with 15px gutters */
+@utility container {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 15px;
+  @media (width >= 576px) {
+    max-width: 540px;
+  }
+  @media (width >= 768px) {
+    max-width: 720px;
+  }
+  @media (width >= 992px) {
+    max-width: 960px;
+  }
+  @media (width >= 1200px) {
+    max-width: 1140px;
+  }
+  @media (width >= 1900px) {
+    max-width: 1610px;
+  }
+}
+
+/* Old-site link look, for rich text and link lists (keeps shadcn/shadcnblocks components unaffected) */
+@utility content-links {
+  & a {
+    color: var(--color-link);
+  }
+  & a:hover {
+    text-decoration: underline;
+  }
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply font-sans font-light text-body bg-surface text-base leading-normal antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    @apply font-display font-semibold text-ink-900 leading-[1.2] mb-2;
+  }
+  h1 {
+    @apply text-[32px] md:text-[40px];
+  }
+  h2 {
+    @apply text-[26px] md:text-[32px];
+  }
+  h3 {
+    @apply text-[22px] md:text-[28px];
+  }
+  h4 {
+    @apply text-xl md:text-2xl;
+  }
+  h5 {
+    @apply text-xl;
+  }
+  h6 {
+    @apply text-base;
+  }
+  p {
+    @apply mb-4;
+  }
+  a {
+    @apply text-link;
+  }
+  a:hover {
+    @apply underline;
+  }
+  strong,
+  b {
+    @apply font-semibold;
+  }
+  button,
+  [role="button"] {
+    cursor: pointer;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-sky);
+    outline-offset: 2px;
+  }
 }

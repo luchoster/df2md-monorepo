@@ -9,7 +9,7 @@
     "start": "sanity start",
     "build": "sanity build",
     "deploy": "sanity deploy",
-    "typegen": "rm -f schema.json && sanity schema extract && sanity typegen generate",
+    "typegen": "sanity schemas extract --enforce-required-fields --force && sanity typegen generate",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist .sanity node_modules"
@@ -18,10 +18,13 @@
     "sanity"
   ],
   "dependencies": {
-    "@sanity/vision": "^6.15.0",
+    "@sanity/icons": "^5.2.2",
+    "@sanity/orderable-document-list": "^2.0.24",
+    "@sanity/vision": "^6.17.0",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "sanity": "^6.15.0",
+    "sanity": "^6.17.0",
+    "sanity-plugin-media": "^6.3.1",
     "styled-components": "^6.1.18"
   },
   "devDependencies": {
