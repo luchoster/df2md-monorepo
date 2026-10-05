@@ -3,6 +3,7 @@
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { z } from 'zod'
+import { siteOrigin as configuredSiteOrigin } from '@/lib/site-url'
 import { accountsEnabled } from '@/lib/supabase/env'
 import { createClient } from '@/lib/supabase/server'
 import { safeNext } from './session'
@@ -17,10 +18,9 @@ export type FormState = {
 const NOT_ENABLED: FormState = { error: 'Customer accounts are not switched on yet.' }
 
 async function siteOrigin() {
-  if (process.env.NEXT_PUBLIC_SITE_URL) return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, '')
   const h = await headers()
   const host = h.get('x-forwarded-host') ?? h.get('host')
-  return `${h.get('x-forwarded-proto') ?? 'https'}://${host}`
+  return configuredSiteOrigin(`${h.get('x-forwarded-proto') ?? 'https'}://${host}`)
 }
 
 const str = (form: FormData, key: string) => String(form.get(key) ?? '').trim()

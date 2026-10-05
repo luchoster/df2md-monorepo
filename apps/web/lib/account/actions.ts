@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation'
 import type Stripe from 'stripe'
 import { z } from 'zod'
 import { clampSchedule, describeSchedule } from '@/lib/pricing'
+import { siteOrigin } from '@/lib/site-url'
 import { stripe } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/server'
 import type { FormState } from './auth-actions'
@@ -113,12 +114,12 @@ export async function openBillingPortal() {
   const customerId = await getStripeCustomerId(user, await getProfile(), { create: true })
   if (!stripe || !customerId) redirect('/account?error=payments')
   const h = await headers()
-  const origin =
-    process.env.NEXT_PUBLIC_SITE_URL ??
+  const origin = siteOrigin(
     `${h.get('x-forwarded-proto') ?? 'https'}://${h.get('x-forwarded-host') ?? h.get('host')}`
+  )
   const portal = await stripe.billingPortal.sessions.create({
     customer: customerId,
-    return_url: `${origin.replace(/\/$/, '')}/account`
+    return_url: `${origin}/account`
   })
   redirect(portal.url)
 }

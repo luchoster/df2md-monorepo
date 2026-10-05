@@ -5,6 +5,7 @@ import { getStripeCustomerId } from '@/lib/account/stripe-customer'
 import { quoteCart } from '@/lib/checkout/quote'
 import { type CheckoutResponse, checkoutRequestSchema } from '@/lib/checkout/schema'
 import { clampSchedule, describeSchedule } from '@/lib/pricing'
+import { siteOrigin } from '@/lib/site-url'
 import { FIRST_AUTOSHIP_FLAG, findCustomer, getTaxRateId, stripe } from '@/lib/stripe'
 
 const reply = (body: CheckoutResponse, status = 200) => NextResponse.json(body, { status })
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
     if (!stripe || !process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
       return reply({ ok: false, error: 'payments_not_configured', quote }, 503)
 
-    const origin = process.env.NEXT_PUBLIC_SITE_URL || req.nextUrl.origin
+    const origin = siteOrigin(req.nextUrl.origin)
     const hasAutoship = quote.lines.some((l) => l.autoship)
     const taxRate =
       quote.taxRatePercent > 0 ? await getTaxRateId(stripe, quote.taxRatePercent) : null

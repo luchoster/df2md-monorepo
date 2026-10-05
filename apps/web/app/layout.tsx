@@ -5,11 +5,12 @@ import { Footer } from '@/components/layout/footer'
 import { Header } from '@/components/layout/header'
 import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { siteUrl } from '@/lib/site-url'
 import { SITE_NAME } from '@/sanity/lib/metadata'
 import './globals.css'
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://dogfood2mydoor.com'),
+  metadataBase: siteUrl(),
   title: { default: SITE_NAME, template: `%s | ${SITE_NAME}` },
   icons: { icon: '/brand/favicon.png' }
 }
