@@ -13,9 +13,10 @@ import {
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet'
 import { getNavBrands, getNavCategories, getSettings } from '@/sanity/lib/fetchers'
-import { SHOP_PAGE_SIZE } from '@/sanity/queries/shop'
+import { SHOP_PAGE_SIZE, SHOP_SORTS, type ShopSort } from '@/sanity/queries/shop'
 import { ShopPagination } from './shop-pagination'
 import { ShopSidebar } from './shop-sidebar'
+import { ShopSort as ShopSortSelect } from './shop-sort'
 
 export type Crumb = { label: string; href?: string }
 
@@ -27,6 +28,7 @@ export async function ShopListing({
   page,
   basePath,
   query,
+  sort = 'featured',
   activeCategory,
   activeBrand,
   emptyTitle = 'There were no results for your search…',
@@ -39,6 +41,7 @@ export async function ShopListing({
   page: number
   basePath: string
   query: Record<string, string | undefined>
+  sort?: ShopSort
   activeCategory?: string
   activeBrand?: string
   emptyTitle?: string
@@ -50,9 +53,10 @@ export async function ShopListing({
     getSettings()
   ])
   const pages = Math.ceil(total / SHOP_PAGE_SIZE)
-  const hrefFor = (p: number) => {
+  const hrefFor = (p: number, s: ShopSort = sort) => {
     const params = new URLSearchParams()
     for (const [k, v] of Object.entries(query)) if (v) params.set(k, v)
+    if (s !== 'featured') params.set('sort', s)
     if (p > 1) params.set('page', String(p))
     const qs = params.toString()
     return qs ? `${basePath}?${qs}` : basePath
@@ -63,6 +67,7 @@ export async function ShopListing({
       brands={brands}
       activeCategory={activeCategory}
       activeBrand={activeBrand}
+      sort={sort}
       email={settings?.contact?.email}
     />
   )
@@ -95,19 +100,31 @@ export async function ShopListing({
             {total} {total === 1 ? 'product' : 'products'}
           </p>
         </div>
-        <Sheet>
-          <SheetTrigger asChild>
-            <Button variant="outline" className="lg:hidden">
-              <SlidersHorizontal /> Filters
-            </Button>
-          </SheetTrigger>
-          <SheetContent side="left" className="w-[min(85vw,360px)] overflow-y-auto">
-            <SheetHeader>
-              <SheetTitle>Filters</SheetTitle>
-            </SheetHeader>
-            <div className="px-4 pb-6">{sidebar}</div>
-          </SheetContent>
-        </Sheet>
+        <div className="flex flex-wrap items-center gap-3">
+          {total > 1 && (
+            <ShopSortSelect
+              value={sort}
+              options={Object.entries(SHOP_SORTS).map(([value, { label }]) => ({
+                value,
+                label,
+                href: hrefFor(1, value as ShopSort)
+              }))}
+            />
+          )}
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="outline" className="lg:hidden">
+                <SlidersHorizontal /> Filters
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="left" className="w-[min(85vw,360px)] overflow-y-auto">
+              <SheetHeader>
+                <SheetTitle>Filters</SheetTitle>
+              </SheetHeader>
+              <div className="px-4 pb-6">{sidebar}</div>
+            </SheetContent>
+          </Sheet>
+        </div>
       </div>
 
       <div className="grid gap-10 lg:grid-cols-[240px_1fr]">
@@ -130,7 +147,7 @@ export async function ShopListing({
               </Button>
             </div>
           )}
-          <ShopPagination page={page} pages={pages} hrefFor={hrefFor} />
+          <ShopPagination page={page} pages={pages} hrefFor={(p) => hrefFor(p)} />
         </div>
       </div>
     </div>

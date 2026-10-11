@@ -12,15 +12,25 @@ export function ShopSidebar({
   brands,
   activeCategory,
   activeBrand,
+  sort,
   email
 }: {
   categories: NavCategory[]
   brands: NavBrand[]
   activeCategory?: string
   activeBrand?: string
+  /** kept when switching category or brand */
+  sort?: string
   email?: string | null
 }) {
-  const brandQuery = activeBrand ? `?brand=${encodeURIComponent(activeBrand)}` : ''
+  const qs = (params: Record<string, string | undefined>) => {
+    const search = new URLSearchParams()
+    for (const [k, v] of Object.entries(params)) if (v) search.set(k, v)
+    if (sort && sort !== 'featured') search.set('sort', sort)
+    const str = search.toString()
+    return str ? `?${str}` : ''
+  }
+  const brandQuery = qs({ brand: activeBrand })
   const catBase = activeCategory ? `/shop/category/${activeCategory}` : '/shop'
   return (
     <aside className="space-y-8 text-sm">
@@ -68,7 +78,7 @@ export function ShopSidebar({
             {brands.map((b) => (
               <li key={b._id}>
                 <Link
-                  href={`${catBase}?brand=${encodeURIComponent(b.slug ?? '')}`}
+                  href={`${catBase}${qs({ brand: b.slug ?? undefined })}`}
                   className={cn(
                     'block rounded-md px-2 py-1.5 text-foreground hover:bg-accent',
                     activeBrand === b.slug && 'bg-accent font-semibold text-accent-foreground'

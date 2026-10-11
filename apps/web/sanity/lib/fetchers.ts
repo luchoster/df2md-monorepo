@@ -9,6 +9,7 @@ import {
   CATEGORY_BY_SLUG_QUERY,
   CATEGORY_SLUGS_QUERY,
   SHOP_COUNT_QUERY,
+  type ShopSort,
   shopProductsQuery
 } from '../queries/shop'
 import { client } from './client'
@@ -41,16 +42,28 @@ export const getPage = cache((slug: string) =>
 
 export const getPageSlugs = () => client.withConfig({ useCdn: false }).fetch(PAGES_SLUGS_QUERY)
 
-export type ShopFilters = { brand?: string; cats?: string[]; q?: string; page?: number }
+export type ShopFilters = {
+  brand?: string
+  cats?: string[]
+  q?: string
+  page?: number
+  sort?: ShopSort
+}
 
 /** One page of products plus the total, for /shop and category pages. */
-export async function getShopProducts({ brand = '', cats = [], q = '', page = 1 }: ShopFilters) {
+export async function getShopProducts({
+  brand = '',
+  cats = [],
+  q = '',
+  page = 1,
+  sort = 'featured'
+}: ShopFilters) {
   // `match` wants whole words; add a trailing wildcard so "acan" finds "Acana"
   const term = q.trim() ? `${q.trim().replace(/[*"]/g, '')}*` : ''
   const params = { brand, cats, q: term }
   const tags = ['product', 'brand', 'category'] as const
   const [products, total] = await Promise.all([
-    client.fetch<CardProduct[]>(shopProductsQuery(page), params, {
+    client.fetch<CardProduct[]>(shopProductsQuery(page, sort), params, {
       next: { revalidate: 300, tags: [...tags] }
     }),
     sanityFetch({ query: SHOP_COUNT_QUERY, params, tags: [...tags], revalidate: 300 })

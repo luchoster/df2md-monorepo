@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { type Crumb, ShopListing } from '@/components/shop/shop-listing'
 import { getBrand, getCategory, getCategorySlugs, getShopProducts } from '@/sanity/lib/fetchers'
 import { buildMetadata } from '@/sanity/lib/metadata'
+import { parseShopSort } from '@/sanity/queries/shop'
 
 export async function generateStaticParams() {
   return getCategorySlugs()
@@ -21,14 +22,15 @@ export default async function CategoryPage({
   searchParams
 }: PageProps<'/shop/category/[slug]'>) {
   const { slug } = await params
-  const sp = (await searchParams) as { brand?: string; page?: string }
+  const sp = (await searchParams) as { brand?: string; page?: string; sort?: string }
   const category = await getCategory(slug)
   if (!category) notFound()
   const brandSlug = sp.brand ?? ''
   const page = Math.max(1, Number.parseInt(sp.page ?? '1', 10) || 1)
+  const sort = parseShopSort(sp.sort)
   const [brand, { products, total }] = await Promise.all([
     brandSlug ? getBrand(brandSlug) : null,
-    getShopProducts({ brand: brandSlug, cats: category.ids ?? [category._id], page })
+    getShopProducts({ brand: brandSlug, cats: category.ids ?? [category._id], page, sort })
   ])
 
   const crumbs: Crumb[] = [{ label: 'Shop', href: '/shop' }]
@@ -49,6 +51,7 @@ export default async function CategoryPage({
       page={page}
       basePath={`/shop/category/${slug}`}
       query={{ brand: brandSlug || undefined }}
+      sort={sort}
       activeCategory={slug}
       activeBrand={brandSlug || undefined}
       emptyTitle="Coming Soon"

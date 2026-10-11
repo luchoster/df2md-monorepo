@@ -1,8 +1,9 @@
 import type { Metadata } from 'next'
 import { type Crumb, ShopListing } from '@/components/shop/shop-listing'
 import { getBrand, getShopProducts } from '@/sanity/lib/fetchers'
+import { parseShopSort } from '@/sanity/queries/shop'
 
-type Search = { q?: string; brand?: string; page?: string; starts_with?: string }
+type Search = { q?: string; brand?: string; page?: string; sort?: string; starts_with?: string }
 
 export async function generateMetadata({ searchParams }: PageProps<'/shop'>): Promise<Metadata> {
   const { brand } = (await searchParams) as Search
@@ -16,9 +17,10 @@ export default async function ShopPage({ searchParams }: PageProps<'/shop'>) {
   const q = (sp.q ?? sp.starts_with ?? '').slice(0, 80)
   const brandSlug = sp.brand ?? ''
   const page = Math.max(1, Number.parseInt(sp.page ?? '1', 10) || 1)
+  const sort = parseShopSort(sp.sort)
   const [brand, { products, total }] = await Promise.all([
     brandSlug ? getBrand(brandSlug) : null,
-    getShopProducts({ brand: brandSlug, q, page })
+    getShopProducts({ brand: brandSlug, q, page, sort })
   ])
 
   const crumbs: Crumb[] = [{ label: 'Shop', href: '/shop' }]
@@ -35,6 +37,7 @@ export default async function ShopPage({ searchParams }: PageProps<'/shop'>) {
       page={page}
       basePath="/shop"
       query={{ q: q || undefined, brand: brandSlug || undefined }}
+      sort={sort}
       activeBrand={brandSlug || undefined}
     />
   )
