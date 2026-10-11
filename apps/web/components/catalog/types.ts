@@ -3,6 +3,7 @@ import type { SanityImageValue } from '@/components/sanity-image'
 /** Matches sanity/queries/shared/product-card.ts */
 export type CardVariant = {
   _key: string
+  flavor: string | null
   option: string | null
   price: number | null
   compareAtPrice: number | null

@@ -9,12 +9,26 @@ import { Button } from '@/components/ui/button'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { formatPrice } from '@/lib/format'
 import { cn } from '@/lib/utils'
+import { flavorsOf, sameFlavor, variantLabel } from '@/lib/variants'
 import { urlFor } from '@/sanity/lib/image'
-import type { Product } from './types'
+import type { Product, ProductVariant } from './types'
+import { useVariant } from './variant-context'
+
+const optionClass =
+  'relative flex min-h-11 min-w-16 cursor-pointer items-center justify-center gap-2 rounded-md border px-4 py-1.5 text-sm font-semibold transition-colors hover:bg-accent hover:text-accent-foreground has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary has-data-[state=checked]:text-primary-foreground has-focus-visible:ring-2 has-focus-visible:ring-ring has-disabled:pointer-events-none has-disabled:opacity-50'
+
+function Strike() {
+  return (
+    <span className="absolute inset-0 flex items-center justify-center" aria-hidden>
+      <span className="h-px w-full rotate-12 bg-border" />
+    </span>
+  )
+}
 
 /**
- * Buy box from shadcnblocks Product Detail 1 (price, stock badge, size radio) plus what the old
- * site's price-variation-select did: Autoship vs one-time, and Add to Cart. The Autoship
+ * Buy box from shadcnblocks Product Detail 1 (price, stock badge, option radios) plus what the
+ * old site's price-variation-select did: Autoship vs one-time, and Add to Cart. Products with
+ * flavors get a flavor picker above the size/pack picker; both are always visible. The Autoship
  * schedule is picked once in the cart (one schedule per order).
  */
 export function ProductBuyBox({
@@ -25,17 +39,12 @@ export function ProductBuyBox({
   discountPercent?: number
 }) {
   const variants = product.variants ?? []
-  const initial =
-    variants.find((v) => v._key === product.defaultVariantKey && v.inStock !== false) ??
-    variants.find((v) => v.inStock !== false) ??
-    variants[0]
-  const [variantKey, setVariantKey] = useState(initial?._key ?? '')
+  const { variant, select } = useVariant()
   const [purchase, setPurchase] = useState<'once' | 'autoship'>('once')
   const [quantity, setQuantity] = useState(1)
   const { add } = useCart()
   const id = useId()
 
-  const variant = variants.find((v) => v._key === variantKey) ?? initial
   if (!variant)
     return <p className="text-muted-foreground">This product is not available right now.</p>
   const inStock = variant.inStock !== false
@@ -46,6 +55,21 @@ export function ProductBuyBox({
   const price = variant.price ?? 0
   const discount = product.noDiscounts ? 0 : discountPercent
   const autoshipPrice = Math.round(price * (100 - discount)) / 100
+  const flavors = flavorsOf(variants)
+  const sizes = variants.filter((v) => sameFlavor(v, variant))
+  const showPrices = new Set(sizes.map((v) => v.price)).size > 1
+  const variantImage = (v: ProductVariant) =>
+    v.image?.asset ? v.image : variants.find((o) => sameFlavor(o, v) && o.image?.asset)?.image
+
+  // Switching flavor keeps the size/pack when that flavor has it in stock
+  const pickFlavor = (flavor: string) => {
+    const options = variants.filter((v) => v.flavor?.trim() === flavor)
+    const next =
+      options.find((v) => v.option === variant.option && v.inStock !== false) ??
+      options.find((v) => v.inStock !== false) ??
+      options[0]
+    if (next) select(next._key)
+  }
 
   return (
     <div className="space-y-6">
@@ -76,36 +100,81 @@ export function ProductBuyBox({
         )}
       </div>
 
-      {variants.length > 0 && (
-        <fieldset className="space-y-3">
+      {flavors.length > 0 && (
+        <fieldset>
+          <legend className="mb-3 text-base font-semibold text-foreground">
+            Flavor: <span className="font-normal text-muted-foreground">{variant.flavor}</span>
+          </legend>
+          <RadioGroup
+            value={variant.flavor?.trim() ?? ''}
+            onValueChange={pickFlavor}
+            className="flex flex-wrap gap-3"
+          >
+            {flavors.map((flavor) => {
+              const options = variants.filter((v) => v.flavor?.trim() === flavor)
+              const out = options.every((v) => v.inStock === false)
+              const image = options.map(variantImage).find((img) => img?.asset)
+              return (
+                <label
+                  key={flavor}
+                  htmlFor={`${id}-f-${flavor}`}
+                  className={cn(optionClass, image && 'pl-1.5')}
+                >
+                  <RadioGroupItem
+                    id={`${id}-f-${flavor}`}
+                    value={flavor}
+                    disabled={out}
+                    className="sr-only"
+                  />
+                  {image?.asset && (
+                    // biome-ignore lint/performance/noImgElement: 32px swatch from the Sanity CDN
+                    <img
+                      src={urlFor(image.asset as never)
+                        .width(64)
+                        .height(64)
+                        .fit('fill')
+                        .bg('ffffff')
+                        .url()}
+                      alt=""
+                      width={32}
+                      height={32}
+                      className="size-8 rounded bg-white object-contain"
+                    />
+                  )}
+                  <span>{flavor}</span>
+                  {out && <Strike />}
+                </label>
+              )
+            })}
+          </RadioGroup>
+        </fieldset>
+      )}
+
+      {(sizes.length > 1 || (sizes.length === 1 && sizes[0]?.option)) && (
+        <fieldset>
           <legend className="mb-3 text-base font-semibold text-foreground">
             {product.optionName ?? 'Size'}
           </legend>
-          <RadioGroup
-            value={variant._key}
-            onValueChange={setVariantKey}
-            className="flex flex-wrap gap-3"
-          >
-            {variants.map((v) => {
+          <RadioGroup value={variant._key} onValueChange={select} className="flex flex-wrap gap-3">
+            {sizes.map((v) => {
               const out = v.inStock === false
               return (
-                <label
-                  key={v._key}
-                  htmlFor={`${id}-${v._key}`}
-                  className="relative flex h-11 min-w-16 cursor-pointer items-center justify-center rounded-md border px-4 text-sm font-semibold transition-colors hover:bg-accent hover:text-accent-foreground has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary has-data-[state=checked]:text-primary-foreground has-focus-visible:ring-2 has-focus-visible:ring-ring has-disabled:pointer-events-none has-disabled:opacity-50"
-                >
+                <label key={v._key} htmlFor={`${id}-${v._key}`} className={optionClass}>
                   <RadioGroupItem
                     id={`${id}-${v._key}`}
                     value={v._key}
                     disabled={out}
                     className="sr-only"
                   />
-                  <span>{v.option}</span>
-                  {out && (
-                    <span className="absolute inset-0 flex items-center justify-center" aria-hidden>
-                      <span className="h-px w-full rotate-12 bg-border" />
-                    </span>
-                  )}
+                  <span className="flex flex-col items-center leading-tight">
+                    <span>{v.option}</span>
+                    {showPrices && (
+                      <span className="text-xs font-normal opacity-80">
+                        {formatPrice(v.price ?? 0)}
+                      </span>
+                    )}
+                  </span>
+                  {out && <Strike />}
                 </label>
               )
             })}
@@ -190,10 +259,10 @@ export function ProductBuyBox({
                 variantKey: variant._key,
                 slug: product.slug ?? '',
                 title: product.title ?? '',
-                option: variant.option ?? '',
+                option: variantLabel(variant),
                 price,
-                imageUrl: product.mainImage?.asset
-                  ? urlFor(product.mainImage.asset as never)
+                imageUrl: (variantImage(variant) ?? product.mainImage)?.asset
+                  ? urlFor((variantImage(variant) ?? product.mainImage)?.asset as never)
                       .width(160)
                       .height(160)
                       .fit('fill')

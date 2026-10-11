@@ -2,6 +2,7 @@ import 'server-only'
 import { defineQuery } from 'next-sanity'
 import { nextDeliveryDate } from '@/lib/delivery'
 import { computeTotals } from '@/lib/pricing'
+import { variantLabel } from '@/lib/variants'
 import { client } from '@/sanity/lib/client'
 import { SETTINGS_QUERY } from '@/sanity/queries/settings'
 import type { CheckoutLine, CheckoutQuote, CheckoutRequest } from './schema'
@@ -9,7 +10,7 @@ import type { CheckoutLine, CheckoutQuote, CheckoutRequest } from './schema'
 const CHECKOUT_PRODUCTS_QUERY = defineQuery(`
   *[_type == "product" && _id in $ids]{
     _id, title, status, autoshipEligible, noDiscounts,
-    variants[]{ _key, option, price, inStock }
+    variants[]{ _key, flavor, option, price, inStock }
   }
 `)
 
@@ -39,7 +40,7 @@ export async function quoteCart(
       continue
     }
     if (variant.inStock === false) {
-      problems.push(`${name} (${variant.option}) is out of stock.`)
+      problems.push(`${name} (${variantLabel(variant)}) is out of stock.`)
       continue
     }
     if (item.autoship && product.autoshipEligible === false) {
@@ -50,7 +51,7 @@ export async function quoteCart(
       productId: product._id,
       variantKey: variant._key,
       title: product.title ?? 'Product',
-      option: variant.option ?? '',
+      option: variantLabel(variant),
       unitAmount: Math.round(variant.price * 100),
       quantity: item.quantity,
       autoship: item.autoship,

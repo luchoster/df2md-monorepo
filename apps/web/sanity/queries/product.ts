@@ -13,7 +13,7 @@ export const PRODUCT_QUERY = defineQuery(`
     mainImage { ${imageFragment} },
     gallery[]{ _key, ${imageFragment} },
     optionName, defaultVariantKey, autoshipEligible, noDiscounts, showAdditionalInfo, tags,
-    "variants": variants[price > 0]{ _key, option, sku, price, compareAtPrice, inStock, weightLbs,
+    "variants": variants[price > 0]{ _key, flavor, option, sku, price, compareAtPrice, inStock, weightLbs,
       image { ${imageFragment} } },
     description[]{ ${bodyFragment} },
     nutritionalInfo[]{ ${bodyFragment} },

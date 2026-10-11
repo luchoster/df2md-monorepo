@@ -3,7 +3,8 @@ import { defineField, defineType } from 'sanity'
 import { imageField } from './image'
 
 /**
- * One purchasable size/flavor of a product. Inline in `product.variants[]` with
+ * One purchasable flavor + size/pack of a product (e.g. Beef · 12 Pack). Flavor is optional:
+ * products without flavors only use the option label. Inline in `product.variants[]` with
  * `_key = 'v<wpVariationId>'` so re-running the import patches in place.
  * The Stripe block is written by scripts/import/src/05-stripe-sync.ts, never by editors.
  */
@@ -22,9 +23,15 @@ export default defineType({
   ],
   fields: [
     defineField({
+      name: 'flavor',
+      description:
+        'Optional, e.g. "Beef". Variants with the same flavor are grouped; give one of them an image to show when the flavor is picked.',
+      type: 'string'
+    }),
+    defineField({
       name: 'option',
-      title: 'Option label',
-      description: 'Shown in the size dropdown, e.g. "4 lbs"',
+      title: 'Size / pack',
+      description: 'e.g. "4 lbs", "Single", "12 Pack"',
       type: 'string',
       validation: (rule) => rule.required()
     }),
@@ -86,9 +93,16 @@ export default defineType({
     })
   ],
   preview: {
-    select: { option: 'option', price: 'price', sku: 'sku', inStock: 'inStock', media: 'image' },
-    prepare: ({ option, price, sku, inStock, media }) => ({
-      title: option,
+    select: {
+      flavor: 'flavor',
+      option: 'option',
+      price: 'price',
+      sku: 'sku',
+      inStock: 'inStock',
+      media: 'image'
+    },
+    prepare: ({ flavor, option, price, sku, inStock, media }) => ({
+      title: [flavor, option].filter(Boolean).join(' · '),
       subtitle: [
         price != null ? `$${Number(price).toFixed(2)}` : 'no price',
         sku,

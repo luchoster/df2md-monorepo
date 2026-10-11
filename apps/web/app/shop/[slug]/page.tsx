@@ -7,6 +7,7 @@ import { ProductBuyBox } from '@/components/product/product-buy-box'
 import { ProductGallery } from '@/components/product/product-gallery'
 import { ProductSpecs } from '@/components/product/product-specs'
 import { ProductTabs } from '@/components/product/product-tabs'
+import { VariantProvider } from '@/components/product/variant-context'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -16,6 +17,7 @@ import {
   BreadcrumbSeparator
 } from '@/components/ui/breadcrumb'
 import { formatPrice } from '@/lib/format'
+import { flavorsOf, variantLabel } from '@/lib/variants'
 import { getProduct, getProductSlugs, getSettings } from '@/sanity/lib/fetchers'
 import { urlFor } from '@/sanity/lib/image'
 import { buildMetadata } from '@/sanity/lib/metadata'
@@ -45,7 +47,13 @@ export default async function ProductPage({ params }: PageProps<'/shop/[slug]'>)
   if (product?.status !== 'active') notFound()
 
   const category = product.primaryCategory ?? product.categories?.[0]
-  const images = [product.mainImage, ...(product.gallery ?? [])]
+  // Flavor/variant images follow the product images; the gallery brings the selected one forward
+  const images = [
+    product.mainImage,
+    ...(product.gallery ?? []),
+    ...(product.variants ?? []).map((v) => v.image)
+  ]
+  const hasFlavors = flavorsOf(product.variants ?? []).length > 0
   const prices = (product.variants ?? []).map((v) => v.price ?? 0).filter((p) => p > 0)
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -61,7 +69,7 @@ export default async function ProductPage({ params }: PageProps<'/shop/[slug]'>)
     offers: (product.variants ?? []).map((v) => ({
       '@type': 'Offer',
       sku: v.sku ?? undefined,
-      name: v.option,
+      name: variantLabel(v),
       price: v.price,
       priceCurrency: 'USD',
       availability:
@@ -108,36 +116,38 @@ export default async function ProductPage({ params }: PageProps<'/shop/[slug]'>)
           </BreadcrumbList>
         </Breadcrumb>
 
-        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
-          <ProductGallery images={images} title={product.title ?? ''} />
-          <div className="space-y-8">
-            <div className="space-y-3">
-              {product.brand?.title && (
-                <Link
-                  href={`/shop?brand=${product.brand.slug}`}
-                  className="text-sm font-semibold uppercase tracking-wide text-muted-foreground hover:text-primary"
-                >
-                  {product.brand.title}
-                </Link>
-              )}
-              <h1 className="text-3xl tracking-tight lg:text-4xl">{product.title}</h1>
-              {prices.length > 1 && (
-                <p className="text-sm text-muted-foreground">
-                  {formatPrice(Math.min(...prices))} – {formatPrice(Math.max(...prices))} depending
-                  on size
-                </p>
-              )}
-              {product.shortDescription && (
-                <p className="text-muted-foreground">{product.shortDescription}</p>
-              )}
+        <VariantProvider product={product}>
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12">
+            <ProductGallery images={images} title={product.title ?? ''} />
+            <div className="space-y-8">
+              <div className="space-y-3">
+                {product.brand?.title && (
+                  <Link
+                    href={`/shop?brand=${product.brand.slug}`}
+                    className="text-sm font-semibold uppercase tracking-wide text-muted-foreground hover:text-primary"
+                  >
+                    {product.brand.title}
+                  </Link>
+                )}
+                <h1 className="text-3xl tracking-tight lg:text-4xl">{product.title}</h1>
+                {prices.length > 1 && (
+                  <p className="text-sm text-muted-foreground">
+                    {formatPrice(Math.min(...prices))} – {formatPrice(Math.max(...prices))}{' '}
+                    depending on {hasFlavors ? 'flavor and size' : 'size'}
+                  </p>
+                )}
+                {product.shortDescription && (
+                  <p className="text-muted-foreground">{product.shortDescription}</p>
+                )}
+              </div>
+              <ProductBuyBox
+                product={product}
+                discountPercent={settings?.autoship?.firstOrderDiscountPercent ?? 20}
+              />
+              <ProductSpecs product={product} />
             </div>
-            <ProductBuyBox
-              product={product}
-              discountPercent={settings?.autoship?.firstOrderDiscountPercent ?? 20}
-            />
-            <ProductSpecs product={product} />
           </div>
-        </div>
+        </VariantProvider>
 
         <div className="mt-14">
           <ProductTabs product={product} />

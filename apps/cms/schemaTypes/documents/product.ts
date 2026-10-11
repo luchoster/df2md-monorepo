@@ -3,7 +3,7 @@ import { defineArrayMember, defineField, defineType } from 'sanity'
 import { imageField, imageMember } from '../objects/image'
 import { legacyField, legacyGroup } from '../objects/legacy'
 
-type Variant = { _key: string; price?: number }
+type Variant = { _key: string; price?: number; flavor?: string; option?: string }
 
 export default defineType({
   name: 'product',
@@ -12,7 +12,7 @@ export default defineType({
   icon: PackageIcon,
   groups: [
     { name: 'main', title: 'Product', default: true },
-    { name: 'variants', title: 'Sizes & prices' },
+    { name: 'variants', title: 'Flavors, sizes & prices' },
     { name: 'details', title: 'Details' },
     { name: 'content', title: 'Page blocks' },
     { name: 'seo', title: 'SEO' },
@@ -92,11 +92,11 @@ export default defineType({
     defineField({
       name: 'optionName',
       title: 'Option name',
-      description: 'Label above the variant dropdown',
+      description: 'Label above the size / pack buttons',
       type: 'string',
       group: 'variants',
       initialValue: 'Size',
-      options: { list: ['Size', 'Flavor', 'Color'] }
+      options: { list: ['Size', 'Pack', 'Quantity', 'Flavor', 'Color'] }
     }),
     defineField({
       name: 'variants',
@@ -107,11 +107,17 @@ export default defineType({
         rule
           .required()
           .min(1)
-          .custom((variants: Variant[] | undefined) =>
-            variants?.some((v) => typeof v.price === 'number' && v.price > 0)
-              ? true
-              : 'At least one variant needs a price'
-          )
+          .custom((variants: Variant[] | undefined) => {
+            if (!variants?.some((v) => typeof v.price === 'number' && v.price > 0))
+              return 'At least one variant needs a price'
+            const seen = new Set<string>()
+            for (const v of variants) {
+              const label = [v.flavor?.trim(), v.option?.trim()].filter(Boolean).join(' · ')
+              if (seen.has(label.toLowerCase())) return `"${label}" is listed twice`
+              seen.add(label.toLowerCase())
+            }
+            return true
+          })
     }),
     defineField({
       name: 'defaultVariantKey',

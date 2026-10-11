@@ -1,10 +1,13 @@
 import Link from 'next/link'
+import { flavorsOf } from '@/lib/variants'
 import type { Product } from './types'
 
 /** The "Product Details" spec list from shadcnblocks Product Detail 1, filled from Sanity. */
 export function ProductSpecs({ product }: { product: Product }) {
   const category = product.primaryCategory ?? product.categories?.[0]
-  const sizes = (product.variants ?? []).map((v) => v.option).filter(Boolean)
+  const variants = product.variants ?? []
+  const flavors = flavorsOf(variants)
+  const sizes = [...new Set(variants.map((v) => v.option).filter(Boolean))]
   const rows: { label: string; value: React.ReactNode }[] = [
     product.brand?.title && {
       label: 'Brand',
@@ -22,6 +25,7 @@ export function ProductSpecs({ product }: { product: Product }) {
         </Link>
       )
     },
+    flavors.length > 0 && { label: 'Flavors', value: flavors.join(' · ') },
     sizes.length > 0 && {
       label: product.optionName === 'Flavor' ? 'Flavors' : 'Sizes',
       value: sizes.join(' · ')
