@@ -10,6 +10,7 @@
     "load": "bun run src/03-load.ts",
     "load:dry": "bun run src/03-load.ts --dry-run",
     "verify": "bun run src/04-verify.ts",
+    "flavors": "bun run src/06-flavors.ts",
     "import": "bun run extract && bun run transform && bun run load && bun run verify",
     "validate": "bun run src/03-load.ts --dry-run --offline && node -e \"const d=require('./out/final.json');require('fs').writeFileSync('out/final.ndjson',d.map(x=>JSON.stringify(x)).join('\\n'))\" && cd ../../apps/cms && sanity documents validate --file ../../scripts/import/out/final.ndjson --level error -y",
     "lint": "biome check .",

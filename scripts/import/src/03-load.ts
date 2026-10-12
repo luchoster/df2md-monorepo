@@ -236,15 +236,24 @@ if (!overwriteContent)
   console.log(
     `${skipped} pages/singletons are created only if missing (--overwrite-content to replace)`
   )
+// Products combined by 06-flavors (the merged product and the archived flavors) were reshaped in
+// Sanity on purpose; replacing them from WordPress would undo the merge.
+const merged = new Set<string>(
+  await client.fetch(
+    '*[_type == "product" && (count(flavors) > 0 || defined(legacy.mergedInto))]._id'
+  )
+)
+if (merged.size) console.log(`${merged.size} products merged into flavors are left as they are`)
+const writable = final.filter((d) => !merged.has(d._id!))
 const BATCH = 50
-for (let i = 0; i < final.length; i += BATCH) {
+for (let i = 0; i < writable.length; i += BATCH) {
   const tx = client.transaction()
-  for (const doc of final.slice(i, i + BATCH)) {
+  for (const doc of writable.slice(i, i + BATCH)) {
     if (EDITORIAL.has(doc._type) && !overwriteContent) tx.createIfNotExists(doc as any)
     else tx.createOrReplace(doc as any)
   }
   await tx.commit({ visibility: 'async' })
-  console.log(`  committed ${Math.min(i + BATCH, final.length)}/${final.length}`)
+  console.log(`  committed ${Math.min(i + BATCH, writable.length)}/${writable.length}`)
 }
 console.log(
   `Done → ${client.config().dataset}. ${problems.length} problems in out/load-problems.json`

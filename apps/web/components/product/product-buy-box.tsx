@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils'
 import { flavorsOf, sameFlavor, variantLabel } from '@/lib/variants'
 import { urlFor } from '@/sanity/lib/image'
 import type { Product, ProductVariant } from './types'
-import { useVariant } from './variant-context'
+import { imageFor, useVariant } from './variant-context'
 
 const optionClass =
   'relative flex min-h-11 min-w-16 cursor-pointer items-center justify-center gap-2 rounded-md border px-4 py-1.5 text-sm font-semibold transition-colors hover:bg-accent hover:text-accent-foreground has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary has-data-[state=checked]:text-primary-foreground has-focus-visible:ring-2 has-focus-visible:ring-ring has-disabled:pointer-events-none has-disabled:opacity-50'
@@ -58,8 +58,7 @@ export function ProductBuyBox({
   const flavors = flavorsOf(variants)
   const sizes = variants.filter((v) => sameFlavor(v, variant))
   const showPrices = new Set(sizes.map((v) => v.price)).size > 1
-  const variantImage = (v: ProductVariant) =>
-    v.image?.asset ? v.image : variants.find((o) => sameFlavor(o, v) && o.image?.asset)?.image
+  const variantImage = (v: ProductVariant) => imageFor(product, v)
 
   // Switching flavor keeps the size/pack when that flavor has it in stock
   const pickFlavor = (flavor: string) => {

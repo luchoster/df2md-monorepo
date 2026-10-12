@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, permanentRedirect } from 'next/navigation'
 import { ProductCarousel } from '@/components/catalog/product-carousel'
 import type { CardProduct } from '@/components/catalog/types'
 import { ProductBuyBox } from '@/components/product/product-buy-box'
@@ -18,7 +18,7 @@ import {
 } from '@/components/ui/breadcrumb'
 import { formatPrice } from '@/lib/format'
 import { flavorsOf, variantLabel } from '@/lib/variants'
-import { getProduct, getProductSlugs, getSettings } from '@/sanity/lib/fetchers'
+import { getMergedProduct, getProduct, getProductSlugs, getSettings } from '@/sanity/lib/fetchers'
 import { urlFor } from '@/sanity/lib/image'
 import { buildMetadata } from '@/sanity/lib/metadata'
 
@@ -44,6 +44,14 @@ export async function generateMetadata({ params }: PageProps<'/shop/[slug]'>): P
 export default async function ProductPage({ params }: PageProps<'/shop/[slug]'>) {
   const { slug } = await params
   const [product, settings] = await Promise.all([getProduct(slug), getSettings()])
+  if (!product) {
+    // Flavors that used to be separate products redirect to the combined one, flavor preselected
+    const merged = await getMergedProduct(slug)
+    if (merged?.slug && merged.slug !== slug)
+      permanentRedirect(
+        `/shop/${merged.slug}${merged.flavor ? `?flavor=${encodeURIComponent(merged.flavor)}` : ''}`
+      )
+  }
   if (product?.status !== 'active') notFound()
 
   const category = product.primaryCategory ?? product.categories?.[0]
@@ -51,6 +59,7 @@ export default async function ProductPage({ params }: PageProps<'/shop/[slug]'>)
   const images = [
     product.mainImage,
     ...(product.gallery ?? []),
+    ...(product.flavors ?? []).map((f) => f.image),
     ...(product.variants ?? []).map((v) => v.image)
   ]
   const hasFlavors = flavorsOf(product.variants ?? []).length > 0
@@ -147,11 +156,10 @@ export default async function ProductPage({ params }: PageProps<'/shop/[slug]'>)
               <ProductSpecs product={product} />
             </div>
           </div>
+          <div className="mt-14">
+            <ProductTabs product={product} />
+          </div>
         </VariantProvider>
-
-        <div className="mt-14">
-          <ProductTabs product={product} />
-        </div>
       </section>
 
       {(product.related?.length ?? 0) > 0 && (

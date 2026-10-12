@@ -27,7 +27,7 @@ export function ProductSpecs({ product }: { product: Product }) {
     },
     flavors.length > 0 && { label: 'Flavors', value: flavors.join(' · ') },
     sizes.length > 0 && {
-      label: product.optionName === 'Flavor' ? 'Flavors' : 'Sizes',
+      label: product.optionName && product.optionName !== 'Size' ? product.optionName : 'Sizes',
       value: sizes.join(' · ')
     },
     { label: 'Delivery', value: 'Free next-day delivery, no minimum' },

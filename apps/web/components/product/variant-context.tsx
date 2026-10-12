@@ -2,19 +2,23 @@
 
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { sameFlavor } from '@/lib/variants'
-import type { Product, ProductVariant } from './types'
+import type { Product, ProductFlavor, ProductVariant } from './types'
 
 type VariantContextValue = {
   variant: ProductVariant | undefined
   select: (key: string) => void
-  /** The image to show for the selection: the variant's own, else one from the same flavor */
+  /** The selected variant's entry in `product.flavors` (picture, nutrition, ingredients) */
+  flavor: ProductFlavor | undefined
+  /** The image to show for the selection: the variant's own, else its flavor's */
   image: ProductVariant['image'] | null
 }
 
 const VariantContext = createContext<VariantContextValue | null>(null)
 
-const firstAvailable = (product: Product) => {
-  const variants = product.variants ?? []
+const firstAvailable = (product: Product, flavor?: string) => {
+  const variants = (product.variants ?? []).filter(
+    (v) => !flavor || v.flavor?.trim().toLowerCase() === flavor.trim().toLowerCase()
+  )
   return (
     variants.find((v) => v._key === product.defaultVariantKey && v.inStock !== false) ??
     variants.find((v) => v.inStock !== false) ??
@@ -22,9 +26,26 @@ const firstAvailable = (product: Product) => {
   )
 }
 
+/** Image for a variant: its own, else its flavor entry's, else another variant of that flavor. */
+export function imageFor(product: Product, variant: ProductVariant | undefined) {
+  if (!variant) return null
+  if (variant.image?.asset) return variant.image
+  const entry = flavorEntry(product, variant)
+  if (entry?.image?.asset) return entry.image
+  return (
+    (product.variants ?? []).find((v) => sameFlavor(v, variant) && v.image?.asset)?.image ?? null
+  )
+}
+
+export const flavorEntry = (product: Product, variant: { flavor?: string | null } | undefined) =>
+  variant?.flavor
+    ? product.flavors?.find((f) => f.name?.trim() === variant.flavor?.trim())
+    : undefined
+
 /**
- * The selected variant, shared by the gallery and the buy box. `?variant=<key>` in the URL
- * preselects one (and is kept up to date), so a flavor/size can be linked to directly.
+ * The selected variant, shared by the gallery, the buy box and the tabs. `?variant=<key>` in the
+ * URL preselects one (and is kept up to date), so a flavor/size can be linked to directly;
+ * `?flavor=<name>` picks that flavor's first available size (old per-flavor URLs redirect here).
  */
 export function VariantProvider({
   product,
@@ -38,9 +59,15 @@ export function VariantProvider({
 
   // Read on the client so the product page stays static
   useEffect(() => {
-    const fromUrl = new URLSearchParams(window.location.search).get('variant')
+    const params = new URLSearchParams(window.location.search)
+    const fromUrl = params.get('variant')
+    const flavor = params.get('flavor')
     if (fromUrl && variants.some((v) => v._key === fromUrl)) setKey(fromUrl)
-  }, [variants])
+    else if (flavor) {
+      const match = firstAvailable(product, flavor)
+      if (match?.flavor) setKey(match._key)
+    }
+  }, [variants, product])
 
   const select = useCallback((next: string) => {
     setKey(next)
@@ -51,10 +78,12 @@ export function VariantProvider({
 
   const value = useMemo<VariantContextValue>(() => {
     const variant = variants.find((v) => v._key === key) ?? firstAvailable(product)
-    const image = variant?.image?.asset
-      ? variant.image
-      : (variants.find((v) => variant && sameFlavor(v, variant) && v.image?.asset)?.image ?? null)
-    return { variant, select, image }
+    return {
+      variant,
+      select,
+      flavor: flavorEntry(product, variant),
+      image: imageFor(product, variant)
+    }
   }, [variants, key, product, select])
 
   return <VariantContext.Provider value={value}>{children}</VariantContext.Provider>

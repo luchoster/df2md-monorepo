@@ -1,17 +1,42 @@
+'use client'
+
 import type { PortableTextBlock } from '@portabletext/types'
 import { PortableTextRenderer } from '@/components/portable-text-renderer'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import type { Product } from './types'
+import { useVariant } from './variant-context'
 
-/** Description / Nutritional Facts / Feeding Instructions / Ingredients & Use, only the ones with content. */
+/**
+ * Description / Nutritional Facts / Feeding Instructions / Ingredients & Use, only the ones with
+ * content. Each tab shows the selected flavor's own text when it has one, else the product's.
+ */
 export function ProductTabs({ product }: { product: Product }) {
+  const { flavor } = useVariant()
+  const pick = <T,>(own: T[] | null | undefined, fallback: T[] | null | undefined) =>
+    own?.length ? own : fallback
   const tabs = [
-    { key: 'description', label: 'Description', value: product.description },
+    {
+      key: 'description',
+      label: 'Description',
+      value: pick(flavor?.description, product.description)
+    },
     ...(product.showAdditionalInfo !== false
       ? [
-          { key: 'nutrition', label: 'Nutritional Facts', value: product.nutritionalInfo },
-          { key: 'feeding', label: 'Feeding Instructions', value: product.feedingInstructions },
-          { key: 'ingredients', label: 'Ingredients & Use', value: product.ingredientsAndUse }
+          {
+            key: 'nutrition',
+            label: 'Nutritional Facts',
+            value: pick(flavor?.nutritionalInfo, product.nutritionalInfo)
+          },
+          {
+            key: 'feeding',
+            label: 'Feeding Instructions',
+            value: pick(flavor?.feedingInstructions, product.feedingInstructions)
+          },
+          {
+            key: 'ingredients',
+            label: 'Ingredients & Use',
+            value: pick(flavor?.ingredientsAndUse, product.ingredientsAndUse)
+          }
         ]
       : [])
   ].filter((t) => t.value?.length)
@@ -32,7 +57,7 @@ export function ProductTabs({ product }: { product: Product }) {
       </TabsList>
       {tabs.map((t) => (
         <TabsContent key={t.key} value={t.key} className="max-w-4xl">
-          <PortableTextRenderer value={t.value as PortableTextBlock[]} />
+          <PortableTextRenderer key={flavor?._key} value={t.value as PortableTextBlock[]} />
         </TabsContent>
       ))}
     </Tabs>

@@ -25,7 +25,7 @@ export default defineType({
     defineField({
       name: 'flavor',
       description:
-        'Optional, e.g. "Beef". Variants with the same flavor are grouped; give one of them an image to show when the flavor is picked.',
+        'Optional, e.g. "Beef". Must match a name in the product’s Flavors list (picture, nutrition and ingredients come from there).',
       type: 'string'
     }),
     defineField({

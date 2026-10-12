@@ -12,6 +12,9 @@ export const PRODUCT_QUERY = defineQuery(`
     "primaryCategory": primaryCategory->{ title, "slug": slug.current, "parent": parent->{ title, "slug": slug.current } },
     mainImage { ${imageFragment} },
     gallery[]{ _key, ${imageFragment} },
+    "flavors": flavors[]{ _key, name, image { ${imageFragment} },
+      description[]{ ${bodyFragment} }, nutritionalInfo[]{ ${bodyFragment} },
+      feedingInstructions[]{ ${bodyFragment} }, ingredientsAndUse[]{ ${bodyFragment} } },
     optionName, defaultVariantKey, autoshipEligible, noDiscounts, showAdditionalInfo, tags,
     "variants": variants[price > 0]{ _key, flavor, option, sku, price, compareAtPrice, inStock, weightLbs,
       image { ${imageFragment} } },
@@ -23,6 +26,19 @@ export const PRODUCT_QUERY = defineQuery(`
     "related": *[_type == "product" && status == "active" && _id != ^._id
       && count((categories[]._ref)[@ in ^.^.categories[]._ref]) > 0
       && count(variants[price > 0]) > 0] | order(featured desc, lower(title) asc)[0...10]{ ${productCardFragment} }
+  }
+`)
+
+/**
+ * Where an old product URL should go: a flavor merged into another product, or a product whose
+ * slug changed when flavors were combined into it. The flavor is preselected.
+ */
+export const MERGED_PRODUCT_QUERY = defineQuery(`
+  *[_type == "product" && (
+    (slug.current == $slug && defined(legacy.mergedInto)) ||
+    (status == "active" && $slug in legacy.previousSlugs)
+  )][0]{
+    "slug": coalesce(legacy.mergedInto->slug.current, slug.current), "flavor": legacy.mergedFlavor
   }
 `)
 

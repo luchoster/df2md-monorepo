@@ -90,13 +90,27 @@ export default defineType({
     defineField({ name: 'description', type: 'block-content', group: 'main' }),
 
     defineField({
+      name: 'flavors',
+      description:
+        'Only for products sold in several flavors/recipes. Each flavor can have its own picture, ingredients and nutrition facts; empty fields use the product’s.',
+      type: 'array',
+      group: 'variants',
+      of: [defineArrayMember({ type: 'flavor' })],
+      validation: (rule) =>
+        rule.custom((flavors: { name?: string }[] | undefined) => {
+          const names = (flavors ?? []).map((f) => f.name?.trim().toLowerCase())
+          const dupe = names.find((n, i) => n && names.indexOf(n) !== i)
+          return dupe ? `"${dupe}" is listed twice` : true
+        })
+    }),
+    defineField({
       name: 'optionName',
       title: 'Option name',
       description: 'Label above the size / pack buttons',
       type: 'string',
       group: 'variants',
       initialValue: 'Size',
-      options: { list: ['Size', 'Pack', 'Quantity', 'Flavor', 'Color'] }
+      options: { list: ['Size', 'Pack', 'Quantity', 'Firmness', 'Color'] }
     }),
     defineField({
       name: 'variants',
@@ -107,9 +121,17 @@ export default defineType({
         rule
           .required()
           .min(1)
-          .custom((variants: Variant[] | undefined) => {
+          .custom((variants: Variant[] | undefined, ctx) => {
             if (!variants?.some((v) => typeof v.price === 'number' && v.price > 0))
               return 'At least one variant needs a price'
+            const flavors = ((ctx.document?.flavors as { name?: string }[] | undefined) ?? [])
+              .map((f) => f.name?.trim())
+              .filter(Boolean)
+            if (flavors.length) {
+              const stray = variants.find((v) => !flavors.includes(v.flavor?.trim()))
+              if (stray)
+                return `Every variant needs one of the flavors above (${stray.flavor || stray.option || 'a variant'} doesn’t match)`
+            }
             const seen = new Set<string>()
             for (const v of variants) {
               const label = [v.flavor?.trim(), v.option?.trim()].filter(Boolean).join(' · ')
@@ -205,7 +227,24 @@ export default defineType({
     }),
 
     defineField({ name: 'seo', type: 'meta', group: 'seo' }),
-    legacyField()
+    legacyField([
+      defineField({
+        name: 'mergedInto',
+        title: 'Merged into',
+        description: 'This flavor was combined into another product; its URL redirects there.',
+        type: 'reference',
+        to: [{ type: 'product' }],
+        weak: true
+      }),
+      defineField({ name: 'mergedFlavor', title: 'As flavor', type: 'string' }),
+      defineField({
+        name: 'previousSlugs',
+        title: 'Previous URLs',
+        description: 'Old slugs that redirect here',
+        type: 'array',
+        of: [defineArrayMember({ type: 'string' })]
+      })
+    ])
   ],
   orderings: [
     { title: 'Title', name: 'titleAsc', by: [{ field: 'title', direction: 'asc' }] },
