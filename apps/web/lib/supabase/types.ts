@@ -12,6 +12,8 @@ export type Profile = {
   postal_code: string | null
   delivery_notes: string | null
   stripe_customer_id: string | null
+  /** False until the customer chooses a password on this site (imported accounts) */
+  password_set: boolean
   created_at: string
   updated_at: string
 }

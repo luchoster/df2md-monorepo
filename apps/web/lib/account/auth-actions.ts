@@ -5,8 +5,9 @@ import { redirect } from 'next/navigation'
 import { z } from 'zod'
 import { siteOrigin as configuredSiteOrigin } from '@/lib/site-url'
 import { accountsEnabled } from '@/lib/supabase/env'
-import { createClient } from '@/lib/supabase/server'
-import { safeNext } from './session'
+import { createAdminClient, createClient } from '@/lib/supabase/server'
+import { LOGIN_CODE_LENGTH } from './login-code'
+import { safeNext, setPasswordPath } from './session'
 
 export type FormState = {
   error?: string
@@ -31,6 +32,20 @@ const fieldErrors = (error: z.ZodError) =>
 const email = z.email('Enter a valid email').max(200)
 const password = z.string().min(8, 'Use at least 8 characters').max(72)
 
+/** Where a customer goes right after signing in: /set-password first if they have none yet. */
+async function afterSignIn(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  next: string
+) {
+  const { data } = await supabase
+    .from('profiles')
+    .select('password_set')
+    .eq('id', userId)
+    .maybeSingle()
+  return data && !data.password_set ? setPasswordPath(next) : next
+}
+
 export async function signIn(_: FormState, form: FormData): Promise<FormState> {
   if (!accountsEnabled) return NOT_ENABLED
   const values = { email: str(form, 'email') }
@@ -40,7 +55,7 @@ export async function signIn(_: FormState, form: FormData): Promise<FormState> {
   if (!parsed.success) return { fieldErrors: fieldErrors(parsed.error), values }
 
   const supabase = await createClient()
-  const { error } = await supabase.auth.signInWithPassword(parsed.data)
+  const { data, error } = await supabase.auth.signInWithPassword(parsed.data)
   if (error)
     return {
       error:
@@ -49,7 +64,69 @@ export async function signIn(_: FormState, form: FormData): Promise<FormState> {
           : 'Wrong email or password.',
       values
     }
-  redirect(safeNext(form.get('next')))
+  redirect(await afterSignIn(supabase, data.user.id, safeNext(form.get('next'))))
+}
+
+/**
+ * Emails a one-time sign-in code to an existing account (never creates one). Reports success
+ * either way, so the form can't be used to find out who has an account.
+ */
+export async function sendLoginCode(_: FormState, form: FormData): Promise<FormState> {
+  if (!accountsEnabled) return NOT_ENABLED
+  const values = { email: str(form, 'email') }
+  const parsed = email.safeParse(values.email)
+  if (!parsed.success) return { fieldErrors: { email: 'Enter a valid email' }, values }
+
+  const next = safeNext(form.get('next'))
+  const supabase = await createClient()
+  const { error } = await supabase.auth.signInWithOtp({
+    email: parsed.data,
+    options: {
+      shouldCreateUser: false,
+      // The email can carry a link as well as the code; the link signs in through /auth/confirm
+      emailRedirectTo: `${await siteOrigin()}/auth/confirm?next=${encodeURIComponent(next)}`
+    }
+  })
+  if (error?.status === 429)
+    return {
+      error: 'Too many codes were requested. Please wait a few minutes and try again.',
+      values
+    }
+  return { done: true, values }
+}
+
+export async function verifyLoginCode(_: FormState, form: FormData): Promise<FormState> {
+  if (!accountsEnabled) return NOT_ENABLED
+  const values = { email: str(form, 'email') }
+  const token = str(form, 'token')
+  const parsed = z
+    .object({
+      email,
+      token: z
+        .string()
+        .regex(/^\d+$/, 'Enter the code from the email')
+        .length(LOGIN_CODE_LENGTH, {
+          message: `Enter all ${LOGIN_CODE_LENGTH} digits`
+        })
+    })
+    .safeParse({ email: values.email, token })
+  if (!parsed.success) return { fieldErrors: fieldErrors(parsed.error), values, done: true }
+
+  const supabase = await createClient()
+  const { data, error } = await supabase.auth.verifyOtp({
+    email: parsed.data.email,
+    token: parsed.data.token,
+    type: 'email'
+  })
+  if (error || !data.user)
+    return {
+      fieldErrors: {
+        token: 'That code is wrong or has expired. Check the email or send a new one.'
+      },
+      values,
+      done: true
+    }
+  redirect(await afterSignIn(supabase, data.user.id, safeNext(form.get('next'))))
 }
 
 export async function signUp(_: FormState, form: FormData): Promise<FormState> {
@@ -83,6 +160,12 @@ export async function signUp(_: FormState, form: FormData): Promise<FormState> {
     if (error.code === 'weak_password') return { fieldErrors: { password: error.message }, values }
     return { error: 'We could not create your account. Please try again.', values }
   }
+  // They chose a password just now, so they're never sent to /set-password
+  if (data.user)
+    await createAdminClient()
+      ?.from('profiles')
+      .update({ password_set: true })
+      .eq('id', data.user.id)
   // Email confirmation off: signed in straight away
   if (data.session) redirect(next)
   return { done: true, values }
@@ -113,15 +196,18 @@ export async function updatePassword(_: FormState, form: FormData): Promise<Form
   if (!parsed.success) return { fieldErrors: fieldErrors(parsed.error) }
 
   const supabase = await createClient()
-  const { error } = await supabase.auth.updateUser({ password: parsed.data.password })
+  const { data, error } = await supabase.auth.updateUser({ password: parsed.data.password })
   if (error)
     return {
       error:
         error.code === 'same_password'
           ? 'Choose a password you haven’t used before.'
-          : 'Your reset link has expired. Please request a new one.'
+          : 'Your session has expired. Please sign in again with an email code.'
     }
-  redirect('/account?updated=password')
+  // Server-set flag (customers can't write it), so it goes through the secret key
+  await createAdminClient()?.from('profiles').update({ password_set: true }).eq('id', data.user.id)
+  const next = form.get('next')
+  redirect(next ? safeNext(next) : '/account?updated=password')
 }
 
 export async function signOut() {

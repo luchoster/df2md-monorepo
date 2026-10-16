@@ -29,7 +29,11 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
         </>
       }
     >
-      <LoginForm next={next} notice={NOTICES[String(params.error ?? '')]} />
+      <LoginForm
+        next={next}
+        notice={NOTICES[String(params.error ?? '')]}
+        method={params.method === 'code' ? 'code' : 'password'}
+      />
     </AuthCard>
   )
 }

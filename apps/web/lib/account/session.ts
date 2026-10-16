@@ -20,12 +20,20 @@ export const getUser = cache(async (): Promise<SessionUser | null> => {
   }
 })
 
-/** For account pages: sends signed-out visitors to /login and back here afterwards. */
+/**
+ * For account pages: sends signed-out visitors to /login, and customers who haven't chosen a
+ * password yet to /set-password, and back here afterwards.
+ */
 export async function requireUser(next: string) {
   const user = await getUser()
   if (!user) redirect(`/login?next=${encodeURIComponent(next)}`)
+  const profile = await getProfile()
+  if (profile && !profile.password_set) redirect(setPasswordPath(next))
   return user
 }
+
+export const setPasswordPath = (next: string) =>
+  `/set-password${next === '/account' ? '' : `?next=${encodeURIComponent(next)}`}`
 
 export const getProfile = cache(async (): Promise<Profile | null> => {
   const user = await getUser()
