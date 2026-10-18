@@ -16,6 +16,10 @@ export const formatDate = (value: string | number) =>
 export const isoDay = (unixSeconds: number) =>
   new Intl.DateTimeFormat('en-CA', { timeZone: tz }).format(new Date(unixSeconds * 1000))
 
+/** Orders from the old shop keep their invoice number (DF-8361); new ones are #10001 and up. */
+export const orderLabel = (order: { number: number; legacy_number: string | null }) =>
+  order.legacy_number ?? `#${order.number}`
+
 export const STATUS: Record<
   OrderStatus,
   { label: string; tone: 'brand' | 'sky' | 'muted' | 'orange' }

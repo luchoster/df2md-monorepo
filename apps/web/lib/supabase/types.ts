@@ -60,7 +60,33 @@ export type Order = {
   stripe_invoice_id: string | null
   stripe_customer_id: string | null
   stripe_subscription_id: string | null
+  /** 'snipcart' for orders brought over from the old shop */
+  source: 'site' | 'snipcart'
+  legacy_id: string | null
+  /** The old shop's invoice number (DF-8361), shown instead of `number` */
+  legacy_number: string | null
+  refunded: number
   created_at: string
+}
+
+/** An Autoship from the old shop (supabase/migrations/*_legacy_import.sql), read-only here. */
+export type LegacySubscription = {
+  id: string
+  snipcart_id: string
+  user_id: string | null
+  email: string
+  status: 'active' | 'paused' | 'past_due' | 'cancelled'
+  title: string
+  option: string | null
+  product_id: string | null
+  quantity: number
+  unit_amount: number
+  interval: 'day' | 'week' | 'month' | 'year'
+  interval_count: number
+  next_billing_date: string | null
+  card: { brand: string; last4: string; exp_month: number; exp_year: number } | null
+  started_at: string | null
+  paused_at: string | null
 }
 
 export type OrderItem = {

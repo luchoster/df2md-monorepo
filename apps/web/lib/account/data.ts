@@ -2,7 +2,7 @@ import 'server-only'
 import type Stripe from 'stripe'
 import { stripe } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/server'
-import type { OrderWithItems, Pet } from '@/lib/supabase/types'
+import type { LegacySubscription, OrderWithItems, Pet } from '@/lib/supabase/types'
 import { getProfile, getUser } from './session'
 import { getStripeCustomerId } from './stripe-customer'
 
@@ -26,6 +26,18 @@ export async function getOrder(number: number): Promise<OrderWithItems | null> {
     .eq('number', number)
     .maybeSingle()
   return (data as OrderWithItems | null) ?? null
+}
+
+/** Autoships brought over from the old shop (still billed there until cutover). */
+export async function getLegacyAutoships(): Promise<LegacySubscription[]> {
+  if (!(await getUser())) return []
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('legacy_subscriptions')
+    .select('*')
+    .neq('status', 'cancelled')
+    .order('started_at', { ascending: false })
+  return (data as LegacySubscription[] | null) ?? []
 }
 
 export async function getPets(): Promise<Pet[]> {

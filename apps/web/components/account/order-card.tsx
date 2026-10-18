@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { SanityImage } from '@/components/sanity-image'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { cents, formatDate, STATUS, TONES } from '@/lib/account/format'
+import { cents, formatDate, orderLabel, STATUS, TONES } from '@/lib/account/format'
 import { formatDeliveryDate } from '@/lib/delivery'
 import type { OrderWithItems } from '@/lib/supabase/types'
 import { cn } from '@/lib/utils'
@@ -54,7 +54,7 @@ export function OrderCard({
         <dl className="grid grid-cols-3 gap-4 sm:flex sm:gap-8">
           <div>
             <dt className="text-xs text-muted-foreground">Order</dt>
-            <dd className="font-semibold">#{order.number}</dd>
+            <dd className="font-semibold">{orderLabel(order)}</dd>
           </div>
           <div>
             <dt className="text-xs text-muted-foreground">Placed</dt>

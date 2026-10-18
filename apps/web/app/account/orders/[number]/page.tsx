@@ -6,7 +6,7 @@ import { StatusBadge, Thumb } from '@/components/account/order-card'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
 import { getOrder } from '@/lib/account/data'
-import { cents, formatDate } from '@/lib/account/format'
+import { cents, formatDate, orderLabel } from '@/lib/account/format'
 import { requireUser } from '@/lib/account/session'
 import { formatDeliveryDate, formatSlot } from '@/lib/delivery'
 import { formatPhone, formatPhoneHref } from '@/lib/format'
@@ -65,7 +65,7 @@ export default async function OrderPage({ params }: PageProps<'/account/orders/[
         <dl className="flex flex-wrap items-center gap-x-6 gap-y-2">
           <div>
             <dt className="text-sm text-muted-foreground">Order</dt>
-            <dd className="text-lg font-semibold">#{order.number}</dd>
+            <dd className="text-lg font-semibold">{orderLabel(order)}</dd>
           </div>
           <Separator orientation="vertical" className="hidden h-10 md:block" />
           <div>
@@ -134,7 +134,7 @@ export default async function OrderPage({ params }: PageProps<'/account/orders/[
               </div>
               {order.discount > 0 && (
                 <div className="flex justify-between text-brand-dark">
-                  <dt>First Autoship discount</dt>
+                  <dt>{order.source === 'snipcart' ? 'Discount' : 'First Autoship discount'}</dt>
                   <dd>−{cents(order.discount)}</dd>
                 </div>
               )}
@@ -151,6 +151,12 @@ export default async function OrderPage({ params }: PageProps<'/account/orders/[
                 <dt>Total paid</dt>
                 <dd>{cents(order.total)}</dd>
               </div>
+              {order.refunded > 0 && (
+                <div className="flex justify-between text-orange">
+                  <dt>Refunded</dt>
+                  <dd>−{cents(order.refunded)}</dd>
+                </div>
+              )}
             </dl>
           </Panel>
         </div>

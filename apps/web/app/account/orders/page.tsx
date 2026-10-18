@@ -45,17 +45,13 @@ export default async function OrdersPage() {
             key: order.id,
             text: [
               order.number,
+              order.legacy_number,
               formatDate(order.created_at),
               STATUS[order.status].label,
               ...order.order_items.map((i) => `${i.title} ${i.option ?? ''}`)
             ].join(' '),
             node: <OrderCard order={order} thumbs={thumbs} />
           }))}
-          empty={(query) => (
-            <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
-              No orders match “{query}”.
-            </p>
-          )}
         />
       )}
     </div>

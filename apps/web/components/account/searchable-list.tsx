@@ -8,11 +8,12 @@ import { Input } from '@/components/ui/input'
 export function SearchableList({
   items,
   label,
-  empty
+  noun = 'orders'
 }: {
   items: { key: string; text: string; node: React.ReactNode }[]
   label: string
-  empty: (query: string) => React.ReactNode
+  /** Plural used in "No orders match …" */
+  noun?: string
 }) {
   const [query, setQuery] = useState('')
   const words = query.trim().toLowerCase().split(/\s+/).filter(Boolean)
@@ -39,7 +40,11 @@ export function SearchableList({
         {shown.map((i) => (
           <div key={i.key}>{i.node}</div>
         ))}
-        {shown.length === 0 && empty(query.trim())}
+        {shown.length === 0 && (
+          <p className="rounded-xl border border-dashed p-8 text-center text-sm text-muted-foreground">
+            No {noun} match “{query.trim()}”.
+          </p>
+        )}
       </div>
     </>
   )

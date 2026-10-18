@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { FormMessage } from '@/components/account/form-field'
 import { ProfileForm } from '@/components/account/profile-form'
 import { getOrders } from '@/lib/account/data'
-import { cents, formatDate, STATUS, TONES } from '@/lib/account/format'
+import { cents, formatDate, orderLabel, STATUS, TONES } from '@/lib/account/format'
 import { getProfile, requireUser } from '@/lib/account/session'
 import { cn } from '@/lib/utils'
 
@@ -34,7 +34,7 @@ export default async function AccountPage({ searchParams }: PageProps<'/account'
           <div>
             <p className="text-xs text-muted-foreground">Latest order</p>
             <p className="font-semibold">
-              #{last.number} · {formatDate(last.created_at)} · {cents(last.total)}
+              {orderLabel(last)} · {formatDate(last.created_at)} · {cents(last.total)}
             </p>
           </div>
           <span

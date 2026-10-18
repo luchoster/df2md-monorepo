@@ -5,7 +5,7 @@ import { AutoshipActions } from '@/components/account/autoship-actions'
 import { Thumb } from '@/components/account/order-card'
 import { Button } from '@/components/ui/button'
 import { Separator } from '@/components/ui/separator'
-import { getAutoships } from '@/lib/account/data'
+import { getAutoships, getLegacyAutoships } from '@/lib/account/data'
 import { cents, describeEvery, formatDate, isoDay } from '@/lib/account/format'
 import { requireUser } from '@/lib/account/session'
 import { cn } from '@/lib/utils'
@@ -21,10 +21,14 @@ const BADGE = {
 
 export default async function AutoshipPage() {
   await requireUser('/account/autoship')
-  const { autoships, available } = await getAutoships()
-  const thumbs = await getProductThumbs(
-    autoships.flatMap((a) => a.lines.map((l) => l.productId ?? ''))
-  )
+  const [{ autoships, available }, legacy] = await Promise.all([
+    getAutoships(),
+    getLegacyAutoships()
+  ])
+  const thumbs = await getProductThumbs([
+    ...autoships.flatMap((a) => a.lines.map((l) => l.productId ?? '')),
+    ...legacy.map((l) => l.product_id ?? '')
+  ])
   const now = Math.floor(Date.now() / 1000)
   const minDate = isoDay(now + 86400)
   const maxDate = isoDay(now + 365 * 86400)
@@ -44,7 +48,7 @@ export default async function AutoshipPage() {
         </p>
       )}
 
-      {available && autoships.length === 0 && (
+      {available && autoships.length === 0 && legacy.length === 0 && (
         <div className="flex flex-col items-center rounded-xl border border-dashed px-6 py-14 text-center">
           <span className="mb-4 grid size-14 place-items-center rounded-full bg-muted">
             <Repeat className="size-7 text-muted-foreground" aria-hidden />
@@ -59,6 +63,85 @@ export default async function AutoshipPage() {
           </Button>
         </div>
       )}
+
+      {legacy.map((a) => {
+        const badge = BADGE[a.status === 'cancelled' ? 'paused' : a.status]
+        const thumb = a.product_id ? thumbs.get(a.product_id) : undefined
+        return (
+          <article key={a.id} className="overflow-hidden rounded-xl border bg-card">
+            <header className="flex flex-col gap-3 bg-muted/40 px-4 py-3 sm:flex-row sm:items-center sm:justify-between md:px-6 md:py-4">
+              <dl className="grid grid-cols-2 gap-4 sm:flex sm:gap-8">
+                <div>
+                  <dt className="text-xs text-muted-foreground">Schedule</dt>
+                  <dd className="font-semibold">{describeEvery(a.interval_count, a.interval)}</dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-muted-foreground">Next order</dt>
+                  <dd className="font-medium">
+                    {a.status === 'paused'
+                      ? 'Paused'
+                      : a.next_billing_date
+                        ? formatDate(`${a.next_billing_date}T12:00:00`)
+                        : '—'}
+                  </dd>
+                </div>
+                <div>
+                  <dt className="text-xs text-muted-foreground">Each order</dt>
+                  <dd className="font-semibold">
+                    {cents(a.unit_amount * a.quantity)}{' '}
+                    <span className="text-xs font-normal">+ tax</span>
+                  </dd>
+                </div>
+              </dl>
+              <span
+                className={cn(
+                  'w-fit rounded-full px-2.5 py-1 text-xs font-semibold',
+                  badge.className
+                )}
+              >
+                {badge.label}
+              </span>
+            </header>
+            <div className="flex items-center justify-between gap-4 p-4 md:px-6">
+              <div className="flex items-center gap-4">
+                <Thumb thumb={thumb} title={a.title} />
+                <div>
+                  <h3 className="font-sans text-base font-semibold">
+                    {thumb?.slug ? (
+                      <Link href={`/shop/${thumb.slug}`} className="hover:text-brand">
+                        {a.title}
+                      </Link>
+                    ) : (
+                      a.title
+                    )}
+                  </h3>
+                  <p className="text-sm text-muted-foreground">
+                    {[a.option, `Qty ${a.quantity}`].filter(Boolean).join(' · ')}
+                  </p>
+                </div>
+              </div>
+              <p className="text-sm font-semibold">{cents(a.unit_amount * a.quantity)}</p>
+            </div>
+            <footer className="space-y-2 border-t px-4 py-4 text-sm text-muted-foreground md:px-6">
+              <div className="flex flex-wrap gap-x-6 gap-y-2">
+                {a.card && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <CreditCard className="size-4" aria-hidden />
+                    <span className="capitalize">{a.card.brand}</span> ending {a.card.last4}
+                  </span>
+                )}
+                {a.started_at && (
+                  <span className="inline-flex items-center gap-1.5">
+                    <CalendarClock className="size-4" aria-hidden /> Since{' '}
+                    {formatDate(a.started_at)}
+                  </span>
+                )}
+              </div>
+              <p>Set up on our previous website. To change or pause it, give us a call for now.</p>
+            </footer>
+          </article>
+        )
+      })}
 
       {autoships.map((a) => {
         const badge = BADGE[a.status]
