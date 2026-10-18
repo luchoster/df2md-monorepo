@@ -35,5 +35,16 @@ export async function findCustomer(s: Stripe, email: string) {
   return found.data[0] ?? null
 }
 
+/**
+ * The old shop (Snipcart) paused an Autoship by putting a 100%-off coupon on the subscription
+ * instead of pausing it. Needs `discounts.source.coupon` expanded.
+ */
+export function hasPauseCoupon(sub: Stripe.Subscription) {
+  return sub.discounts.some((d) => {
+    const coupon = typeof d === 'string' ? null : d.source?.coupon
+    return Boolean(coupon && typeof coupon !== 'string' && coupon.percent_off === 100)
+  })
+}
+
 /** First-Autoship discount is once per customer; the webhook sets this flag after payment. */
 export const FIRST_AUTOSHIP_FLAG = 'first_autoship_redeemed'

@@ -21,10 +21,13 @@ const BADGE = {
 
 export default async function AutoshipPage() {
   await requireUser('/account/autoship')
-  const [{ autoships, available }, legacy] = await Promise.all([
+  const [{ autoships, available }, imported] = await Promise.all([
     getAutoships(),
     getLegacyAutoships()
   ])
+  // Once Stripe returns an old-shop Autoship itself (live keys), it's managed like any other
+  const managed = new Set(autoships.flatMap((a) => [a.id, a.snipcartId]))
+  const legacy = imported.filter((l) => !managed.has(l.id) && !managed.has(l.snipcart_id))
   const thumbs = await getProductThumbs([
     ...autoships.flatMap((a) => a.lines.map((l) => l.productId ?? '')),
     ...legacy.map((l) => l.product_id ?? '')

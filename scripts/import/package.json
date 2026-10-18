@@ -15,7 +15,9 @@
     "validate": "bun run src/03-load.ts --dry-run --offline && node -e \"const d=require('./out/final.json');require('fs').writeFileSync('out/final.ndjson',d.map(x=>JSON.stringify(x)).join('\\n'))\" && cd ../../apps/cms && sanity documents validate --file ../../scripts/import/out/final.ndjson --level error -y",
     "lint": "biome check .",
     "typecheck": "tsc --noEmit",
-    "customers": "bun run src/07-customers.ts"
+    "snipcart:export": "bun run src/00-snipcart-export.ts",
+    "customers": "bun run src/07-customers.ts",
+    "autoship:pause": "bun run src/08-autoship-pause.ts"
   },
   "devDependencies": {
     "@types/jsdom": "^30.0.0",

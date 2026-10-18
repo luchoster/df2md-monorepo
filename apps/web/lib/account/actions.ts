@@ -7,7 +7,7 @@ import type Stripe from 'stripe'
 import { z } from 'zod'
 import { clampSchedule, describeSchedule } from '@/lib/pricing'
 import { siteOrigin } from '@/lib/site-url'
-import { stripe } from '@/lib/stripe'
+import { hasPauseCoupon, stripe } from '@/lib/stripe'
 import { createClient } from '@/lib/supabase/server'
 import type { FormState } from './auth-actions'
 import { getProfile, getUser } from './session'
@@ -56,10 +56,10 @@ export async function updateProfile(_: FormState, form: FormData): Promise<FormS
   if (error) return { error: 'We could not save your details. Please try again.' }
 
   // Keep the Stripe customer's name and phone in step (receipts, card-holder name)
-  const profile = await getProfile()
-  if (stripe && profile?.stripe_customer_id)
+  const customerId = await getStripeCustomerId(user, await getProfile())
+  if (stripe && customerId)
     await stripe.customers
-      .update(profile.stripe_customer_id, {
+      .update(customerId, {
         name: `${parsed.data.first_name} ${parsed.data.last_name}`,
         phone: parsed.data.phone ?? undefined
       })
@@ -132,7 +132,9 @@ async function ownSubscription(id: string) {
   if (!user || !stripe) return null
   const customerId = await getStripeCustomerId(user, await getProfile())
   if (!customerId || !id.startsWith('sub_')) return null
-  const sub = await stripe.subscriptions.retrieve(id).catch(() => null)
+  const sub = await stripe.subscriptions
+    .retrieve(id, { expand: ['discounts.source.coupon'] })
+    .catch(() => null)
   if (!sub || sub.status === 'canceled') return null
   const owner = typeof sub.customer === 'string' ? sub.customer : sub.customer.id
   return owner === customerId ? { sub, stripe } : null
@@ -159,7 +161,11 @@ export async function resumeAutoship(_: FormState, form: FormData): Promise<Form
   const found = await ownSubscription(str(form, 'id'))
   if (!found) return NOT_FOUND
   try {
-    await found.stripe.subscriptions.update(found.sub.id, { pause_collection: '' })
+    await found.stripe.subscriptions.update(found.sub.id, {
+      pause_collection: '',
+      // Paused on the old shop: its 100%-off coupon is the pause
+      ...(hasPauseCoupon(found.sub) ? { discounts: '' } : {})
+    })
   } catch {
     return FAILED
   }

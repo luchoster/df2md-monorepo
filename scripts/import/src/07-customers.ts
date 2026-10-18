@@ -1,8 +1,10 @@
 /**
  * Plan §4: customers, order history and Autoships from the old shop → Supabase.
  *
- *   bun run customers            dry run: reads everything, prints what it would write
- *   bun run customers --apply    writes to Supabase
+ *   bun run customers                          dry run: reads everything, prints what it would write
+ *   bun run customers --apply                  writes to Supabase
+ *   bun run customers --apply --link-stripe    also puts each customer's LIVE Stripe id on their
+ *                                              profile (launch step; test keys fall back by email)
  *
  * Sources: the Snipcart export in ~/Sites/dogfood/backups/snipcart (customers, orders,
  * subscriptions) and the LIVE Stripe account through STRIPE_READ_KEY (read-only restricted key:
@@ -19,6 +21,7 @@ import { argFlag, OUT_DIR, ROOT } from './lib/env'
 import { importClient } from './lib/sanity'
 
 const apply = argFlag('apply')
+const linkStripe = argFlag('link-stripe')
 const SNIPCART_DIR =
   process.env.SNIPCART_EXPORT ?? join(ROOT, '..', '..', '..', 'backups', 'snipcart')
 
@@ -235,6 +238,64 @@ const orders = [...snipOrders]
     }
   })
 
+// ------------------------------------------------------------------ names and addresses
+// Snipcart's customer record is often empty (guest checkouts); every order has the details
+const latestOrder = new Map<string, any>()
+for (const o of snipOrders) {
+  const e = lower(o.email)
+  if (!latestOrder.has(e) || o.creationDate > latestOrder.get(e).creationDate) latestOrder.set(e, o)
+}
+const tidyCase = (word: string) =>
+  word.replace(/[A-Za-z][^\s-']*/g, (w) => w[0]!.toUpperCase() + w.slice(1).toLowerCase())
+/** "LUIS E SUAREZ" → { first: "Luis", last: "Suarez" }; middle initials are dropped. */
+function splitFullName(full: string | null) {
+  if (!full) return { first: null, last: null }
+  const shouty = full === full.toUpperCase() || full === full.toLowerCase()
+  const words = full
+    .split(/\s+/)
+    .filter(Boolean)
+    .map((w) => (shouty ? tidyCase(w) : w))
+  if (words.length === 1) return { first: words[0]!, last: null }
+  const inner = words.slice(1, -1)
+  const initials = inner.every((w) => /^[A-Za-z]\.?$/.test(w))
+  return {
+    first: words[0]!,
+    last: initials ? words.at(-1)! : [...inner, words.at(-1)].join(' ')
+  }
+}
+function contactFor(c: any) {
+  const o = latestOrder.get(lower(c.email)) ?? {}
+  const wp = wpByEmail.get(lower(c.email))
+  const pick = (field: string) =>
+    blank(c[`shipping${field}`]) ??
+    blank(c[`billing${field}`]) ??
+    blank(o[`shipping${field}`]) ??
+    blank(o[`billing${field}`])
+  const name = splitFullName(
+    blank(c.billingAddressName) ??
+      blank(c.shippingAddressName) ??
+      blank(o.billingAddressName) ??
+      blank(o.shippingAddressName) ??
+      blank(o.cardHolderName)
+  )
+  // Address fields come as a set, from the same record
+  const from = [c, o].find(
+    (r) => blank(r.shippingAddressAddress1) || blank(r.billingAddressAddress1)
+  )
+  const side = from && blank(from.shippingAddressAddress1) ? 'shipping' : 'billing'
+  const addr = (field: string) => (from ? blank(from[`${side}Address${field}`]) : null)
+  return {
+    first_name: blank(wp?.firstName) ?? name.first,
+    last_name: blank(wp?.lastName) ?? name.last,
+    phone: pick('AddressPhone') ?? blank(wp?.phone),
+    address_line1: addr('Address1'),
+    address_line2: addr('Address2'),
+    city: addr('City'),
+    state: addr('Province'),
+    postal_code: addr('PostalCode')
+  }
+}
+
 // ------------------------------------------------------------------ live Stripe reads
 console.log('Reading live Stripe (cards, Autoships)…')
 const cardsByCustomer = new Map<string, any[]>()
@@ -291,12 +352,7 @@ if (!apply) {
 
 let created = 0
 await pool(toCreate, 5, async (c) => {
-  const wp = wpByEmail.get(lower(c.email))
-  const first = blank(c.billingAddressFirstName) ?? blank(wp?.firstName)
-  const name = blank(c.billingAddressName) ?? blank(c.shippingAddressName)
-  const last =
-    blank(wp?.lastName) ??
-    (name && first && name.startsWith(first) ? blank(name.slice(first.length)) : null)
+  const { first_name: first, last_name: last } = contactFor(c)
   const user = await sb('/auth/v1/admin/users', {
     method: 'POST',
     body: JSON.stringify({
@@ -325,26 +381,14 @@ await pool(snipCustomers, 8, async (c) => {
   const user = userByEmail.get(lower(c.email))
   const p = user && profiles.get(user.id)
   if (!p) return
-  const wp = wpByEmail.get(lower(c.email))
-  const first = blank(c.billingAddressFirstName) ?? blank(wp?.firstName)
-  const name = blank(c.shippingAddressName) ?? blank(c.billingAddressName)
-  const fill: Record<string, string | null> = {
-    first_name: first,
-    last_name:
-      blank(wp?.lastName) ??
-      (name && first && name.startsWith(first) ? blank(name.slice(first.length)) : null),
-    phone: blank(c.shippingAddressPhone) ?? blank(c.billingAddressPhone) ?? blank(wp?.phone),
-    address_line1: blank(c.shippingAddressAddress1) ?? blank(c.billingAddressAddress1),
-    address_line2: blank(c.shippingAddressAddress2) ?? blank(c.billingAddressAddress2),
-    city: blank(c.shippingAddressCity) ?? blank(c.billingAddressCity),
-    postal_code: blank(c.shippingAddressPostalCode) ?? blank(c.billingAddressPostalCode)
-  }
+  const { state, ...fill } = contactFor(c)
   const patch: Record<string, unknown> = {}
   for (const [k, v] of Object.entries(fill)) if (v && !p[k]) patch[k] = v
-  const state = blank(c.shippingAddressProvince) ?? blank(c.billingAddressProvince)
+  // state defaults to NV, so it follows a newly filled address
   if (state && patch.address_line1) patch.state = state
-  // A LIVE Stripe id here would break checkout on test keys; it lives in legacy_customers
-  if (p.stripe_customer_id && p.stripe_customer_id === c.gatewayId) patch.stripe_customer_id = null
+  // The old shop's live customer is canonical for imported accounts (replaces any test-mode id)
+  if (linkStripe && c.gatewayId && p.stripe_customer_id !== c.gatewayId)
+    patch.stripe_customer_id = c.gatewayId
   if (!Object.keys(patch).length) return
   await sb(`/rest/v1/profiles?id=eq.${user.id}`, { method: 'PATCH', body: JSON.stringify(patch) })
   patched++
@@ -423,8 +467,21 @@ for (let i = 0; i < pending.length; i += 400) {
   itemCount += items.length
   console.log(`  orders ${orderCount}/${pending.length}`)
 }
+// Orders imported before: refresh what can change (status, refunds, who it belongs to)
+const known = orders.filter((o) => imported.has(o.order.legacy_id))
+for (let i = 0; i < known.length; i += 500)
+  await sb('/rest/v1/orders?on_conflict=legacy_id', {
+    method: 'POST',
+    prefer: 'resolution=merge-duplicates,return=minimal',
+    body: JSON.stringify(
+      known.slice(i, i + 500).map((o) => ({
+        ...o.order,
+        user_id: userByEmail.get(o.order.email)?.id ?? null
+      }))
+    )
+  })
 console.log(
-  `orders: ${orderCount} imported with ${itemCount} items (${imported.size} were already there)`
+  `orders: ${orderCount} imported with ${itemCount} items, ${known.length} existing ones refreshed`
 )
 
 // ------------------------------------------------------------------ legacy_subscriptions

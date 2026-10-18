@@ -112,6 +112,38 @@ export async function recordCheckoutOrder(stripe: Stripe, sessionId: string) {
 }
 
 /**
+ * For Autoships set up on the old shop (Snipcart), which carry none of our metadata: the
+ * customer, product and size from the imported record, delivery details from their profile.
+ */
+async function oldShopDetails(snipcartId: string | undefined) {
+  const admin = createAdminClient()
+  if (!snipcartId || !admin) return null
+  const { data: sub } = await admin
+    .from('legacy_subscriptions')
+    .select('user_id, title, option, product_id, interval, interval_count')
+    .eq('snipcart_id', snipcartId)
+    .maybeSingle()
+  if (!sub?.user_id) return null
+  const { data: p } = await admin.from('profiles').select('*').eq('id', sub.user_id).maybeSingle()
+  const address = p
+    ? [p.address_line1, p.address_line2, p.city, [p.state, p.postal_code].filter(Boolean).join(' ')]
+        .filter(Boolean)
+        .join(', ')
+    : ''
+  const unit = sub.interval as string
+  return {
+    user_id: sub.user_id as string,
+    title: sub.title as string,
+    option: (sub.option as string | null) ?? null,
+    productId: (sub.product_id as string | null) ?? null,
+    address: address || null,
+    phone: (p?.phone as string | null) ?? null,
+    notes: (p?.delivery_notes as string | null) ?? null,
+    schedule: sub.interval_count === 1 ? `Every ${unit}` : `Every ${sub.interval_count} ${unit}s`
+  }
+}
+
+/**
  * invoice.paid for an Autoship renewal (not the first invoice, which the checkout order covers).
  * Delivery details come from the subscription's metadata; the date from today's delivery rules.
  */
@@ -119,6 +151,9 @@ export async function recordRenewalOrder(stripe: Stripe, invoice: Stripe.Invoice
   if (invoice.billing_reason !== 'subscription_cycle') return { skipped: 'not_renewal' as const }
   const details = invoice.parent?.subscription_details
   const m = details?.metadata ?? {}
+  // An old-shop "paused" Autoship still renews at $0 (100%-off coupon): nothing to deliver
+  if (invoice.total === 0 && invoice.subtotal > 0) return { skipped: 'fully_discounted' as const }
+  const old = m.address ? null : await oldShopDetails(m.snipcart_subscription_id)
 
   const productIds = [
     ...new Set(
@@ -136,12 +171,14 @@ export async function recordRenewalOrder(stripe: Stripe, invoice: Stripe.Invoice
     .filter((l) => l.amount >= 0)
     .map((l) => {
       const product = byId.get(l.pricing?.price_details?.product ?? '')
-      const { title, option } = splitName(product?.name ?? l.description ?? 'Item')
+      const { title, option } = old
+        ? { title: old.title, option: old.option }
+        : splitName(product?.name ?? l.description ?? 'Item')
       const quantity = l.quantity ?? 1
       return {
         title,
         option,
-        productId: product?.metadata?.productId ?? null,
+        productId: product?.metadata?.productId ?? old?.productId ?? null,
         variantKey: product?.metadata?.variantKey ?? null,
         unitAmount: Math.round(l.amount / quantity),
         quantity,
@@ -155,17 +192,17 @@ export async function recordRenewalOrder(stripe: Stripe, invoice: Stripe.Invoice
 
   return insertOrder(
     {
-      user_id: m.user_id || null,
+      user_id: m.user_id || old?.user_id || null,
       email: invoice.customer_email ?? '',
       customer_name: invoice.customer_name ?? null,
-      phone: m.phone || invoice.customer_phone || null,
+      phone: m.phone || invoice.customer_phone || old?.phone || null,
       kind: 'autoship_renewal',
       fulfillment: m.fulfillment === 'pickup' ? 'pickup' : 'delivery',
       delivery_date: nextDeliveryDate(settings?.delivery),
       requested_time: m.requested_time || null,
-      address: m.address || null,
-      notes: m.notes || null,
-      autoship_schedule: m.autoship_schedule || null,
+      address: m.address || old?.address || null,
+      notes: m.notes || old?.notes || null,
+      autoship_schedule: m.autoship_schedule || old?.schedule || null,
       subtotal: invoice.subtotal,
       discount,
       tax,
