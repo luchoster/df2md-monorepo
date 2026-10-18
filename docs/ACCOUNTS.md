@@ -34,6 +34,17 @@ device, point them at `/auth/confirm` with a token hash. `{{ .RedirectTo }}` alr
 page to return to (`?next=…`):
 - Confirm signup: `<a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email">Confirm your email</a>`
 - Reset password: `<a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=recovery">Choose a new password</a>`
+- Magic Link (the emailed sign-in code; must contain `{{ .Token }}`). Subject:
+  `Your Dog Food 2 My Door sign-in code`. Body:
+  ```html
+  <h2>Your sign-in code</h2>
+  <p>Enter this code on the sign-in page:</p>
+  <p style="font-size:28px;font-weight:bold;letter-spacing:6px">{{ .Token }}</p>
+  <p>It expires in one hour. If you didn't ask for it, you can ignore this email.</p>
+  <p>Or <a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=magiclink">sign in with this link</a>.</p>
+  ```
+  Codes are 8 digits (Providers → Email → Email OTP length); `LOGIN_CODE_LENGTH` in
+  `apps/web/lib/account/login-code.ts` must match.
 
 **Authentication → Emails → SMTP**: the built-in sender only allows a few emails an hour.
 Before launch, connect a real sender (Resend works: `smtp.resend.com`, port 465, user `resend`,
