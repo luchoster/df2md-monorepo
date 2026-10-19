@@ -22,8 +22,8 @@ Snipcart is still live and still billing Autoships.
 - [ ] **Ask Stripe support and Snipcart support** the questions in §5 and note the answers here.
 - [ ] **Customer announcement** written: new site, sign in with an emailed code
       (`https://<domain>/login?method=code`), choose a password, Autoships carry over.
-- [ ] **Remove the sandbox test Autoships** on luchoster@gmail.com (two Snipcart-style test
-      subscriptions, and their `legacy_subscriptions` rows with `snipcart_id` `sandbox-test-*`).
+- [x] **Pause / Resume tested** on luchoster@gmail.com (sandbox, Oct 19): no charge, date kept.
+      Test Autoships cancelled and their `legacy_subscriptions` rows removed.
 
 ## 2. Launch day, in this order
 
