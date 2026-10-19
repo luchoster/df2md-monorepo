@@ -19,7 +19,8 @@ Snipcart is still live and still billing Autoships.
       (API version `2026-08-26.dahlia`; events `checkout.session.completed`,
       `checkout.session.async_payment_succeeded`, `invoice.paid`), its secret in Vercel as
       `STRIPE_WEBHOOK_SECRET`. Buy with `4242 4242 4242 4242` → the order shows under Orders.
-- [ ] **Ask Snipcart support** the questions in §5 and note the answers here.
+- [ ] **Ask Snipcart support** the questions in §5 (nice to know; disconnecting it in Stripe
+      first, step 7, keeps it from touching the subscriptions either way).
 - [ ] **Customer announcement** written: new site, sign in with an emailed code
       (`https://<domain>/login?method=code`), choose a password, Autoships carry over.
 - [ ] **Remove the sandbox test Autoships** on luchoster@gmail.com (two Snipcart-style test
@@ -48,8 +49,12 @@ Run the scripts from `scripts/import` with the repo-root `.env`. Nothing here em
 6. **Smoke test with a real account** (yours): sign in, Orders shows history, Autoship shows the
    live subscriptions (no "set up on our previous website" duplicates), a small real purchase
    goes through and lands under Orders (refund it afterwards).
-7. **Turn off Snipcart** as agreed with Snipcart support (§5), so it stops acting on renewals and
-   stops emailing customers.
+7. **Turn off Snipcart**, in this order, so it can't cancel anything or email anyone:
+   1. Snipcart dashboard: turn off the customer email notifications.
+   2. Stripe (live) → Settings → Connected / Installed apps → Snipcart → **disconnect**. The
+      subscriptions stay (Stripe doesn't cancel them on disconnect) and Stripe keeps charging
+      renewals itself (§5); Snipcart just can't reach them any more.
+   3. Snipcart: invalidate the Live API key (reversible), or cancel the account.
 8. **Convert Snipcart's pauses** (103 Autoships paused with a 100%-off coupon) to Stripe pauses:
    ```bash
    bun run autoship:pause                                         # dry run (read-only key)
