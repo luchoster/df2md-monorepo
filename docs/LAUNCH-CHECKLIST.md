@@ -19,9 +19,6 @@ Snipcart is still live and still billing Autoships.
       (API version `2026-08-26.dahlia`; events `checkout.session.completed`,
       `checkout.session.async_payment_succeeded`, `invoice.paid`), its secret in Vercel as
       `STRIPE_WEBHOOK_SECRET`. Buy with `4242 4242 4242 4242` → the order shows under Orders.
-- [ ] **Confirm who charges Snipcart's renewals** (see §5): give the read-only key
-      `STRIPE_READ_KEY` the **Events: Read** permission, then check the `invoice.finalized`
-      events. If Snipcart's servers charge them, build the `invoice.created` handler (§5) first.
 - [ ] **Ask Snipcart support** the questions in §5 and note the answers here.
 - [ ] **Customer announcement** written: new site, sign in with an emailed code
       (`https://<domain>/login?method=code`), choose a password, Autoships carry over.
@@ -41,8 +38,8 @@ Run the scripts from `scripts/import` with the repo-root `.env`. Nothing here em
    bun run customers --apply --link-stripe        # new orders, refreshed statuses, live ids
    ```
 3. **Live Stripe webhook.** Stripe (live) → Developers → Webhooks → add endpoint
-   `https://<domain>/api/stripe/webhook`, API version `2026-08-26.dahlia`, the 3 events above
-   (plus `invoice.created` if §5 says so). Copy its signing secret.
+   `https://<domain>/api/stripe/webhook`, API version `2026-08-26.dahlia`, the 3 events above.
+   Copy its signing secret.
 4. **Switch Vercel to live keys** (Production): `STRIPE_SECRET_KEY` (live `sk_live_…`),
    `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` (live `pk_live_…`), `STRIPE_WEBHOOK_SECRET` (step 3).
    Redeploy.
@@ -66,8 +63,7 @@ Run the scripts from `scripts/import` with the repo-root `.env`. Nothing here em
 
 - [ ] Every Autoship renewal produces an order on the new site (Supabase `orders` with
       `kind = 'autoship_renewal'`) and a paid invoice in Stripe. Check daily for a week.
-- [ ] No renewal invoices stuck in **draft** in Stripe (Invoices → Draft). Stuck drafts mean
-      nobody is finalizing them (§5).
+- [ ] No renewal invoices stuck in **draft** in Stripe (Invoices → Draft) for more than ~2 hours.
 - [ ] Payment problems: 8 Autoships were already `past_due` at import, and 36 old renewal
       invoices are still open from Snipcart's time. Decide whether to chase or void them.
 - [ ] Customers who can't get in: they use "Email me a sign-in code"; there's no password to
@@ -86,30 +82,17 @@ Researched Oct 18, 2026 from the live data (read-only key) and the Stripe/Snipca
 
 **How Snipcart bills today.** All 144 Autoships are real Stripe subscriptions on the store's own
 Stripe account, created through Snipcart's Stripe Connect app (`application:
-ca_1KNMZBmM0lzZtdKcTPz1VqSqV2mW3l1c`, no application fee). Each renewal invoice is created by
-Stripe with `auto_advance: false`, and is finalized and charged 60–72 minutes later. Invoices
-with `auto_advance: false` never advance on their own, which strongly suggests Snipcart's servers
-finalize and charge each renewal. Snipcart "pauses" by adding a 100%-off forever coupon, and its
-failed payments are left open (36 open renewal invoices, no retries).
+ca_1KNMZBmM0lzZtdKcTPz1VqSqV2mW3l1c`, no application fee). Snipcart "pauses" by adding a 100%-off
+forever coupon, and its failed payments are left open (36 open renewal invoices, no retries).
+
+**Who charges the renewals: Stripe.** Checked Oct 19, 2026 on live drafts: a renewal invoice is
+created with `auto_advance: true` and Stripe schedules its own charge an hour later
+(`next_payment_attempt`); Stripe turns `auto_advance` off once the invoice is paid. So renewals
+keep charging after Snipcart is turned off, and no webhook change is needed.
 
 **What Stripe says about disconnecting a platform.** Subscriptions are **not** cancelled when an
-account disconnects a platform, and Stripe recommends agreeing on subscription migration with the
-platform before disconnecting.
-
-**The risk.** Once Snipcart is off (or disconnected), nobody may finalize renewal invoices: they
-would sit in draft and the active Autoships would silently stop charging and stop producing
-orders. Our webhook only reacts to `invoice.paid`, so it wouldn't notice.
-
-**To confirm** (Events: Read on `STRIPE_READ_KEY`): `invoice.finalized` events for
-`subscription_cycle` invoices with a `request.id` were finalized by an API call (Snipcart);
-without one, Stripe did it automatically.
-
-**Fix if confirmed:** handle `invoice.created` in our webhook: for a draft renewal of a
-subscription with `metadata.snipcart_subscription_id` and `auto_advance: false`, set
-`auto_advance: true` so Stripe finalizes and charges it after its usual hour. Add
-`invoice.created` to the live webhook's events. It can't double-charge (one invoice per cycle).
-Alternative: recreate the 41 active Autoships as our own subscriptions (same card, price,
-schedule, `billing_cycle_anchor` at their next date) and cancel Snipcart's.
+account disconnects a platform. The open question is only what Snipcart itself does on the way out
+(cancel subscriptions? email customers?), hence the questions below.
 
 **Questions for Snipcart support:**
 1. When we deactivate the store / cancel the plan, does Snipcart cancel, pause or leave the
