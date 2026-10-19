@@ -19,8 +19,7 @@ Snipcart is still live and still billing Autoships.
       (API version `2026-08-26.dahlia`; events `checkout.session.completed`,
       `checkout.session.async_payment_succeeded`, `invoice.paid`), its secret in Vercel as
       `STRIPE_WEBHOOK_SECRET`. Buy with `4242 4242 4242 4242` → the order shows under Orders.
-- [ ] **Ask Snipcart support** the questions in §5 (nice to know; disconnecting it in Stripe
-      first, step 7, keeps it from touching the subscriptions either way).
+- [ ] **Ask Stripe support and Snipcart support** the questions in §5 and note the answers here.
 - [ ] **Customer announcement** written: new site, sign in with an emailed code
       (`https://<domain>/login?method=code`), choose a password, Autoships carry over.
 - [ ] **Remove the sandbox test Autoships** on luchoster@gmail.com (two Snipcart-style test
@@ -51,9 +50,9 @@ Run the scripts from `scripts/import` with the repo-root `.env`. Nothing here em
    goes through and lands under Orders (refund it afterwards).
 7. **Turn off Snipcart**, in this order, so it can't cancel anything or email anyone:
    1. Snipcart dashboard: turn off the customer email notifications.
-   2. Stripe (live) → Settings → Connected / Installed apps → Snipcart → **disconnect**. The
-      subscriptions stay (Stripe doesn't cancel them on disconnect) and Stripe keeps charging
-      renewals itself (§5); Snipcart just can't reach them any more.
+   2. Stripe (live) → Settings → Connected / Installed apps → Snipcart → **disconnect**, once
+      Stripe support has confirmed the subscriptions keep billing (§5). Afterwards check the next
+      renewals get charged (§3).
    3. Snipcart: invalidate the Live API key (reversible), or cancel the account.
 8. **Convert Snipcart's pauses** (103 Autoships paused with a 100%-off coupon) to Stripe pauses:
    ```bash
@@ -95,9 +94,14 @@ created with `auto_advance: true` and Stripe schedules its own charge an hour la
 (`next_payment_attempt`); Stripe turns `auto_advance` off once the invoice is paid. So renewals
 keep charging after Snipcart is turned off, and no webhook change is needed.
 
-**What Stripe says about disconnecting a platform.** Subscriptions are **not** cancelled when an
-account disconnects a platform. The open question is only what Snipcart itself does on the way out
-(cancel subscriptions? email customers?), hence the questions below.
+**What Stripe says about disconnecting a platform.** Not a guarantee: disconnecting while
+subscriptions are active "may have consequences depending on" how they were created, and Stripe
+recommends discussing migration with the platform first. Other platforms differ (some keep
+billing, Gumroad's fail). Ours should keep billing, since they're subscriptions on our own account,
+no application fee, and Stripe already charges the renewals itself, but get it confirmed.
+
+**Question for Stripe support** (they can check the account): if we disconnect the Snipcart Connect
+app (`ca_1KNMZBmM0lzZtdKcTPz1VqSqV2mW3l1c`), do the subscriptions it created keep billing as now?
 
 **Questions for Snipcart support:**
 1. When we deactivate the store / cancel the plan, does Snipcart cancel, pause or leave the
