@@ -404,6 +404,12 @@ export function CheckoutForm({
                     className="text-primary"
                   />
                 )}
+                {verified && verified.discount === 0 && estimate.discount > 0 && (
+                  <p className="text-xs text-muted-foreground">
+                    The first-Autoship discount is for new Autoship customers. This account or email
+                    has had an Autoship before.
+                  </p>
+                )}
                 <Row label={method === 'pickup' ? 'Pickup' : 'Delivery'} value="Free" />
                 <Row
                   label={`Tax (${settings.taxRatePercent}%)`}

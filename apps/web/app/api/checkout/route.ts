@@ -2,11 +2,12 @@ import { type NextRequest, NextResponse } from 'next/server'
 import type Stripe from 'stripe'
 import { getProfile, getUser } from '@/lib/account/session'
 import { getStripeCustomerId } from '@/lib/account/stripe-customer'
+import { hadAutoshipBefore } from '@/lib/checkout/first-autoship'
 import { quoteCart } from '@/lib/checkout/quote'
 import { type CheckoutResponse, checkoutRequestSchema } from '@/lib/checkout/schema'
 import { clampSchedule, describeSchedule } from '@/lib/pricing'
 import { siteOrigin } from '@/lib/site-url'
-import { FIRST_AUTOSHIP_FLAG, findCustomer, getTaxRateId, stripe } from '@/lib/stripe'
+import { findCustomer, getTaxRateId, stripe } from '@/lib/stripe'
 
 const reply = (body: CheckoutResponse, status = 200) => NextResponse.json(body, { status })
 
@@ -42,7 +43,13 @@ export async function POST(req: NextRequest) {
       : accountCustomerId
         ? await stripe.customers.retrieve(accountCustomerId).then((c) => (c.deleted ? null : c))
         : await findCustomer(stripe, input.customer.email)
-    const firstAutoship = customer?.metadata?.[FIRST_AUTOSHIP_FLAG] !== 'true'
+    const firstAutoship =
+      input.items.some((i) => i.autoship) &&
+      !(await hadAutoshipBefore(stripe, {
+        customer,
+        emails: [input.customer.email, user?.email ?? ''],
+        userId: user?.id
+      }))
     const { quote, problems } = await quoteCart(input, { firstAutoship })
     if (problems.length)
       return reply(

@@ -149,8 +149,10 @@ function matchProduct(wpId: string, size: string | null) {
 
 // ------------------------------------------------------------------ build rows
 const PLURAL: Record<string, string> = { Day: 'day', Week: 'week', Month: 'month', Year: 'year' }
+// One-time items also carry a paymentSchedule, with interval 0
+const isAutoship = (i: any) => Boolean(i.paymentSchedule?.interval || i.subscription)
 const every = (s: { interval: string; intervalCount: number } | null | undefined) => {
-  if (!s) return null
+  if (!s?.interval) return null
   const unit = PLURAL[s.interval] ?? lower(s.interval)
   return s.intervalCount === 1 ? `Every ${unit}` : `Every ${s.intervalCount} ${unit}s`
 }
@@ -196,7 +198,7 @@ const orders = [...snipOrders]
           : delivery && delivery >= today
             ? 'paid'
             : 'delivered'
-    const autoshipItem = o.items.find((i: any) => i.paymentSchedule || i.subscription)
+    const autoshipItem = o.items.find(isAutoship)
     return {
       order: {
         source: 'snipcart',
@@ -232,7 +234,7 @@ const orders = [...snipOrders]
           option: size,
           unit_amount: cents(i.price),
           quantity: Math.max(1, Number(i.quantity) || 1),
-          autoship: Boolean(i.paymentSchedule || i.subscription)
+          autoship: isAutoship(i)
         }
       })
     }
