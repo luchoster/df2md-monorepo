@@ -1,4 +1,5 @@
 import { Star } from 'lucide-react'
+import { PortableTextRenderer } from '@/components/portable-text-renderer'
 import { Section } from '../section'
 import type { BlockOf } from '../types'
 
@@ -37,7 +38,7 @@ export default function ReviewsEmbed({
                     />
                   ))}
                 </div>
-                <p className="mb-3">{r.text}</p>
+                <PortableTextRenderer value={r.text} className="mb-3" />
                 <p className="mb-0 font-semibold text-ink-900">— {r.author}</p>
               </li>
             ))}

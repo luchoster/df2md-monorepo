@@ -1,6 +1,6 @@
 import { OlistIcon } from '@sanity/icons/Olist'
 import { defineArrayMember, defineField, defineType } from 'sanity'
-import { backgroundField, paddingField } from '../shared'
+import { backgroundField, paddingField, ptToText } from '../shared'
 
 /** shadcnblocks Feature 187: heading + numbered steps joined by a connector line. */
 export default defineType({
@@ -10,7 +10,7 @@ export default defineType({
   icon: OlistIcon,
   fields: [
     defineField({ name: 'heading', type: 'string', validation: (rule) => rule.required() }),
-    defineField({ name: 'description', type: 'text', rows: 2 }),
+    defineField({ name: 'description', type: 'simple-content' }),
     defineField({
       name: 'steps',
       type: 'array',
@@ -21,9 +21,12 @@ export default defineType({
           type: 'object',
           fields: [
             defineField({ name: 'title', type: 'string', validation: (rule) => rule.required() }),
-            defineField({ name: 'description', type: 'text', rows: 3 })
+            defineField({ name: 'description', type: 'simple-content' })
           ],
-          preview: { select: { title: 'title', subtitle: 'description' } }
+          preview: {
+            select: { title: 'title', description: 'description' },
+            prepare: ({ title, description }) => ({ title, subtitle: ptToText(description) })
+          }
         })
       ]
     }),

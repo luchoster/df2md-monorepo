@@ -1,9 +1,16 @@
 import { PackageIcon } from '@sanity/icons/Package'
 import { defineArrayMember, defineField, defineType } from 'sanity'
+import { listSelectInput } from '../../components/list-select-input'
 import { imageField, imageMember } from '../objects/image'
 import { legacyField, legacyGroup } from '../objects/legacy'
 
 type Variant = { _key: string; price?: number; flavor?: string; option?: string }
+
+const DefaultVariantInput = listSelectInput<Variant>(
+  ['variants'],
+  (v) => ({ value: v._key, title: [v.flavor, v.option].filter(Boolean).join(' · ') || v._key }),
+  'First variant'
+)
 
 export default defineType({
   name: 'product',
@@ -146,7 +153,8 @@ export default defineType({
       title: 'Default variant',
       type: 'string',
       group: 'variants',
-      description: 'The variant _key preselected on the product page. Empty = first variant.',
+      description: 'Preselected on the product page',
+      components: { input: DefaultVariantInput },
       validation: (rule) =>
         rule.custom((value, ctx) => {
           if (!value) return true

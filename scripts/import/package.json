@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "description": "WordPress dump \u2192 Sanity import pipeline (REBUILD-PLAN \u00a73)",
+  "description": "WordPress dump → Sanity import pipeline (REBUILD-PLAN §3)",
   "scripts": {
     "extract": "bun run src/01-extract.ts",
     "transform": "bun run src/02-transform.ts",
@@ -17,7 +17,8 @@
     "typecheck": "tsc --noEmit",
     "snipcart:export": "bun run src/00-snipcart-export.ts",
     "customers": "bun run src/07-customers.ts",
-    "autoship:pause": "bun run src/08-autoship-pause.ts"
+    "autoship:pause": "bun run src/08-autoship-pause.ts",
+    "block-text": "bun run src/09-block-text.ts"
   },
   "devDependencies": {
     "@types/jsdom": "^30.0.0",

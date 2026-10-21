@@ -1,7 +1,7 @@
 import { ThLargeIcon } from '@sanity/icons/ThLarge'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 import { FEATURE_ICONS } from '../../../lib/icons'
-import { backgroundField, paddingField } from '../shared'
+import { backgroundField, paddingField, ptToText } from '../shared'
 
 /** shadcnblocks Feature 17: centered intro + up to six icon features in two columns. */
 export default defineType({
@@ -32,9 +32,12 @@ export default defineType({
               initialValue: 'paw-print'
             }),
             defineField({ name: 'title', type: 'string', validation: (rule) => rule.required() }),
-            defineField({ name: 'description', type: 'text', rows: 3 })
+            defineField({ name: 'description', type: 'simple-content' })
           ],
-          preview: { select: { title: 'title', subtitle: 'description' } }
+          preview: {
+            select: { title: 'title', description: 'description' },
+            prepare: ({ title, description }) => ({ title, subtitle: ptToText(description) })
+          }
         })
       ]
     }),

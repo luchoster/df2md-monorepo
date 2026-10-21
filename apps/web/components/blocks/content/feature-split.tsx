@@ -1,6 +1,7 @@
 import { Check } from 'lucide-react'
 import { stegaClean } from 'next-sanity'
 import { ButtonLink } from '@/components/button-link'
+import { PortableTextRenderer } from '@/components/portable-text-renderer'
 import { SanityImage } from '@/components/sanity-image'
 import { cn } from '@/lib/utils'
 import { Section } from '../section'
@@ -24,7 +25,10 @@ export default function FeatureSplit({
         <div className={cn('flex flex-col lg:items-start', left && 'lg:order-2')}>
           <h2 className="mb-5 text-3xl tracking-tight text-pretty lg:text-5xl">{heading}</h2>
           {description && (
-            <p className="mb-8 max-w-xl text-muted-foreground lg:text-lg">{description}</p>
+            <PortableTextRenderer
+              value={description}
+              className="mb-8 max-w-xl text-muted-foreground lg:text-lg"
+            />
           )}
           {(checklist?.length ?? 0) > 0 && (
             <ul className="space-y-4">

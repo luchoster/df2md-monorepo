@@ -5,7 +5,7 @@ import { metaFragment } from './shared/meta'
 import { productCardFragment } from './shared/product-card'
 
 export const PRODUCT_QUERY = defineQuery(`
-  *[_type == "product" && slug.current == $slug && status != "archived"][0]{
+  *[_type == "product" && slug.current == $slug][0]{
     _id, title, "slug": slug.current, status, featured, shortDescription,
     "brand": brand->{ title, "slug": slug.current },
     "categories": categories[]->{ _id, title, "slug": slug.current, "parent": parent->{ title, "slug": slug.current } },

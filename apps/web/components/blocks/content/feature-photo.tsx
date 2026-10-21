@@ -1,6 +1,7 @@
 import { ChevronRight } from 'lucide-react'
 import { stegaClean } from 'next-sanity'
 import { ButtonLink } from '@/components/button-link'
+import { PortableTextRenderer } from '@/components/portable-text-renderer'
 import { SanityImage } from '@/components/sanity-image'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
@@ -34,7 +35,12 @@ export default function FeaturePhoto({
             </Badge>
           )}
           <h2 className="text-3xl tracking-tight text-pretty lg:text-5xl">{heading}</h2>
-          {description && <p className="text-muted-foreground lg:text-lg">{description}</p>}
+          {description && (
+            <PortableTextRenderer
+              value={description}
+              className="text-muted-foreground lg:text-lg"
+            />
+          )}
           {button && <ButtonLink link={button} size="lg" className="mt-2.5 w-fit" />}
         </div>
         <div className="relative aspect-4/3 w-full overflow-hidden rounded-xl md:aspect-video lg:aspect-4/3">

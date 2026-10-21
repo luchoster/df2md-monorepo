@@ -21,7 +21,7 @@ export default defineType({
       group: 'copy',
       validation: (rule) => rule.required()
     }),
-    defineField({ name: 'description', type: 'text', rows: 3, group: 'copy' }),
+    defineField({ name: 'description', type: 'simple-content', group: 'copy' }),
     defineField({ name: 'button', type: 'link', group: 'copy' }),
     imageField({ name: 'image', required: true, group: 'photo' }),
     defineField({

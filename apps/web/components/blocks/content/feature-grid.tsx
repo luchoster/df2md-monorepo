@@ -1,4 +1,5 @@
 import { ButtonLink } from '@/components/button-link'
+import { PortableTextRenderer } from '@/components/portable-text-renderer'
 import { Badge } from '@/components/ui/badge'
 import { featureIcons } from '../icons'
 import { Section } from '../section'
@@ -38,7 +39,10 @@ export default function FeatureGrid({
                 <div>
                   <h3 className="text-lg tracking-tight md:mb-2 md:text-xl">{f.title}</h3>
                   {f.description && (
-                    <p className="text-muted-foreground md:text-base">{f.description}</p>
+                    <PortableTextRenderer
+                      value={f.description}
+                      className="text-muted-foreground md:text-base"
+                    />
                   )}
                 </div>
               </div>

@@ -1,4 +1,5 @@
 import { ButtonLink } from '@/components/button-link'
+import { PortableTextRenderer } from '@/components/portable-text-renderer'
 import { cn } from '@/lib/utils'
 import { Section } from '../section'
 import type { BlockOf } from '../types'
@@ -18,7 +19,12 @@ export default function Steps({
       <div className="container">
         <div className="max-w-3xl">
           <h2 className="text-3xl tracking-tight sm:text-4xl lg:text-5xl">{heading}</h2>
-          {description && <p className="mt-5 text-muted-foreground md:text-lg">{description}</p>}
+          {description && (
+            <PortableTextRenderer
+              value={description}
+              className="mt-5 text-muted-foreground md:text-lg"
+            />
+          )}
         </div>
         <ol
           className={cn(
@@ -48,7 +54,10 @@ export default function Steps({
                 <div className="max-lg:mt-2">
                   <h3 className="text-lg">{step.title}</h3>
                   {step.description && (
-                    <p className="mt-2 text-muted-foreground">{step.description}</p>
+                    <PortableTextRenderer
+                      value={step.description}
+                      className="mt-2 text-muted-foreground"
+                    />
                   )}
                 </div>
               </li>

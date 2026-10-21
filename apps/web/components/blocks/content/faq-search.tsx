@@ -20,7 +20,10 @@ export default function FaqSearch(props: BlockOf<'faq-search'> & { isFirst?: boo
             {heading}
           </Heading>
           {description && (
-            <p className="max-w-md text-balance text-muted-foreground">{description}</p>
+            <PortableTextRenderer
+              value={description}
+              className="max-w-md text-balance text-muted-foreground"
+            />
           )}
         </div>
         <FaqSearchList

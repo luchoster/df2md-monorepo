@@ -65,7 +65,7 @@ export type ReviewsEmbed = {
   reviews?: Array<{
     author: string;
     rating: number;
-    text: string;
+    text: SimpleContent;
     _type: "review";
     _key: string;
   }>;
@@ -153,10 +153,10 @@ export type ProductGrid = {
 export type Steps = {
   _type: "steps";
   heading: string;
-  description?: string;
+  description?: SimpleContent;
   steps: Array<{
     title: string;
-    description?: string;
+    description?: SimpleContent;
     _type: "step";
     _key: string;
   }>;
@@ -181,7 +181,7 @@ export type Steps = {
 export type AboutIntro = {
   _type: "about-intro";
   heading: string;
-  description?: string;
+  description?: SimpleContent;
   button?: Link;
   images?: Array<{
     asset?: SanityImageAssetReference;
@@ -213,7 +213,7 @@ export type FeaturePhoto = {
   _type: "feature-photo";
   badge?: string;
   heading: string;
-  description?: string;
+  description?: SimpleContent;
   button?: Link;
   image: {
     asset?: SanityImageAssetReference;
@@ -255,10 +255,10 @@ export type FeaturePhoto = {
 export type FeatureRows = {
   _type: "feature-rows";
   heading?: string;
-  subheading?: string;
+  subheading?: SimpleContent;
   rows?: Array<{
     title: string;
-    description?: string;
+    description?: SimpleContent;
     image: FeatureRowImage;
     link?: Link;
     _type: "featureRow";
@@ -285,7 +285,7 @@ export type FeatureRows = {
 export type FeatureSplit = {
   _type: "feature-split";
   heading: string;
-  description?: string;
+  description?: SimpleContent;
   checklist?: Array<string>;
   image: {
     asset?: SanityImageAssetReference;
@@ -341,7 +341,7 @@ export type FeatureGrid = {
       | "thumbs-up"
       | "sparkles";
     title: string;
-    description?: string;
+    description?: SimpleContent;
     _type: "feature";
     _key: string;
   }>;
@@ -367,7 +367,7 @@ export type FaqSearch = {
   _type: "faq-search";
   label?: string;
   heading: string;
-  description?: string;
+  description?: SimpleContent;
   searchPlaceholder?: string;
   items?: Array<{
     question: string;
@@ -1231,7 +1231,7 @@ export type PAGE_QUERY_RESULT = {
         _type: "about-intro";
         _key: string;
         heading: string;
-        description: string | null;
+        description: SimpleContent | null;
         background:
           | "accent"
           | "brand-light"
@@ -1451,7 +1451,7 @@ export type PAGE_QUERY_RESULT = {
         _key: string;
         label: string | null;
         heading: string;
-        description: string | null;
+        description: SimpleContent | null;
         searchPlaceholder: string | null;
         emptyText: string | null;
         padding: SectionPadding | null;
@@ -1509,7 +1509,7 @@ export type PAGE_QUERY_RESULT = {
             | "truck"
             | null;
           title: string;
-          description: string | null;
+          description: SimpleContent | null;
         }> | null;
         button: {
           title: string;
@@ -1543,7 +1543,7 @@ export type PAGE_QUERY_RESULT = {
         _key: string;
         badge: string | null;
         heading: string;
-        description: string | null;
+        description: SimpleContent | null;
         imageSide: "left" | "right" | null;
         chip: string | null;
         overlayHeading: string | null;
@@ -1656,7 +1656,7 @@ export type PAGE_QUERY_RESULT = {
         _type: "feature-rows";
         _key: string;
         heading: string | null;
-        subheading: string | null;
+        subheading: SimpleContent | null;
         firstImageSide: "left" | "right" | null;
         background:
           | "accent"
@@ -1677,7 +1677,7 @@ export type PAGE_QUERY_RESULT = {
         rows: Array<{
           _key: string;
           title: string;
-          description: string | null;
+          description: SimpleContent | null;
           image: {
             _type: "image";
             asset: {
@@ -1728,7 +1728,7 @@ export type PAGE_QUERY_RESULT = {
         _type: "feature-split";
         _key: string;
         heading: string;
-        description: string | null;
+        description: SimpleContent | null;
         checklist: Array<string> | null;
         imageSide: "left" | "right" | null;
         background:
@@ -2001,7 +2001,7 @@ export type PAGE_QUERY_RESULT = {
           _key: string;
           author: string;
           rating: number;
-          text: string;
+          text: SimpleContent;
         }> | null;
       }
     | {
@@ -2125,7 +2125,7 @@ export type PAGE_QUERY_RESULT = {
         _type: "steps";
         _key: string;
         heading: string;
-        description: string | null;
+        description: SimpleContent | null;
         background:
           | "accent"
           | "brand-light"
@@ -2145,7 +2145,7 @@ export type PAGE_QUERY_RESULT = {
         steps: Array<{
           _key: string;
           title: string;
-          description: string | null;
+          description: SimpleContent | null;
         }>;
         button: {
           title: string;
@@ -2231,7 +2231,7 @@ export type HOME_PAGE_QUERY_RESULT =
             _type: "about-intro";
             _key: string;
             heading: string;
-            description: string | null;
+            description: SimpleContent | null;
             background:
               | "accent"
               | "brand-light"
@@ -2451,7 +2451,7 @@ export type HOME_PAGE_QUERY_RESULT =
             _key: string;
             label: string | null;
             heading: string;
-            description: string | null;
+            description: SimpleContent | null;
             searchPlaceholder: string | null;
             emptyText: string | null;
             padding: SectionPadding | null;
@@ -2509,7 +2509,7 @@ export type HOME_PAGE_QUERY_RESULT =
                 | "truck"
                 | null;
               title: string;
-              description: string | null;
+              description: SimpleContent | null;
             }> | null;
             button: {
               title: string;
@@ -2543,7 +2543,7 @@ export type HOME_PAGE_QUERY_RESULT =
             _key: string;
             badge: string | null;
             heading: string;
-            description: string | null;
+            description: SimpleContent | null;
             imageSide: "left" | "right" | null;
             chip: string | null;
             overlayHeading: string | null;
@@ -2656,7 +2656,7 @@ export type HOME_PAGE_QUERY_RESULT =
             _type: "feature-rows";
             _key: string;
             heading: string | null;
-            subheading: string | null;
+            subheading: SimpleContent | null;
             firstImageSide: "left" | "right" | null;
             background:
               | "accent"
@@ -2677,7 +2677,7 @@ export type HOME_PAGE_QUERY_RESULT =
             rows: Array<{
               _key: string;
               title: string;
-              description: string | null;
+              description: SimpleContent | null;
               image: {
                 _type: "image";
                 asset: {
@@ -2728,7 +2728,7 @@ export type HOME_PAGE_QUERY_RESULT =
             _type: "feature-split";
             _key: string;
             heading: string;
-            description: string | null;
+            description: SimpleContent | null;
             checklist: Array<string> | null;
             imageSide: "left" | "right" | null;
             background:
@@ -3001,7 +3001,7 @@ export type HOME_PAGE_QUERY_RESULT =
               _key: string;
               author: string;
               rating: number;
-              text: string;
+              text: SimpleContent;
             }> | null;
           }
         | {
@@ -3125,7 +3125,7 @@ export type HOME_PAGE_QUERY_RESULT =
             _type: "steps";
             _key: string;
             heading: string;
-            description: string | null;
+            description: SimpleContent | null;
             background:
               | "accent"
               | "brand-light"
@@ -3145,7 +3145,7 @@ export type HOME_PAGE_QUERY_RESULT =
             steps: Array<{
               _key: string;
               title: string;
-              description: string | null;
+              description: SimpleContent | null;
             }>;
             button: {
               title: string;
@@ -3219,7 +3219,7 @@ export type HOME_PAGE_QUERY_RESULT =
             _type: "about-intro";
             _key: string;
             heading: string;
-            description: string | null;
+            description: SimpleContent | null;
             background:
               | "accent"
               | "brand-light"
@@ -3439,7 +3439,7 @@ export type HOME_PAGE_QUERY_RESULT =
             _key: string;
             label: string | null;
             heading: string;
-            description: string | null;
+            description: SimpleContent | null;
             searchPlaceholder: string | null;
             emptyText: string | null;
             padding: SectionPadding | null;
@@ -3497,7 +3497,7 @@ export type HOME_PAGE_QUERY_RESULT =
                 | "truck"
                 | null;
               title: string;
-              description: string | null;
+              description: SimpleContent | null;
             }> | null;
             button: {
               title: string;
@@ -3531,7 +3531,7 @@ export type HOME_PAGE_QUERY_RESULT =
             _key: string;
             badge: string | null;
             heading: string;
-            description: string | null;
+            description: SimpleContent | null;
             imageSide: "left" | "right" | null;
             chip: string | null;
             overlayHeading: string | null;
@@ -3644,7 +3644,7 @@ export type HOME_PAGE_QUERY_RESULT =
             _type: "feature-rows";
             _key: string;
             heading: string | null;
-            subheading: string | null;
+            subheading: SimpleContent | null;
             firstImageSide: "left" | "right" | null;
             background:
               | "accent"
@@ -3665,7 +3665,7 @@ export type HOME_PAGE_QUERY_RESULT =
             rows: Array<{
               _key: string;
               title: string;
-              description: string | null;
+              description: SimpleContent | null;
               image: {
                 _type: "image";
                 asset: {
@@ -3716,7 +3716,7 @@ export type HOME_PAGE_QUERY_RESULT =
             _type: "feature-split";
             _key: string;
             heading: string;
-            description: string | null;
+            description: SimpleContent | null;
             checklist: Array<string> | null;
             imageSide: "left" | "right" | null;
             background:
@@ -3989,7 +3989,7 @@ export type HOME_PAGE_QUERY_RESULT =
               _key: string;
               author: string;
               rating: number;
-              text: string;
+              text: SimpleContent;
             }> | null;
           }
         | {
@@ -4113,7 +4113,7 @@ export type HOME_PAGE_QUERY_RESULT =
             _type: "steps";
             _key: string;
             heading: string;
-            description: string | null;
+            description: SimpleContent | null;
             background:
               | "accent"
               | "brand-light"
@@ -4133,7 +4133,7 @@ export type HOME_PAGE_QUERY_RESULT =
             steps: Array<{
               _key: string;
               title: string;
-              description: string | null;
+              description: SimpleContent | null;
             }>;
             button: {
               title: string;
@@ -4223,7 +4223,7 @@ export type PAGE_REDIRECTS_QUERY_RESULT = Array<{
 
 // Source: ../web/sanity/queries/product.ts
 // Variable: PRODUCT_QUERY
-// Query: *[_type == "product" && slug.current == $slug && status != "archived"][0]{    _id, title, "slug": slug.current, status, featured, shortDescription,    "brand": brand->{ title, "slug": slug.current },    "categories": categories[]->{ _id, title, "slug": slug.current, "parent": parent->{ title, "slug": slug.current } },    "primaryCategory": primaryCategory->{ title, "slug": slug.current, "parent": parent->{ title, "slug": slug.current } },    mainImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },    gallery[]{ _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },    "flavors": flavors[]{ _key, name, image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },      description[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } }, nutritionalInfo[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },      feedingInstructions[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } }, ingredientsAndUse[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } } },    optionName, defaultVariantKey, autoshipEligible, noDiscounts, showAdditionalInfo, tags,    "variants": variants[price > 0]{ _key, flavor, option, sku, price, compareAtPrice, inStock, weightLbs,      image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    description[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    nutritionalInfo[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    feedingInstructions[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    ingredientsAndUse[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    seo {   title,  description,  noindex,  image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    "related": *[_type == "product" && status == "active" && _id != ^._id      && count((categories[]._ref)[@ in ^.^.categories[]._ref]) > 0      && count(variants[price > 0]) > 0] | order(featured desc, lower(title) asc)[0...10]{   _id,  title,  "slug": slug.current,  "brand": brand->title,  mainImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },  optionName,  defaultVariantKey,  autoshipEligible,  noDiscounts,  "variants": variants[price > 0]{ _key, flavor, option, price, compareAtPrice, inStock } }  }
+// Query: *[_type == "product" && slug.current == $slug][0]{    _id, title, "slug": slug.current, status, featured, shortDescription,    "brand": brand->{ title, "slug": slug.current },    "categories": categories[]->{ _id, title, "slug": slug.current, "parent": parent->{ title, "slug": slug.current } },    "primaryCategory": primaryCategory->{ title, "slug": slug.current, "parent": parent->{ title, "slug": slug.current } },    mainImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },    gallery[]{ _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },    "flavors": flavors[]{ _key, name, image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },      description[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } }, nutritionalInfo[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },      feedingInstructions[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } }, ingredientsAndUse[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } } },    optionName, defaultVariantKey, autoshipEligible, noDiscounts, showAdditionalInfo, tags,    "variants": variants[price > 0]{ _key, flavor, option, sku, price, compareAtPrice, inStock, weightLbs,      image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    description[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    nutritionalInfo[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    feedingInstructions[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    ingredientsAndUse[]{   ...,  _type == "image" => { _key,   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    seo {   title,  description,  noindex,  image {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop } },    "related": *[_type == "product" && status == "active" && _id != ^._id      && count((categories[]._ref)[@ in ^.^.categories[]._ref]) > 0      && count(variants[price > 0]) > 0] | order(featured desc, lower(title) asc)[0...10]{   _id,  title,  "slug": slug.current,  "brand": brand->title,  mainImage {   _type,  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },  alt,  hotspot,  crop },  optionName,  defaultVariantKey,  autoshipEligible,  noDiscounts,  "variants": variants[price > 0]{ _key, flavor, option, price, compareAtPrice, inStock } }  }
 export type PRODUCT_QUERY_RESULT = {
   _id: string;
   title: string;
@@ -5291,7 +5291,7 @@ declare global {
     '\n  *[_type == "page" && defined(slug.current)]{ "slug": slug.current }\n': PAGES_SLUGS_QUERY_RESULT;
     '\n  *[_id == "homePage"][0]{\n    _id, _type,\n    blocks[]{ \n  \n  _type == "hero-slider" => {\n    _type, _key, autoplay, intervalMs, padding,\n    slides[]{ _key, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }, title, text, buttonText, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }, textPosition, textBackground }\n  }\n,\n  \n  _type == "cta-banner" => {\n    _type, _key, text, background, decoration, size, padding,\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n    image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n  }\n,\n  \n  _type == "rich-content-block" => {\n    _type, _key, title, backgroundColor, textAlign, showLink, padding,\n    content[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "image-text" => {\n    _type, _key, title, content, imageSide, background, padding,\n    image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    cta { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "faq-list" => { _type, _key, heading, padding, items[]{ _key, question, answer } }\n,\n  \n  _type == "faq-search" => {\n    _type, _key, label, heading, description, searchPlaceholder, emptyText, padding,\n    items[]{ _key, question, answer, "answerText": pt::text(answer) },\n    "email": *[_id == "siteSettings"][0].contact.email\n  }\n,\n  \n  _type == "feature-grid" => {\n    _type, _key, label, heading, background, padding,\n    features[]{ _key, icon, title, description },\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "feature-split" => {\n    _type, _key, heading, description, checklist, imageSide, background, padding,\n    image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "feature-rows" => {\n    _type, _key, heading, subheading, firstImageSide, background, padding,\n    rows[]{ _key, title, description, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } }\n  }\n,\n  \n  _type == "feature-photo" => {\n    _type, _key, badge, heading, description, imageSide, chip, overlayHeading, background, padding,\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n    image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    chipImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    overlayLink { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "about-intro" => {\n    _type, _key, heading, description, background, padding,\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n    images[]{ _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n  }\n,\n  \n  _type == "steps" => {\n    _type, _key, heading, description, background, padding,\n    steps[]{ _key, title, description },\n    button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n }\n  }\n,\n  \n  _type == "product-grid" => {\n    _type, _key, heading, source, limit, layout, padding,\n    viewAllLink { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n    "products": select(\n      source == "manual" => products[]->{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  noDiscounts,\n  "variants": variants[price > 0]{ _key, flavor, option, price, compareAtPrice, inStock }\n },\n      source == "category" => *[_type == "product" && status == "active" && ^.category._ref in categories[]._ref]\n        | order(featured desc, title asc)[0...48]{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  noDiscounts,\n  "variants": variants[price > 0]{ _key, flavor, option, price, compareAtPrice, inStock }\n },\n      *[_type == "product" && status == "active" && featured == true] | order(title asc)[0...48]{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  noDiscounts,\n  "variants": variants[price > 0]{ _key, flavor, option, price, compareAtPrice, inStock }\n }\n    )\n  }\n,\n  \n  _type == "category-grid" => {\n    _type, _key, heading, columns, padding,\n    "categories": select(\n      showAllTopLevel == true => *[_type == "category" && !defined(parent) && showInNav != false] | order(order asc){\n        _id, title, "slug": slug.current, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n      },\n      categories[]->{ _id, title, "slug": slug.current, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n } }\n    )\n  }\n,\n  \n  _type == "brand-strip" => {\n    _type, _key, heading, linkToShop, padding,\n    "brands": select(\n      showAll == true => *[_type == "brand" && featured == true] | order(title asc){\n        _id, title, "slug": slug.current, logo { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n      },\n      brands[]->{ _id, title, "slug": slug.current, logo { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n } }\n    )\n  }\n,\n  \n  _type == "contact-map" => {\n    _type, _key, heading, text, phone, email, address, hours, mapEmbedUrl,\n    showForm, formHeading, padding\n  }\n,\n  \n  _type == "reviews-embed" => {\n    _type, _key, heading, provider, embedUrl, padding, reviews[]{ _key, author, rating, text }\n  }\n\n },\n    meta { \n  title,\n  description,\n  noindex,\n  image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n }\n  }\n': HOME_PAGE_QUERY_RESULT;
     '\n  *[_type == "page" && count(oldUrls) > 0]{ "slug": slug.current, oldUrls }\n': PAGE_REDIRECTS_QUERY_RESULT;
-    '\n  *[_type == "product" && slug.current == $slug && status != "archived"][0]{\n    _id, title, "slug": slug.current, status, featured, shortDescription,\n    "brand": brand->{ title, "slug": slug.current },\n    "categories": categories[]->{ _id, title, "slug": slug.current, "parent": parent->{ title, "slug": slug.current } },\n    "primaryCategory": primaryCategory->{ title, "slug": slug.current, "parent": parent->{ title, "slug": slug.current } },\n    mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    gallery[]{ _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    "flavors": flavors[]{ _key, name, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n      description[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n }, nutritionalInfo[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n      feedingInstructions[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n }, ingredientsAndUse[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n } },\n    optionName, defaultVariantKey, autoshipEligible, noDiscounts, showAdditionalInfo, tags,\n    "variants": variants[price > 0]{ _key, flavor, option, sku, price, compareAtPrice, inStock, weightLbs,\n      image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n } },\n    description[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    nutritionalInfo[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    feedingInstructions[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    ingredientsAndUse[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    seo { \n  title,\n  description,\n  noindex,\n  image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    "related": *[_type == "product" && status == "active" && _id != ^._id\n      && count((categories[]._ref)[@ in ^.^.categories[]._ref]) > 0\n      && count(variants[price > 0]) > 0] | order(featured desc, lower(title) asc)[0...10]{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  noDiscounts,\n  "variants": variants[price > 0]{ _key, flavor, option, price, compareAtPrice, inStock }\n }\n  }\n': PRODUCT_QUERY_RESULT;
+    '\n  *[_type == "product" && slug.current == $slug][0]{\n    _id, title, "slug": slug.current, status, featured, shortDescription,\n    "brand": brand->{ title, "slug": slug.current },\n    "categories": categories[]->{ _id, title, "slug": slug.current, "parent": parent->{ title, "slug": slug.current } },\n    "primaryCategory": primaryCategory->{ title, "slug": slug.current, "parent": parent->{ title, "slug": slug.current } },\n    mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    gallery[]{ _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n    "flavors": flavors[]{ _key, name, image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n      description[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n }, nutritionalInfo[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n      feedingInstructions[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n }, ingredientsAndUse[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n } },\n    optionName, defaultVariantKey, autoshipEligible, noDiscounts, showAdditionalInfo, tags,\n    "variants": variants[price > 0]{ _key, flavor, option, sku, price, compareAtPrice, inStock, weightLbs,\n      image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n } },\n    description[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    nutritionalInfo[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    feedingInstructions[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    ingredientsAndUse[]{ \n  ...,\n  _type == "image" => { _key, \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    seo { \n  title,\n  description,\n  noindex,\n  image { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n }\n },\n    "related": *[_type == "product" && status == "active" && _id != ^._id\n      && count((categories[]._ref)[@ in ^.^.categories[]._ref]) > 0\n      && count(variants[price > 0]) > 0] | order(featured desc, lower(title) asc)[0...10]{ \n  _id,\n  title,\n  "slug": slug.current,\n  "brand": brand->title,\n  mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n },\n  optionName,\n  defaultVariantKey,\n  autoshipEligible,\n  noDiscounts,\n  "variants": variants[price > 0]{ _key, flavor, option, price, compareAtPrice, inStock }\n }\n  }\n': PRODUCT_QUERY_RESULT;
     '\n  *[_type == "product" && (\n    (slug.current == $slug && defined(legacy.mergedInto)) ||\n    (status == "active" && $slug in legacy.previousSlugs)\n  )][0]{\n    "slug": coalesce(legacy.mergedInto->slug.current, slug.current), "flavor": legacy.mergedFlavor\n  }\n': MERGED_PRODUCT_QUERY_RESULT;
     '\n  *[_type == "product" && status == "active" && defined(slug.current)]{ "slug": slug.current }\n': PRODUCT_SLUGS_QUERY_RESULT;
     '\n  *[_type == "product" && _id in $ids]{ _id, title, "slug": slug.current, mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n } }\n': PRODUCT_THUMBS_QUERY_RESULT;

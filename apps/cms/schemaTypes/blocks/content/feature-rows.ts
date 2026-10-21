@@ -1,7 +1,7 @@
 import { StackIcon } from '@sanity/icons/Stack'
 import { defineArrayMember, defineField, defineType } from 'sanity'
 import { imageField } from '../../objects/image'
-import { backgroundField, paddingField } from '../shared'
+import { backgroundField, paddingField, ptToText } from '../shared'
 
 /** shadcnblocks Feature 62: a centered heading, then image-and-text rows that alternate sides. */
 export default defineType({
@@ -11,7 +11,7 @@ export default defineType({
   icon: StackIcon,
   fields: [
     defineField({ name: 'heading', type: 'string' }),
-    defineField({ name: 'subheading', type: 'text', rows: 2 }),
+    defineField({ name: 'subheading', type: 'simple-content' }),
     defineField({
       name: 'rows',
       type: 'array',
@@ -22,11 +22,18 @@ export default defineType({
           type: 'object',
           fields: [
             defineField({ name: 'title', type: 'string', validation: (rule) => rule.required() }),
-            defineField({ name: 'description', type: 'text', rows: 3 }),
+            defineField({ name: 'description', type: 'simple-content' }),
             imageField({ name: 'image', required: true }),
             defineField({ name: 'link', type: 'link' })
           ],
-          preview: { select: { title: 'title', subtitle: 'description', media: 'image' } }
+          preview: {
+            select: { title: 'title', description: 'description', media: 'image' },
+            prepare: ({ title, description, media }) => ({
+              title,
+              subtitle: ptToText(description),
+              media
+            })
+          }
         })
       ]
     }),

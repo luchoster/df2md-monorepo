@@ -1,4 +1,5 @@
 import { ButtonLink } from '@/components/button-link'
+import { PortableTextRenderer } from '@/components/portable-text-renderer'
 import { SanityImage } from '@/components/sanity-image'
 import { Section } from '../section'
 import type { BlockOf } from '../types'
@@ -17,9 +18,10 @@ export default function AboutIntro(props: BlockOf<'about-intro'> & { isFirst?: b
             {button && <ButtonLink link={button} variant="outline" size="lg" />}
           </div>
           {description && (
-            <p className="text-lg whitespace-pre-line text-muted-foreground md:text-xl">
-              {description}
-            </p>
+            <PortableTextRenderer
+              value={description}
+              className="text-lg text-muted-foreground md:text-xl"
+            />
           )}
         </div>
         {gallery.length > 0 && (

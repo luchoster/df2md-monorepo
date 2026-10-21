@@ -98,17 +98,27 @@ const components: PortableTextComponents = {
   }
 }
 
+/** Plain strings render as paragraphs: block text fields that were text areas before Portable Text. */
 export function PortableTextRenderer({
   value,
   className
 }: {
-  value: PortableTextBlock[] | null | undefined
+  /** Any Portable Text array (Sanity typegen's shapes are looser than @portabletext/types) */
+  value: readonly { _type: string }[] | string | null | undefined
   className?: string
 }) {
   if (!value?.length) return null
   return (
     <div className={cn('content-links [&>*:last-child]:mb-0', className)}>
-      <PortableText value={value} components={components} />
+      {typeof value === 'string' ? (
+        value.split(/\n\s*\n/).map((p) => (
+          <p key={p} className="mb-4 whitespace-pre-line">
+            {p.trim()}
+          </p>
+        ))
+      ) : (
+        <PortableText value={value as PortableTextBlock[]} components={components} />
+      )}
     </div>
   )
 }

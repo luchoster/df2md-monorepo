@@ -1,6 +1,13 @@
 import { TagIcon } from '@sanity/icons/Tag'
 import { defineField, defineType } from 'sanity'
+import { listSelectInput } from '../../components/list-select-input'
 import { imageField } from './image'
+
+const FlavorInput = listSelectInput<{ name?: string }>(
+  ['flavors'],
+  (f) => (f.name?.trim() ? { value: f.name.trim(), title: f.name.trim() } : null),
+  'No flavor'
+)
 
 /**
  * One purchasable flavor + size/pack of a product (e.g. Beef · 12 Pack). Flavor is optional:
@@ -25,8 +32,9 @@ export default defineType({
     defineField({
       name: 'flavor',
       description:
-        'Optional, e.g. "Beef". Must match a name in the product’s Flavors list (picture, nutrition and ingredients come from there).',
-      type: 'string'
+        'One of the product’s Flavors (picture, nutrition and ingredients come from there). Add flavors on the Flavors list first.',
+      type: 'string',
+      components: { input: FlavorInput }
     }),
     defineField({
       name: 'option',

@@ -11,7 +11,7 @@ export default defineType({
   icon: UsersIcon,
   fields: [
     defineField({ name: 'heading', type: 'string', validation: (rule) => rule.required() }),
-    defineField({ name: 'description', type: 'text', rows: 4 }),
+    defineField({ name: 'description', type: 'simple-content' }),
     defineField({ name: 'button', type: 'link' }),
     defineField({
       name: 'images',

@@ -11,7 +11,7 @@ export default defineType({
   fields: [
     defineField({ name: 'label', type: 'string', initialValue: 'FAQ' }),
     defineField({ name: 'heading', type: 'string', validation: (rule) => rule.required() }),
-    defineField({ name: 'description', type: 'text', rows: 2 }),
+    defineField({ name: 'description', type: 'simple-content' }),
     defineField({
       name: 'searchPlaceholder',
       type: 'string',

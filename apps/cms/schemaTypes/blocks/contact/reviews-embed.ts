@@ -1,6 +1,6 @@
 import { CommentIcon } from '@sanity/icons/Comment'
 import { defineArrayMember, defineField, defineType } from 'sanity'
-import { paddingField } from '../shared'
+import { paddingField, ptToText } from '../shared'
 
 export default defineType({
   name: 'reviews-embed',
@@ -45,8 +45,7 @@ export default defineType({
             }),
             defineField({
               name: 'text',
-              type: 'text',
-              rows: 4,
+              type: 'simple-content',
               validation: (rule) => rule.required()
             })
           ],
@@ -54,7 +53,7 @@ export default defineType({
             select: { title: 'author', rating: 'rating', text: 'text' },
             prepare: ({ title, rating, text }) => ({
               title: `${'★'.repeat(rating ?? 0)} ${title}`,
-              subtitle: text
+              subtitle: ptToText(text)
             })
           }
         })

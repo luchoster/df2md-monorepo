@@ -7,6 +7,7 @@ import { ProductBuyBox } from '@/components/product/product-buy-box'
 import { ProductGallery } from '@/components/product/product-gallery'
 import { ProductSpecs } from '@/components/product/product-specs'
 import { ProductTabs } from '@/components/product/product-tabs'
+import { ProductUnavailable } from '@/components/product/product-unavailable'
 import { VariantProvider } from '@/components/product/variant-context'
 import {
   Breadcrumb,
@@ -38,21 +39,31 @@ export async function generateMetadata({ params }: PageProps<'/shop/[slug]'>): P
     },
     product.title
   )
+  if (product.status !== 'active') return { title: product.title, robots: { index: false } }
   return { ...meta, alternates: { canonical: `/shop/${slug}` } }
 }
 
 export default async function ProductPage({ params }: PageProps<'/shop/[slug]'>) {
   const { slug } = await params
   const [product, settings] = await Promise.all([getProduct(slug), getSettings()])
-  if (!product) {
+  if (product?.status !== 'active') {
     // Flavors that used to be separate products redirect to the combined one, flavor preselected
     const merged = await getMergedProduct(slug)
     if (merged?.slug && merged.slug !== slug)
       permanentRedirect(
         `/shop/${merged.slug}${merged.flavor ? `?flavor=${encodeURIComponent(merged.flavor)}` : ''}`
       )
+    // Hidden from the shop (draft/archived), but the link may be bookmarked
+    if (product)
+      return (
+        <ProductUnavailable
+          title={product.title}
+          image={product.mainImage}
+          phone={settings?.contact?.phone ?? '702-971-2484'}
+        />
+      )
+    notFound()
   }
-  if (product?.status !== 'active') notFound()
 
   const category = product.primaryCategory ?? product.categories?.[0]
   // Flavor/variant images follow the product images; the gallery brings the selected one forward

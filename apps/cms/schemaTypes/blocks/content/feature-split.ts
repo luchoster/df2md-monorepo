@@ -11,7 +11,7 @@ export default defineType({
   icon: SplitVerticalIcon,
   fields: [
     defineField({ name: 'heading', type: 'string', validation: (rule) => rule.required() }),
-    defineField({ name: 'description', type: 'text', rows: 3 }),
+    defineField({ name: 'description', type: 'simple-content' }),
     defineField({
       name: 'checklist',
       type: 'array',
