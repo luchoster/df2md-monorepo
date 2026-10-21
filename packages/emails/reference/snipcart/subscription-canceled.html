@@ -1,0 +1,94 @@
+---
+Subject: Your subscription to {{{ subscription.name }}} has been canceled.
+---
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title></title>
+</head>
+<body fontsize="10" style="font-family: verdana; font-size: 10pt; color: #000;">
+    <center>
+    <table width="60%">
+        <tr>
+            <td>
+                <table width="100%" cellpadding="5" id="business" style="border-bottom: solid 1px #333">
+                    <tr>
+                        <td width="50%" valign="top">
+                            {{! Using `settings` object you'll be able to access some information about the account, such as the billing address or the logoUrl. }}
+                            {{ #with settings.businessAddress }}
+                            <p size="9">
+                                <b>
+                                    {{company}}
+                                </b>
+
+                                <br />
+
+                                {{ #if address1 }}
+                                {{ address1 }}
+                                <br />
+                                {{ /if }}
+
+                                {{ #if address2 }}
+                                {{ address2 }}
+                                <br />
+                                {{ /if }}
+
+                                {{ #if city }}
+                                {{ city }},
+                                {{ /if }}
+
+                                {{ #if province }}
+                                {{ province }},
+                                {{ /if }}
+
+                                {{ #if country }}
+                                {{ country }}
+                                <br />
+                                {{ /if }}
+
+                                {{ #if postalCode }}
+                                {{ businessAdress.postalCode }}
+                                {{ /if }}
+
+                            </p>
+                            {{ /with }}
+                        </td>
+
+                        {{ #if settings.logoUrl }}
+                        <td width="50%" align="right">
+                            <img src="{{ settings.logoUrl }}" style="max-height: 80px;" />
+                        </td>
+                        {{ /if }}
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <table width="50%" cellpadding="5">
+        <tr>
+            <td width="100%" valign="top">
+
+                {{ #if subscription.user }}
+                    <p>
+                        Hi {{ subscription.user.billingAddress.fullName }},
+                    </p>
+                {{ /if }}
+
+                <p>
+                    Your subscription to {{ subscription.name }} has been canceled.
+                </p>
+
+                <p>
+                    If you have any questions, please reply directly to this email.
+                </p>
+
+                <p>
+                    Thank you.
+                </p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

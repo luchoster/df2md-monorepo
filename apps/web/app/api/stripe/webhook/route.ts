@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import type Stripe from 'stripe'
+import { sendNewOrderEmail } from '@/lib/orders/notify'
 import { recordCheckoutOrder, recordRenewalOrder } from '@/lib/orders/record'
 import { FIRST_AUTOSHIP_FLAG, stripe } from '@/lib/stripe'
 
@@ -7,6 +8,7 @@ import { FIRST_AUTOSHIP_FLAG, stripe } from '@/lib/stripe'
  * Stripe webhook. Subscribe to: checkout.session.completed,
  * checkout.session.async_payment_succeeded and invoice.paid.
  * - Saves each paid order (and every Autoship renewal) to Supabase for the account pages
+ * - Emails the store (info@) a copy of each new one, once
  * - Marks the customer's first-Autoship discount as used
  * Handlers are idempotent, so Stripe's retries are safe. A 500 makes Stripe retry.
  */
@@ -41,12 +43,15 @@ export async function POST(req: NextRequest) {
             metadata: { [FIRST_AUTOSHIP_FLAG]: 'true' }
           })
         }
-        await recordCheckoutOrder(stripe, session.id)
+        const saved = await recordCheckoutOrder(stripe, session.id)
+        if ('orderId' in saved && saved.orderId) await sendNewOrderEmail(saved.orderId)
         break
       }
-      case 'invoice.paid':
-        await recordRenewalOrder(stripe, event.data.object)
+      case 'invoice.paid': {
+        const saved = await recordRenewalOrder(stripe, event.data.object)
+        if ('orderId' in saved && saved.orderId) await sendNewOrderEmail(saved.orderId)
         break
+      }
     }
   } catch (error) {
     console.error(`stripe webhook ${event.type} failed`, error)

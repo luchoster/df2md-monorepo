@@ -11,6 +11,7 @@
     "clean": "rm -rf .next node_modules"
   },
   "dependencies": {
+    "@df2md/emails": "workspace:*",
     "@hookform/resolvers": "^5.9.1",
     "@next/env": "16.3.6",
     "@portabletext/react": "^8.0.1",

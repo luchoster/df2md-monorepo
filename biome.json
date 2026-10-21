@@ -18,7 +18,8 @@
       "!**/schema.json",
       "!.mcp.json",
       "!scripts/import/out",
-      "!scripts/import/data"
+      "!scripts/import/data",
+      "!packages/emails/reference"
     ]
   },
   "formatter": {

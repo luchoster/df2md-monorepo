@@ -18,7 +18,12 @@ Snipcart is still live and still billing Autoships.
 - [ ] **Sandbox purchase test.** Sandbox webhook to `https://df2md.zera.us/api/stripe/webhook`
       (API version `2026-08-26.dahlia`; events `checkout.session.completed`,
       `checkout.session.async_payment_succeeded`, `invoice.paid`), its secret in Vercel as
-      `STRIPE_WEBHOOK_SECRET`. Buy with `4242 4242 4242 4242` → the order shows under Orders.
+      `STRIPE_WEBHOOK_SECRET`. Buy with `4242 4242 4242 4242` → the order shows under Orders,
+      info@dogfood2mydoor.com gets "New order #… (test)", and the payment's **View receipt** in
+      Stripe shows the delivery date (Stripe doesn't email receipts in the sandbox).
+- [ ] **Order emails.** Resend: `dogfood2mydoor.com` verified as a sending domain. Vercel:
+      `RESEND_API_KEY` (and optionally `EMAIL_FROM`, `ORDER_NOTIFICATION_EMAIL`, see `.env.example`).
+- [ ] **Stripe branding** (Settings → Branding, sandbox and live): icon, logo, `#00ad4c`.
 - [ ] **Ask Stripe support and Snipcart support** the questions in §5 and note the answers here.
 - [ ] **Customer announcement** written: new site, sign in with an emailed code
       (`https://<domain>/login?method=code`), choose a password, Autoships carry over.
@@ -54,6 +59,9 @@ Run the scripts from `scripts/import` with the repo-root `.env`. Nothing here em
       Stripe support has confirmed the subscriptions keep billing (§5). Afterwards check the next
       renewals get charged (§3).
    3. Snipcart: invalidate the Live API key (reversible), or cancel the account.
+   4. Stripe (live) → Settings → Customer emails: turn on **successful payments** and
+      **refunds**; Billing → Subscriptions and emails: **failed payments** and **expiring cards**.
+      Stripe sends the customer receipts from now on (Snipcart did until step 7).
 8. **Convert Snipcart's pauses** (103 Autoships paused with a 100%-off coupon) to Stripe pauses:
    ```bash
    bun run autoship:pause                                         # dry run (read-only key)

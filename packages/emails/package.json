@@ -1,0 +1,28 @@
+{
+  "name": "@df2md/emails",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "dev": "email dev --dir src/templates --port 3002",
+    "lint": "biome check .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@react-email/components": "^1.0.12"
+  },
+  "devDependencies": {
+    "@df2md/typescript": "workspace:*",
+    "@types/react": "^19.3.0",
+    "react-email": "^6.11.3",
+    "typescript": "^5.9.3",
+    "react": "19.3.0",
+    "react-dom": "19.3.0"
+  },
+  "peerDependencies": {
+    "react": "^19.2.4"
+  }
+}

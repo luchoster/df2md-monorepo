@@ -5,11 +5,16 @@ import { getStripeCustomerId } from '@/lib/account/stripe-customer'
 import { hadAutoshipBefore } from '@/lib/checkout/first-autoship'
 import { quoteCart } from '@/lib/checkout/quote'
 import { type CheckoutResponse, checkoutRequestSchema } from '@/lib/checkout/schema'
+import { formatDeliveryDate, formatSlot } from '@/lib/delivery'
 import { clampSchedule, describeSchedule } from '@/lib/pricing'
 import { siteOrigin } from '@/lib/site-url'
 import { findCustomer, getTaxRateId, stripe } from '@/lib/stripe'
 
 const reply = (body: CheckoutResponse, status = 200) => NextResponse.json(body, { status })
+
+/** "Delivery Thursday, Oct 23, around 2:00 PM" for Stripe's receipt */
+const receiptNote = (method: 'delivery' | 'pickup', date: string, time?: string) =>
+  `${method === 'pickup' ? 'Store pickup' : 'Delivery'} ${formatDeliveryDate(date)}${time ? `, around ${formatSlot(time)}` : ''}`
 
 /**
  * Validates the checkout form, re-prices the cart from Sanity and creates a Stripe Checkout
@@ -124,8 +129,20 @@ export async function POST(req: NextRequest) {
       saved_payment_method_options: customer ? { payment_method_save: 'enabled' } : undefined,
       metadata,
       ...(hasAutoship
-        ? { subscription_data: { metadata } }
-        : { payment_intent_data: { metadata, setup_future_usage: 'off_session' } }),
+        ? {
+            subscription_data: {
+              metadata,
+              description: `Autoship ${metadata.autoship_schedule?.toLowerCase()}`
+            }
+          }
+        : {
+            payment_intent_data: {
+              metadata,
+              setup_future_usage: 'off_session',
+              // Shown on Stripe's receipt
+              description: receiptNote(f.method, quote.deliveryDate, metadata.requested_time)
+            }
+          }),
       // only used when a payment method needs a redirect (e.g. some bank authentications)
       return_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`
     })

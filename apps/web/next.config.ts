@@ -6,6 +6,8 @@ import type { NextConfig } from 'next'
 loadEnvConfig(join(process.cwd(), '..', '..'))
 
 const nextConfig: NextConfig = {
+  // Workspace packages ship TypeScript source
+  transpilePackages: ['@df2md/emails'],
   images: {
     // Every image goes through next-sanity/image (Sanity CDN loader); nothing else is optimized.
     remotePatterns: [{ protocol: 'https', hostname: 'cdn.sanity.io' }]
