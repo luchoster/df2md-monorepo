@@ -15,7 +15,7 @@ const LINKS: { href: string; label: string; icon: LucideIcon }[] = [
 ]
 
 const item =
-  'flex shrink-0 items-center gap-3 rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'
+  'flex shrink-0 items-center gap-3 whitespace-nowrap rounded-md px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground'
 
 /** Sidebar on desktop, a scrolling tab row on phones (shadcnblocks Settings Profile 4 layout). */
 export function AccountNav() {
@@ -23,8 +23,11 @@ export function AccountNav() {
   const active = (href: string) =>
     href === '/account' ? pathname === href : pathname === href || pathname.startsWith(`${href}/`)
   return (
-    <nav aria-label="Account" className="-mx-4 overflow-x-auto px-4 lg:mx-0 lg:px-0">
-      <ul className="flex gap-1 lg:flex-col">
+    <nav
+      aria-label="Account"
+      className="-mx-4 overflow-x-auto px-4 [scrollbar-width:none] lg:mx-0 lg:overflow-visible lg:px-0 [&::-webkit-scrollbar]:hidden"
+    >
+      <ul className="flex w-max gap-1 lg:w-auto lg:flex-col">
         {LINKS.map(({ href, label, icon: Icon }) => (
           <li key={href}>
             <Link
