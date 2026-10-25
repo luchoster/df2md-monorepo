@@ -1,6 +1,6 @@
 'use client'
 
-import { AlertTriangle, Lock, MapPin, Pencil, Repeat, Store, Truck } from 'lucide-react'
+import { AlertTriangle, Lock, MapPin, Pencil, Repeat, Store, Truck, UserRound } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -74,6 +74,9 @@ export function CheckoutForm({
   const [submitting, setSubmitting] = useState(false)
   /** Set once the server has verified the order and created the Stripe session */
   const [clientSecret, setClientSecret] = useState<string | null>(null)
+  /** Guests pick "sign in" or "continue as guest" before the form shows */
+  const [guest, setGuest] = useState(false)
+  const chooseFirst = accountsEnabled && !customer && !guest
 
   if (!ready) return <CartSkeleton />
   if (!items.length)
@@ -177,7 +180,7 @@ export function CheckoutForm({
           <div className="space-y-8 lg:col-span-2">
             <div className="flex flex-wrap items-end justify-between gap-2">
               <h1 className="text-3xl md:text-4xl">Checkout</h1>
-              {accountsEnabled && !customer && (
+              {accountsEnabled && !customer && guest && (
                 <p className="text-sm text-muted-foreground">
                   Have an account?{' '}
                   <Link
@@ -191,166 +194,170 @@ export function CheckoutForm({
               )}
             </div>
 
-            <Panel title="Contact" disabled={!!clientSecret}>
-              <div className="grid gap-4 sm:grid-cols-2">
-                <Text
-                  name="name"
-                  label="Full name"
-                  autoComplete="name"
-                  defaultValue={customer?.name}
-                  error={errors.name}
-                  className="sm:col-span-2"
-                />
-                <Text
-                  name="email"
-                  label="Email"
-                  type="email"
-                  autoComplete="email"
-                  defaultValue={customer?.email}
-                  readOnly={!!customer}
-                  error={errors.email}
-                />
-                <Text
-                  name="phone"
-                  label="Phone"
-                  type="tel"
-                  autoComplete="tel"
-                  defaultValue={customer?.phone}
-                  error={errors.phone}
-                />
-              </div>
-            </Panel>
+            {chooseFirst && <SignInOrGuest onGuest={() => setGuest(true)} />}
 
-            <Panel title="Delivery" disabled={!!clientSecret}>
-              <RadioGroup
-                value={method}
-                onValueChange={(v) => setMethod(v as 'delivery' | 'pickup')}
-                className="grid gap-3 md:grid-cols-2"
-              >
-                <MethodCard
-                  value="delivery"
-                  icon={<Truck />}
-                  title="Free next-day delivery"
-                  description={formatDeliveryDate(settings.deliveryDate)}
-                />
-                {settings.pickupEnabled && (
-                  <MethodCard
-                    value="pickup"
-                    icon={<Store />}
-                    title="Pick up in store"
-                    description={settings.pickupNote}
-                  />
-                )}
-              </RadioGroup>
-
-              {method === 'delivery' ? (
-                <div className="mt-6 grid gap-4 sm:grid-cols-6">
+            <div className={cn('space-y-8', chooseFirst && 'hidden')}>
+              <Panel title="Contact" disabled={!!clientSecret}>
+                <div className="grid gap-4 sm:grid-cols-2">
                   <Text
-                    name="line1"
-                    label="Street address"
-                    autoComplete="address-line1"
-                    defaultValue={customer?.line1}
-                    error={errors.line1}
-                    className="sm:col-span-4"
-                  />
-                  <Text
-                    name="line2"
-                    label="Apt / suite (optional)"
-                    autoComplete="address-line2"
-                    defaultValue={customer?.line2}
+                    name="name"
+                    label="Full name"
+                    autoComplete="name"
+                    defaultValue={customer?.name}
+                    error={errors.name}
                     className="sm:col-span-2"
                   />
                   <Text
-                    name="city"
-                    label="City"
-                    autoComplete="address-level2"
-                    defaultValue={customer?.city}
-                    error={errors.city}
-                    list="df2md-cities"
-                    className="sm:col-span-3"
+                    name="email"
+                    label="Email"
+                    type="email"
+                    autoComplete="email"
+                    defaultValue={customer?.email}
+                    readOnly={!!customer}
+                    error={errors.email}
                   />
-                  <div className="space-y-1.5 sm:col-span-1">
-                    <Label htmlFor="state">State</Label>
-                    <Input id="state" value="NV" readOnly className="bg-muted" />
-                  </div>
                   <Text
-                    name="postalCode"
-                    label="ZIP code"
-                    autoComplete="postal-code"
-                    inputMode="numeric"
-                    defaultValue={customer?.postalCode}
-                    error={errors.postalCode}
-                    className="sm:col-span-2"
+                    name="phone"
+                    label="Phone"
+                    type="tel"
+                    autoComplete="tel"
+                    defaultValue={customer?.phone}
+                    error={errors.phone}
                   />
-                  <datalist id="df2md-cities">
-                    <option value="Las Vegas" />
-                    <option value="Henderson" />
-                    <option value="Boulder City" />
-                  </datalist>
-                  {settings.allowTimeRequest && (
-                    <div className="space-y-1.5 sm:col-span-3">
-                      <Label htmlFor="time">Preferred delivery time</Label>
-                      <Select value={time} onValueChange={setTime}>
-                        <SelectTrigger id="time" className="w-full bg-background">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="any">Any time</SelectItem>
-                          {slots.map((s) => (
-                            <SelectItem key={s} value={s}>
-                              Around {formatSlot(s)}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
                 </div>
-              ) : (
-                <p className="mt-5 flex items-start gap-2 rounded-lg bg-background p-4 text-sm">
-                  <MapPin className="mt-0.5 size-4 shrink-0 text-primary" />
-                  <span className="whitespace-pre-line">{settings.storeAddress}</span>
-                </p>
-              )}
-              <div className="mt-4 space-y-1.5">
-                <Label htmlFor="notes">Notes for our driver (optional)</Label>
-                <Textarea
-                  id="notes"
-                  name="notes"
-                  rows={2}
-                  placeholder="Gate code, leave at the side door, frozen items…"
-                  defaultValue={customer?.notes}
-                  className="bg-background"
-                />
-              </div>
-            </Panel>
+              </Panel>
 
-            <Panel title="Payment" id="payment">
-              {clientSecret ? (
-                <>
-                  <PaymentStep clientSecret={clientSecret} />
-                  <Button
-                    type="button"
-                    variant="ghost"
-                    size="sm"
-                    className="mt-3 text-muted-foreground"
-                    onClick={() => setClientSecret(null)}
-                  >
-                    <Pencil /> Edit details
-                  </Button>
-                </>
-              ) : (
-                <p className="flex items-start gap-3 text-sm">
-                  <Lock className="mt-0.5 size-4 shrink-0 text-primary" />
-                  <span>
-                    Continue to payment and the secure card form appears right here. Payments are
-                    processed by Stripe; returning customers can use their saved cards.
-                    {hasAutoship &&
-                      ' Your card is saved for Autoship deliveries; you can pause or cancel anytime.'}
-                  </span>
-                </p>
-              )}
-            </Panel>
+              <Panel title="Delivery" disabled={!!clientSecret}>
+                <RadioGroup
+                  value={method}
+                  onValueChange={(v) => setMethod(v as 'delivery' | 'pickup')}
+                  className="grid gap-3 md:grid-cols-2"
+                >
+                  <MethodCard
+                    value="delivery"
+                    icon={<Truck />}
+                    title="Free next-day delivery"
+                    description={formatDeliveryDate(settings.deliveryDate)}
+                  />
+                  {settings.pickupEnabled && (
+                    <MethodCard
+                      value="pickup"
+                      icon={<Store />}
+                      title="Pick up in store"
+                      description={settings.pickupNote}
+                    />
+                  )}
+                </RadioGroup>
+
+                {method === 'delivery' ? (
+                  <div className="mt-6 grid gap-4 sm:grid-cols-6">
+                    <Text
+                      name="line1"
+                      label="Street address"
+                      autoComplete="address-line1"
+                      defaultValue={customer?.line1}
+                      error={errors.line1}
+                      className="sm:col-span-4"
+                    />
+                    <Text
+                      name="line2"
+                      label="Apt / suite (optional)"
+                      autoComplete="address-line2"
+                      defaultValue={customer?.line2}
+                      className="sm:col-span-2"
+                    />
+                    <Text
+                      name="city"
+                      label="City"
+                      autoComplete="address-level2"
+                      defaultValue={customer?.city}
+                      error={errors.city}
+                      list="df2md-cities"
+                      className="sm:col-span-3"
+                    />
+                    <div className="space-y-1.5 sm:col-span-1">
+                      <Label htmlFor="state">State</Label>
+                      <Input id="state" value="NV" readOnly className="bg-muted" />
+                    </div>
+                    <Text
+                      name="postalCode"
+                      label="ZIP code"
+                      autoComplete="postal-code"
+                      inputMode="numeric"
+                      defaultValue={customer?.postalCode}
+                      error={errors.postalCode}
+                      className="sm:col-span-2"
+                    />
+                    <datalist id="df2md-cities">
+                      <option value="Las Vegas" />
+                      <option value="Henderson" />
+                      <option value="Boulder City" />
+                    </datalist>
+                    {settings.allowTimeRequest && (
+                      <div className="space-y-1.5 sm:col-span-3">
+                        <Label htmlFor="time">Preferred delivery time</Label>
+                        <Select value={time} onValueChange={setTime}>
+                          <SelectTrigger id="time" className="w-full bg-background">
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="any">Any time</SelectItem>
+                            {slots.map((s) => (
+                              <SelectItem key={s} value={s}>
+                                Around {formatSlot(s)}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="mt-5 flex items-start gap-2 rounded-lg bg-background p-4 text-sm">
+                    <MapPin className="mt-0.5 size-4 shrink-0 text-primary" />
+                    <span className="whitespace-pre-line">{settings.storeAddress}</span>
+                  </p>
+                )}
+                <div className="mt-4 space-y-1.5">
+                  <Label htmlFor="notes">Notes for our driver (optional)</Label>
+                  <Textarea
+                    id="notes"
+                    name="notes"
+                    rows={2}
+                    placeholder="Gate code, leave at the side door, frozen items…"
+                    defaultValue={customer?.notes}
+                    className="bg-background"
+                  />
+                </div>
+              </Panel>
+
+              <Panel title="Payment" id="payment">
+                {clientSecret ? (
+                  <>
+                    <PaymentStep clientSecret={clientSecret} />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      className="mt-3 text-muted-foreground"
+                      onClick={() => setClientSecret(null)}
+                    >
+                      <Pencil /> Edit details
+                    </Button>
+                  </>
+                ) : (
+                  <p className="flex items-start gap-3 text-sm">
+                    <Lock className="mt-0.5 size-4 shrink-0 text-primary" />
+                    <span>
+                      Continue to payment and the secure card form appears right here. Payments are
+                      processed by Stripe; returning customers can use their saved cards.
+                      {hasAutoship &&
+                        ' Your card is saved for Autoship deliveries; you can pause or cancel anytime.'}
+                    </span>
+                  </p>
+                )}
+              </Panel>
+            </div>
           </div>
 
           <aside className="space-y-5">
@@ -442,6 +449,10 @@ export function CheckoutForm({
                 <p className="rounded-lg bg-accent px-3 py-2 text-center text-sm font-semibold text-accent-foreground">
                   Order verified. Complete your payment below.
                 </p>
+              ) : chooseFirst ? (
+                <p className="text-center text-sm text-muted-foreground">
+                  Sign in or continue as a guest to enter your details.
+                </p>
               ) : (
                 <Button type="submit" size="lg" className="w-full text-base" disabled={submitting}>
                   {submitting ? 'Checking your order…' : 'Continue to payment'}
@@ -459,6 +470,41 @@ export function CheckoutForm({
         </div>
       </form>
     </section>
+  )
+}
+
+/** First step for guests when accounts are on: sign in (saved cards, prefilled address) or not. */
+function SignInOrGuest({ onGuest }: { onGuest: () => void }) {
+  const next = encodeURIComponent('/checkout')
+  return (
+    <div className="grid gap-4 sm:grid-cols-2">
+      <div className="flex flex-col rounded-xl border bg-accent/40 p-4 sm:p-6">
+        <h2 className="mb-1 flex items-center gap-2 text-xl">
+          <UserRound className="size-5 text-primary" /> Sign in
+        </h2>
+        <p className="mb-5 flex-1 text-sm text-muted-foreground">
+          Use your saved cards and delivery address, and manage Autoship from your account.
+        </p>
+        <Button asChild size="lg" className="w-full">
+          <Link href={`/login?next=${next}`}>Sign in</Link>
+        </Button>
+        <p className="mt-3 text-center text-sm text-muted-foreground">
+          New here?{' '}
+          <Link href={`/register?next=${next}`} className="font-medium text-brand hover:underline">
+            Create an account
+          </Link>
+        </p>
+      </div>
+      <div className="flex flex-col rounded-xl border bg-accent/40 p-4 sm:p-6">
+        <h2 className="mb-1 text-xl">Continue as guest</h2>
+        <p className="mb-5 flex-1 text-sm text-muted-foreground">
+          No account needed. You can create one later with the same email to see this order.
+        </p>
+        <Button type="button" size="lg" variant="outline" className="w-full" onClick={onGuest}>
+          Continue as guest
+        </Button>
+      </div>
+    </div>
   )
 }
 
