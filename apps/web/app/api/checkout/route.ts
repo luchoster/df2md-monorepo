@@ -126,7 +126,15 @@ export async function POST(req: NextRequest) {
       ...(customer ? { customer: customer.id } : { customer_email: input.customer.email }),
       ...(hasAutoship || customer ? {} : { customer_creation: 'always' as const }),
       ...(coupon ? { discounts: [{ coupon: coupon.id }] } : {}),
-      saved_payment_method_options: customer ? { payment_method_save: 'enabled' } : undefined,
+      // Returning customers pick from their saved cards. Stripe only lists cards marked
+      // `allow_redisplay: always` by default; cards saved through the customer portal or imported
+      // from the old shop are `unspecified`, so we ask for all of them.
+      saved_payment_method_options: customer
+        ? {
+            payment_method_save: 'enabled',
+            allow_redisplay_filters: ['always', 'limited', 'unspecified']
+          }
+        : undefined,
       metadata,
       ...(hasAutoship
         ? {
