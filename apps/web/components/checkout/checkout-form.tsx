@@ -19,7 +19,12 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { Textarea } from '@/components/ui/textarea'
-import type { CheckoutQuote, CheckoutRequest, CheckoutResponse } from '@/lib/checkout/schema'
+import type {
+  CheckoutQuote,
+  CheckoutRequest,
+  CheckoutResponse,
+  SavedCard
+} from '@/lib/checkout/schema'
 import { formatDeliveryDate, formatSlot, timeSlots } from '@/lib/delivery'
 import { formatPrice } from '@/lib/format'
 import { computeTotals, describeSchedule, fromCents, toCents } from '@/lib/pricing'
@@ -74,6 +79,7 @@ export function CheckoutForm({
   const [submitting, setSubmitting] = useState(false)
   /** Set once the server has verified the order and created the Stripe session */
   const [clientSecret, setClientSecret] = useState<string | null>(null)
+  const [savedCards, setSavedCards] = useState<SavedCard[]>([])
   /** Guests pick "sign in" or "continue as guest" before the form shows */
   const [guest, setGuest] = useState(false)
   const chooseFirst = accountsEnabled && !customer && !guest
@@ -149,6 +155,7 @@ export function CheckoutForm({
       const data = (await res.json()) as CheckoutResponse
       if (data.ok) {
         setVerified(data.quote)
+        setSavedCards(data.savedCards)
         setClientSecret(data.clientSecret)
         requestAnimationFrame(() =>
           document.getElementById('payment')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -334,7 +341,11 @@ export function CheckoutForm({
               <Panel title="Payment" id="payment">
                 {clientSecret ? (
                   <>
-                    <PaymentStep clientSecret={clientSecret} />
+                    <PaymentStep
+                      clientSecret={clientSecret}
+                      savedCards={savedCards}
+                      signedIn={!!customer}
+                    />
                     <Button
                       type="button"
                       variant="ghost"

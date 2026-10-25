@@ -4,7 +4,7 @@ import { getProfile, getUser } from '@/lib/account/session'
 import { getStripeCustomerId } from '@/lib/account/stripe-customer'
 import { hadAutoshipBefore } from '@/lib/checkout/first-autoship'
 import { quoteCart } from '@/lib/checkout/quote'
-import { type CheckoutResponse, checkoutRequestSchema } from '@/lib/checkout/schema'
+import { type CheckoutResponse, checkoutRequestSchema, type SavedCard } from '@/lib/checkout/schema'
 import { formatDeliveryDate, formatSlot } from '@/lib/delivery'
 import { clampSchedule, describeSchedule } from '@/lib/pricing'
 import { siteOrigin } from '@/lib/site-url'
@@ -63,6 +63,10 @@ export async function POST(req: NextRequest) {
       )
     if (!stripe || !process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY)
       return reply({ ok: false, error: 'payments_not_configured', quote }, 503)
+
+    // Signed in: the cards on the account's Stripe profile, made redisplayable so Checkout offers
+    // them (done before the session is created, which is when Stripe decides what to list)
+    const savedCards = accountCustomerId && customer ? await listSavedCards(stripe, customer) : []
 
     const origin = siteOrigin(req.nextUrl.origin)
     const hasAutoship = quote.lines.some((l) => l.autoship)
@@ -126,13 +130,16 @@ export async function POST(req: NextRequest) {
       ...(customer ? { customer: customer.id } : { customer_email: input.customer.email }),
       ...(hasAutoship || customer ? {} : { customer_creation: 'always' as const }),
       ...(coupon ? { discounts: [{ coupon: coupon.id }] } : {}),
-      // Returning customers pick from their saved cards. Stripe only lists cards marked
+      // Signed-in customers pick from their saved cards. Stripe only lists cards marked
       // `allow_redisplay: always` by default; cards saved through the customer portal or imported
-      // from the old shop are `unspecified`, so we ask for all of them.
+      // from the old shop are `unspecified`, so we ask for all of them. Guests matched by email
+      // are not signed in, so they only get the save checkbox (the page hides saved cards too).
       saved_payment_method_options: customer
         ? {
             payment_method_save: 'enabled',
-            allow_redisplay_filters: ['always', 'limited', 'unspecified']
+            ...(accountCustomerId
+              ? { allow_redisplay_filters: ['always', 'limited', 'unspecified'] }
+              : {})
           }
         : undefined,
       metadata,
@@ -155,12 +162,52 @@ export async function POST(req: NextRequest) {
       return_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`
     })
     if (!session.client_secret) throw new Error('Stripe did not return a client secret')
-    return reply({ ok: true, clientSecret: session.client_secret, quote })
+    return reply({ ok: true, clientSecret: session.client_secret, quote, savedCards })
   } catch (error) {
     console.error('checkout failed', error)
     return reply(
       { ok: false, error: 'server', message: 'We could not start checkout. Please try again.' },
       500
     )
+  }
+}
+
+/**
+ * The signed-in customer's cards, default first, straight from their Stripe profile.
+ *
+ * Checkout only redisplays cards whose `allow_redisplay` is `always`. Cards added in the customer
+ * portal or saved without the checkbox are `unspecified`/`limited`, which is why a card visible
+ * under "Payment methods" never showed at checkout. The customer put these cards on their own
+ * account, so they're marked `always` here (Stripe's recommended fix for existing cards); the
+ * session then lists them and accepts them in `confirm`.
+ */
+async function listSavedCards(s: Stripe, customer: Stripe.Customer): Promise<SavedCard[]> {
+  try {
+    const { data } = await s.customers.listPaymentMethods(customer.id, { type: 'card', limit: 10 })
+    const def = customer.invoice_settings?.default_payment_method
+    const defaultId = typeof def === 'string' ? def : (def?.id ?? null)
+    await Promise.all(
+      data
+        .filter((pm) => pm.allow_redisplay !== 'always' && pm.id.startsWith('pm_'))
+        .map((pm) =>
+          s.paymentMethods
+            .update(pm.id, { allow_redisplay: 'always' })
+            .catch((error) => console.error('allow_redisplay update failed', pm.id, error))
+        )
+    )
+    return data
+      .filter((pm) => pm.card)
+      .map((pm) => ({
+        id: pm.id,
+        brand: pm.card?.brand ?? 'card',
+        last4: pm.card?.last4 ?? '',
+        expMonth: pm.card?.exp_month ?? 0,
+        expYear: pm.card?.exp_year ?? 0,
+        isDefault: pm.id === defaultId
+      }))
+      .sort((a, b) => Number(b.isDefault) - Number(a.isDefault))
+  } catch (error) {
+    console.error('could not list saved cards', error)
+    return []
   }
 }
