@@ -70,8 +70,18 @@ export type CheckoutQuote = {
   firstAutoship: boolean
 }
 
+/** A card on the signed-in customer's Stripe profile, offered as a one-tap choice at payment. */
+export type SavedCard = {
+  id: string
+  brand: string
+  last4: string
+  expMonth: number
+  expYear: number
+  isDefault: boolean
+}
+
 export type CheckoutResponse =
-  | { ok: true; clientSecret: string; quote: CheckoutQuote }
+  | { ok: true; clientSecret: string; quote: CheckoutQuote; savedCards: SavedCard[] }
   | { ok: false; error: 'invalid'; issues: { path: string; message: string }[] }
   | { ok: false; error: 'cart_changed'; message: string; problems: string[] }
   | { ok: false; error: 'payments_not_configured'; quote: CheckoutQuote }
