@@ -1,9 +1,9 @@
 import type { Metadata, Viewport } from 'next'
 import { AddedNotice } from '@/components/cart/added-notice'
 import { CartProvider } from '@/components/cart/cart-provider'
+import { AppToaster } from '@/components/layout/app-toaster'
 import { Footer } from '@/components/layout/footer'
 import { Header } from '@/components/layout/header'
-import { Toaster } from '@/components/ui/sonner'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { siteUrl } from '@/lib/site-url'
 import { SITE_NAME } from '@/sanity/lib/metadata'
@@ -29,7 +29,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
             </main>
             <Footer />
             <AddedNotice />
-            <Toaster position="bottom-right" richColors closeButton />
+            <AppToaster />
           </CartProvider>
         </TooltipProvider>
       </body>
