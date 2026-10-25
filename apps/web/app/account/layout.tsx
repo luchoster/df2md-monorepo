@@ -26,7 +26,8 @@ export default async function AccountLayout({ children }: LayoutProps<'/account'
         <p className="text-sm text-muted-foreground">{user.email}</p>
       </div>
       <div className="grid gap-6 lg:grid-cols-[220px_1fr] lg:gap-10">
-        <aside className="lg:sticky lg:top-24 lg:self-start">
+        {/* min-w-0 lets the tab row scroll inside the screen instead of widening the page */}
+        <aside className="min-w-0 lg:sticky lg:top-24 lg:self-start">
           <AccountNav />
         </aside>
         <div className="min-w-0">{children}</div>
