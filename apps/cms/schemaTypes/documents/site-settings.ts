@@ -1,4 +1,6 @@
 import { CogIcon } from '@sanity/icons/Cog'
+import { FolderIcon } from '@sanity/icons/Folder'
+import { LinkIcon } from '@sanity/icons/Link'
 import { defineArrayMember, defineField, defineType, type StringRule } from 'sanity'
 
 const menuLink = defineArrayMember({
@@ -11,10 +13,63 @@ const menuLink = defineArrayMember({
   preview: { select: { title: 'label', subtitle: 'link.href', internal: 'link.internal.title' } }
 })
 
-/** An item in the black category bar; it can open a dropdown. */
+/**
+ * A category bar item that reuses a `category` document: its title, link and subcategories
+ * all come from the category, so editors only pick which one to show.
+ */
+const categoryNavItem = defineArrayMember({
+  name: 'categoryNavItem',
+  title: 'Category (from your categories)',
+  type: 'object',
+  icon: FolderIcon,
+  fields: [
+    defineField({
+      name: 'category',
+      type: 'reference',
+      to: [{ type: 'category' }],
+      description:
+        'A top-level category. Its title, link and subcategories are reused here, so edit those on the category itself.',
+      options: { filter: '!defined(parent)' },
+      validation: (rule) => rule.required()
+    }),
+    defineField({
+      name: 'label',
+      type: 'string',
+      description: 'Optional. Leave empty to show the category title.'
+    }),
+    defineField({
+      name: 'showSubcategories',
+      title: 'Subcategories dropdown',
+      type: 'boolean',
+      initialValue: true,
+      description:
+        'Open a dropdown listing the subcategories of this category (those with "Show in shop sidebar" on).'
+    })
+  ],
+  preview: {
+    select: {
+      label: 'label',
+      title: 'category.title',
+      media: 'category.image',
+      showSubcategories: 'showSubcategories'
+    },
+    prepare: ({ label, title, media, showSubcategories }) => ({
+      title: label || title || 'Pick a category',
+      subtitle:
+        showSubcategories === false
+          ? 'Category · no dropdown'
+          : 'Category · subcategories dropdown',
+      media
+    })
+  }
+})
+
+/** A hand-built item in the black category bar: brands dropdown, custom links or any link. */
 const navItem = defineArrayMember({
   name: 'navItem',
+  title: 'Custom item',
   type: 'object',
+  icon: LinkIcon,
   fields: [
     defineField({ name: 'label', type: 'string', validation: (rule) => rule.required() }),
     defineField({
@@ -95,10 +150,11 @@ export default defineType({
     defineField({
       name: 'mainMenu',
       title: 'Category bar',
-      description: 'The black navigation bar under the logo',
+      description:
+        'The black navigation bar under the logo. Add a Category to reuse an existing category (its title, link and subcategories come from the category). Use Custom item for brands, custom dropdowns or other links. Drag to reorder; changes go live on publish.',
       type: 'array',
       group: 'navigation',
-      of: [navItem]
+      of: [categoryNavItem, navItem]
     }),
 
     defineField({ name: 'footerColumns', type: 'array', group: 'footer', of: [footerColumn] }),

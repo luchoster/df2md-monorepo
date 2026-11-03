@@ -5,6 +5,11 @@ import type {
 } from '@/sanity.types'
 
 export type Settings = NonNullable<SETTINGS_QUERY_RESULT>
+/**
+ * One category bar item, already normalized by SETTINGS_QUERY: a hand-built `navItem` or a
+ * `categoryNavItem` (label, link and subcategories taken from its category document) both
+ * carry `label`, `dropdown`, `link` (for `hrefFor`), `subcategories` and `children`.
+ */
 export type NavItem = NonNullable<Settings['mainMenu']>[number]
 export type NavBrand = NAV_BRANDS_QUERY_RESULT[number]
 export type NavCategory = NAV_CATEGORIES_QUERY_RESULT[number]

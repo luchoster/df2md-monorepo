@@ -833,34 +833,6 @@ export type SanityImageHotspot = {
   width: number;
 };
 
-export type Category = {
-  _id: string;
-  _type: "category";
-  _createdAt: string;
-  _updatedAt: string;
-  _rev: string;
-  title: string;
-  slug: Slug;
-  parent?: CategoryReference;
-  order?: number;
-  image?: {
-    asset?: SanityImageAssetReference;
-    media?: unknown;
-    hotspot?: SanityImageHotspot;
-    crop?: SanityImageCrop;
-    alt?: string;
-    _type: "image";
-  };
-  description?: string;
-  showInNav?: boolean;
-  seo?: Meta;
-  legacy?: {
-    termId?: number;
-    wpSlug?: string;
-    importedAt?: string;
-  };
-};
-
 export type Brand = {
   _id: string;
   _type: "brand";
@@ -890,19 +862,28 @@ export type SiteSettings = {
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
-  mainMenu?: Array<{
-    label: string;
-    link?: Link;
-    dropdown?: "none" | "brands" | "children" | "custom";
-    children?: Array<{
-      label: string;
-      link: Link;
-      _type: "menuLink";
-      _key: string;
-    }>;
-    _type: "navItem";
-    _key: string;
-  }>;
+  mainMenu?: Array<
+    | {
+        category: CategoryReference;
+        label?: string;
+        showSubcategories?: boolean;
+        _type: "categoryNavItem";
+        _key: string;
+      }
+    | {
+        label: string;
+        link?: Link;
+        dropdown?: "none" | "brands" | "children" | "custom";
+        children?: Array<{
+          label: string;
+          link: Link;
+          _type: "menuLink";
+          _key: string;
+        }>;
+        _type: "navItem";
+        _key: string;
+      }
+  >;
   footerColumns?: Array<{
     title: string;
     links?: Array<{
@@ -956,6 +937,34 @@ export type SiteSettings = {
     reminderDaysBefore?: number;
   };
   taxRatePercent?: number;
+};
+
+export type Category = {
+  _id: string;
+  _type: "category";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  title: string;
+  slug: Slug;
+  parent?: CategoryReference;
+  order?: number;
+  image?: {
+    asset?: SanityImageAssetReference;
+    media?: unknown;
+    hotspot?: SanityImageHotspot;
+    crop?: SanityImageCrop;
+    alt?: string;
+    _type: "image";
+  };
+  description?: string;
+  showInNav?: boolean;
+  seo?: Meta;
+  legacy?: {
+    termId?: number;
+    wpSlug?: string;
+    importedAt?: string;
+  };
 };
 
 export type HomePage = {
@@ -1184,9 +1193,9 @@ export type AllSanitySchemaTypes =
   | Product
   | SanityImageCrop
   | SanityImageHotspot
-  | Category
   | Brand
   | SiteSettings
+  | Category
   | HomePage
   | MediaFolderReference
   | MediaFolder
@@ -4994,7 +5003,7 @@ export type PRODUCT_THUMBS_QUERY_RESULT = Array<{
 
 // Source: ../web/sanity/queries/settings.ts
 // Variable: SETTINGS_QUERY
-// Query: *[_id == "siteSettings"][0]{    mainMenu[]{      _key, label, dropdown,      link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } },      "subcategories": select(        dropdown == "children" => *[_type == "category" && parent._ref == ^.link.internal._ref && showInNav != false]          | order(order asc, title asc){ _id, title, "slug": slug.current }      ),      children[]{ _key, label, link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } } }    },    footerColumns[]{ _key, title, links[]{ _key, label, link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } } } },    legalLinks[]{ _key, label, link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } } },    social,    contact,    announcement{ active, text, button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } } },    delivery,    autoship,    taxRatePercent  }
+// Query: *[_id == "siteSettings"][0]{    mainMenu[]{      _key, _type,      _type == "navItem" => {        label, dropdown,        link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } },        "subcategories": select(          dropdown == "children" =>   *[_type == "category" && parent._ref == ^.link.internal._ref && showInNav != false]    | order(order asc, title asc){ _id, title, "slug": slug.current }        ),        children[]{ _key, label, link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } } }      },      _type == "categoryNavItem" => {        "label": coalesce(label, category->title),        "dropdown": select(showSubcategories != false => "children", "none"),        "link": {          "title": coalesce(label, category->title),          "linkType": "internal",          "href": null,          "target": false,          "buttonVariant": null,          "internal": category->{ _type, "slug": slug.current }        },        "categorySlug": category->slug.current,        "subcategories": select(          showSubcategories != false =>   *[_type == "category" && parent._ref == ^.category._ref && showInNav != false]    | order(order asc, title asc){ _id, title, "slug": slug.current }        ),        "children": null      }    },    footerColumns[]{ _key, title, links[]{ _key, label, link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } } } },    legalLinks[]{ _key, label, link {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } } },    social,    contact,    announcement{ active, text, button {   title,  linkType,  href,  target,  buttonVariant,  "internal": internal->{ _type, "slug": slug.current } } },    delivery,    autoship,    taxRatePercent  }
 export type SETTINGS_QUERY_RESULT =
   | {
       mainMenu: null;
@@ -5008,72 +5017,99 @@ export type SETTINGS_QUERY_RESULT =
       taxRatePercent: null;
     }
   | {
-      mainMenu: Array<{
-        _key: string;
-        label: string;
-        dropdown: "brands" | "children" | "custom" | "none" | null;
-        link: {
-          title: string;
-          linkType: "href" | "internal" | null;
-          href: string | null;
-          target: boolean | null;
-          buttonVariant:
-            "dark" | "default" | "link" | "outline" | "secondary" | null;
-          internal:
-            | {
-                _type: "brand";
-                slug: string;
-              }
-            | {
+      mainMenu: Array<
+        | {
+            _key: string;
+            _type: "categoryNavItem";
+            label: string;
+            dropdown: "children" | "none";
+            link: {
+              title: string;
+              linkType: "internal";
+              href: null;
+              target: false;
+              buttonVariant: null;
+              internal: {
                 _type: "category";
                 slug: string;
-              }
-            | {
-                _type: "page";
-                slug: string;
-              }
-            | {
-                _type: "product";
-                slug: string;
-              }
-            | null;
-        } | null;
-        subcategories: Array<{
-          _id: string;
-          title: string;
-          slug: string;
-        }>;
-        children: Array<{
-          _key: string;
-          label: string;
-          link: {
-            title: string;
-            linkType: "href" | "internal" | null;
-            href: string | null;
-            target: boolean | null;
-            buttonVariant:
-              "dark" | "default" | "link" | "outline" | "secondary" | null;
-            internal:
-              | {
-                  _type: "brand";
-                  slug: string;
-                }
-              | {
-                  _type: "category";
-                  slug: string;
-                }
-              | {
-                  _type: "page";
-                  slug: string;
-                }
-              | {
-                  _type: "product";
-                  slug: string;
-                }
-              | null;
-          };
-        }> | null;
-      }> | null;
+              };
+            };
+            categorySlug: string;
+            subcategories: Array<{
+              _id: string;
+              title: string;
+              slug: string;
+            }>;
+            children: null;
+          }
+        | {
+            _key: string;
+            _type: "navItem";
+            label: string;
+            dropdown: "brands" | "children" | "custom" | "none" | null;
+            link: {
+              title: string;
+              linkType: "href" | "internal" | null;
+              href: string | null;
+              target: boolean | null;
+              buttonVariant:
+                "dark" | "default" | "link" | "outline" | "secondary" | null;
+              internal:
+                | {
+                    _type: "brand";
+                    slug: string;
+                  }
+                | {
+                    _type: "category";
+                    slug: string;
+                  }
+                | {
+                    _type: "page";
+                    slug: string;
+                  }
+                | {
+                    _type: "product";
+                    slug: string;
+                  }
+                | null;
+            } | null;
+            subcategories: Array<{
+              _id: string;
+              title: string;
+              slug: string;
+            }>;
+            children: Array<{
+              _key: string;
+              label: string;
+              link: {
+                title: string;
+                linkType: "href" | "internal" | null;
+                href: string | null;
+                target: boolean | null;
+                buttonVariant:
+                  "dark" | "default" | "link" | "outline" | "secondary" | null;
+                internal:
+                  | {
+                      _type: "brand";
+                      slug: string;
+                    }
+                  | {
+                      _type: "category";
+                      slug: string;
+                    }
+                  | {
+                      _type: "page";
+                      slug: string;
+                    }
+                  | {
+                      _type: "product";
+                      slug: string;
+                    }
+                  | null;
+              };
+            }> | null;
+          }
+      > | null;
       footerColumns: Array<{
         _key: string;
         title: string;
@@ -5295,7 +5331,7 @@ declare global {
     '\n  *[_type == "product" && (\n    (slug.current == $slug && defined(legacy.mergedInto)) ||\n    (status == "active" && $slug in legacy.previousSlugs)\n  )][0]{\n    "slug": coalesce(legacy.mergedInto->slug.current, slug.current), "flavor": legacy.mergedFlavor\n  }\n': MERGED_PRODUCT_QUERY_RESULT;
     '\n  *[_type == "product" && status == "active" && defined(slug.current)]{ "slug": slug.current }\n': PRODUCT_SLUGS_QUERY_RESULT;
     '\n  *[_type == "product" && _id in $ids]{ _id, title, "slug": slug.current, mainImage { \n  _type,\n  asset->{ _id, url, metadata { lqip, dimensions { width, height, aspectRatio } } },\n  alt,\n  hotspot,\n  crop\n } }\n': PRODUCT_THUMBS_QUERY_RESULT;
-    '\n  *[_id == "siteSettings"][0]{\n    mainMenu[]{\n      _key, label, dropdown,\n      link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n      "subcategories": select(\n        dropdown == "children" => *[_type == "category" && parent._ref == ^.link.internal._ref && showInNav != false]\n          | order(order asc, title asc){ _id, title, "slug": slug.current }\n      ),\n      children[]{ _key, label, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } }\n    },\n    footerColumns[]{ _key, title, links[]{ _key, label, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } } },\n    legalLinks[]{ _key, label, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } },\n    social,\n    contact,\n    announcement{ active, text, button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } },\n    delivery,\n    autoship,\n    taxRatePercent\n  }\n': SETTINGS_QUERY_RESULT;
+    '\n  *[_id == "siteSettings"][0]{\n    mainMenu[]{\n      _key, _type,\n      _type == "navItem" => {\n        label, dropdown,\n        link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n },\n        "subcategories": select(\n          dropdown == "children" => \n  *[_type == "category" && parent._ref == ^.link.internal._ref && showInNav != false]\n    | order(order asc, title asc){ _id, title, "slug": slug.current }\n\n        ),\n        children[]{ _key, label, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } }\n      },\n      _type == "categoryNavItem" => {\n        "label": coalesce(label, category->title),\n        "dropdown": select(showSubcategories != false => "children", "none"),\n        "link": {\n          "title": coalesce(label, category->title),\n          "linkType": "internal",\n          "href": null,\n          "target": false,\n          "buttonVariant": null,\n          "internal": category->{ _type, "slug": slug.current }\n        },\n        "categorySlug": category->slug.current,\n        "subcategories": select(\n          showSubcategories != false => \n  *[_type == "category" && parent._ref == ^.category._ref && showInNav != false]\n    | order(order asc, title asc){ _id, title, "slug": slug.current }\n\n        ),\n        "children": null\n      }\n    },\n    footerColumns[]{ _key, title, links[]{ _key, label, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } } },\n    legalLinks[]{ _key, label, link { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } },\n    social,\n    contact,\n    announcement{ active, text, button { \n  title,\n  linkType,\n  href,\n  target,\n  buttonVariant,\n  "internal": internal->{ _type, "slug": slug.current }\n } },\n    delivery,\n    autoship,\n    taxRatePercent\n  }\n': SETTINGS_QUERY_RESULT;
     '\n  *[_type == "brand" && count(*[_type == "product" && status == "active" && references(^._id)]) > 0]\n    | order(lower(title) asc){ _id, title, "slug": slug.current }\n': NAV_BRANDS_QUERY_RESULT;
     '\n  *[_type == "category" && !defined(parent) && showInNav != false] | order(order asc, title asc){\n    _id, title, "slug": slug.current,\n    "children": *[_type == "category" && parent._ref == ^._id && showInNav != false] | order(order asc, title asc){\n      _id, title, "slug": slug.current\n    }\n  }\n': NAV_CATEGORIES_QUERY_RESULT;
     'count(*[\n  _type == "product" && status == "active" && count(variants[price > 0]) > 0\n  && ($brand == "" || brand->slug.current == $brand)\n  && (count($cats) == 0 || count((categories[]._ref)[@ in $cats]) > 0)\n  && ($q == "" || [title, brand->title] match $q)\n])': SHOP_COUNT_QUERY_RESULT;

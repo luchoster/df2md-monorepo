@@ -52,6 +52,8 @@ export default defineType({
     defineField({
       name: 'showInNav',
       title: 'Show in shop sidebar',
+      description:
+        'Lists this category in the shop sidebar. For a subcategory, this also controls whether it appears in the category bar dropdowns.',
       type: 'boolean',
       group: 'main',
       initialValue: true
