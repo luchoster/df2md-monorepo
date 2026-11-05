@@ -63,3 +63,22 @@ export async function saveStripeCustomerId(userId: string, customerId: string) {
     .eq('id', userId)
     .is('stripe_customer_id', null)
 }
+
+/** After a confirmed email change, Stripe's receipts and payment emails follow the new address. */
+export async function syncStripeEmail(userId: string, email: string) {
+  const admin = createAdminClient()
+  if (!stripe || !admin) return
+  const { data } = await admin
+    .from('profiles')
+    .select('stripe_customer_id')
+    .eq('id', userId)
+    .maybeSingle()
+  const customerId = data?.stripe_customer_id as string | null | undefined
+  if (!customerId) return
+  try {
+    await stripe.customers.update(customerId, { email })
+  } catch (error) {
+    // The address is already changed on the account; don't fail the confirmation over this
+    console.error(`updating the email of Stripe customer ${customerId} failed`, error)
+  }
+}

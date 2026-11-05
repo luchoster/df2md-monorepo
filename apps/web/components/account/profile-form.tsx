@@ -1,5 +1,6 @@
 'use client'
 
+import Link from 'next/link'
 import { useActionState, useEffect } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
@@ -36,7 +37,21 @@ export function ProfileForm({ profile, email }: { profile: Profile | null; email
             defaultValue={profile?.last_name ?? ''}
             error={e.last_name}
           />
-          <FormField name="email" label="Email" value={email} disabled readOnly />
+          <FormField
+            name="email"
+            label="Email"
+            value={email}
+            disabled
+            readOnly
+            hint={
+              <Link
+                href="/account/security"
+                className="text-sm font-medium text-brand hover:underline"
+              >
+                Change
+              </Link>
+            }
+          />
           <FormField
             name="phone"
             label="Phone"

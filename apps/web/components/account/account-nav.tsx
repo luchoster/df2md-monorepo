@@ -1,6 +1,15 @@
 'use client'
 
-import { CreditCard, Dog, LogOut, type LucideIcon, Package, Repeat, UserRound } from 'lucide-react'
+import {
+  CreditCard,
+  Dog,
+  KeyRound,
+  LogOut,
+  type LucideIcon,
+  Package,
+  Repeat,
+  UserRound
+} from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { openBillingPortal } from '@/lib/account/actions'
@@ -11,7 +20,8 @@ const LINKS: { href: string; label: string; icon: LucideIcon }[] = [
   { href: '/account', label: 'Profile', icon: UserRound },
   { href: '/account/orders', label: 'Orders', icon: Package },
   { href: '/account/autoship', label: 'Autoship', icon: Repeat },
-  { href: '/account/dogs', label: 'My dogs', icon: Dog }
+  { href: '/account/dogs', label: 'My dogs', icon: Dog },
+  { href: '/account/security', label: 'Sign-in & security', icon: KeyRound }
 ]
 
 const item =

@@ -7,8 +7,16 @@ import { getUser, safeNext } from '@/lib/account/session'
 
 export const metadata: Metadata = { title: 'Sign in', robots: { index: false } }
 
-const NOTICES: Record<string, string> = {
-  link: 'That link has expired or was already used. Sign in, or request a new link.'
+const NOTICES: Record<string, { tone: 'success' | 'error'; text: string }> = {
+  link: {
+    tone: 'error',
+    text: 'That link has expired or was already used. Sign in, or request a new link.'
+  },
+  // First of the two email-change links, opened where the customer isn't signed in
+  'email-pending': {
+    tone: 'success',
+    text: 'Thanks, that’s confirmed. Now open the link we sent to your other email address to finish the change.'
+  }
 }
 
 export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
@@ -31,7 +39,7 @@ export default async function LoginPage({ searchParams }: PageProps<'/login'>) {
     >
       <LoginForm
         next={next}
-        notice={NOTICES[String(params.error ?? '')]}
+        notice={NOTICES[String(params.error ?? params.notice ?? '')]}
         method={params.method === 'code' ? 'code' : 'password'}
       />
     </AuthCard>

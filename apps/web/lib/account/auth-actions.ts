@@ -8,6 +8,7 @@ import { accountsEnabled } from '@/lib/supabase/env'
 import { createAdminClient, createClient } from '@/lib/supabase/server'
 import { LOGIN_CODE_LENGTH } from './login-code'
 import { safeNext, setPasswordPath } from './session'
+import { getStripeCustomerId } from './stripe-customer'
 
 export type FormState = {
   error?: string
@@ -208,6 +209,118 @@ export async function updatePassword(_: FormState, form: FormData): Promise<Form
   await createAdminClient()?.from('profiles').update({ password_set: true }).eq('id', data.user.id)
   const next = form.get('next')
   redirect(next ? safeNext(next) : '/account?updated=password')
+}
+
+const SIGNED_OUT: FormState = { error: 'Your session has expired. Please sign in again.' }
+
+/**
+ * Change the password from the account page. The current password is checked by signing in
+ * with it again, which also gives the fresh session Supabase asks for before a password change.
+ * Customers who forgot it use /forgot-password instead.
+ */
+export async function changePassword(_: FormState, form: FormData): Promise<FormState> {
+  if (!accountsEnabled) return NOT_ENABLED
+  const parsed = z
+    .object({
+      current: z.string().min(1, 'Enter your current password'),
+      password,
+      confirm: z.string()
+    })
+    .refine((v) => v.password === v.confirm, {
+      path: ['confirm'],
+      message: 'Passwords don’t match'
+    })
+    .safeParse({
+      current: String(form.get('current') ?? ''),
+      password: String(form.get('password') ?? ''),
+      confirm: String(form.get('confirm') ?? '')
+    })
+  if (!parsed.success) return { fieldErrors: fieldErrors(parsed.error) }
+
+  const supabase = await createClient()
+  const { data: session } = await supabase.auth.getUser()
+  const user = session.user
+  if (!user?.email) return SIGNED_OUT
+  const check = await supabase.auth.signInWithPassword({
+    email: user.email,
+    password: parsed.data.current
+  })
+  if (check.error)
+    return check.error.status === 429
+      ? { error: 'Too many attempts. Please wait a few minutes and try again.' }
+      : { fieldErrors: { current: 'That isn’t your current password.' } }
+
+  const { error } = await supabase.auth.updateUser({ password: parsed.data.password })
+  if (error) {
+    if (error.code === 'same_password')
+      return { fieldErrors: { password: 'Choose a password you haven’t used before.' } }
+    if (error.code === 'weak_password') return { fieldErrors: { password: error.message } }
+    return { error: 'We couldn’t save your new password. Please try again.' }
+  }
+  await createAdminClient()?.from('profiles').update({ password_set: true }).eq('id', user.id)
+  return { done: true }
+}
+
+/**
+ * Before the email changes, pin what the account only reaches through its current address:
+ * guest orders (shown by matching email, see the orders policy) get the account's id, and the
+ * Stripe customer with that email is saved on the profile.
+ */
+async function keepWhatTheEmailLinks(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  user: { id: string; email: string }
+) {
+  const admin = createAdminClient()
+  if (!admin) return
+  // Read as the customer: row-level security returns exactly the guest orders that are theirs
+  const { data: guestOrders } = await supabase.from('orders').select('id').is('user_id', null)
+  const ids = (guestOrders ?? []).map((o) => o.id as string)
+  if (ids.length) await admin.from('orders').update({ user_id: user.id }).in('id', ids)
+  try {
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('stripe_customer_id, first_name, last_name')
+      .eq('id', user.id)
+      .maybeSingle()
+    await getStripeCustomerId({ ...user, emailConfirmed: true, pendingEmail: null }, profile)
+  } catch (error) {
+    console.error('linking the Stripe customer before an email change failed', error)
+  }
+}
+
+/**
+ * Starts an email change. Supabase emails a confirmation link to the new address (and to the
+ * current one too while "Secure email change" is on); the address only changes once the links
+ * are opened, through /auth/confirm.
+ */
+export async function requestEmailChange(_: FormState, form: FormData): Promise<FormState> {
+  if (!accountsEnabled) return NOT_ENABLED
+  const values = { email: str(form, 'email').toLowerCase() }
+  const parsed = email.safeParse(values.email)
+  if (!parsed.success) return { fieldErrors: { email: 'Enter a valid email' }, values }
+
+  const supabase = await createClient()
+  const { data: session } = await supabase.auth.getUser()
+  const user = session.user
+  if (!user?.email || !user.email_confirmed_at) return SIGNED_OUT
+  if (parsed.data === user.email.toLowerCase())
+    return { fieldErrors: { email: 'That’s already your email.' }, values }
+
+  await keepWhatTheEmailLinks(supabase, { id: user.id, email: user.email })
+  const { error } = await supabase.auth.updateUser(
+    { email: parsed.data },
+    { emailRedirectTo: `${await siteOrigin()}/auth/confirm?next=/account/security` }
+  )
+  if (error) {
+    if (error.code === 'email_exists')
+      return { fieldErrors: { email: 'Another account already uses that email.' }, values }
+    if (error.status === 429)
+      return { error: 'Please wait a minute before asking for another link.', values }
+    if (error.code === 'email_address_invalid' || error.code === 'validation_failed')
+      return { fieldErrors: { email: 'Enter a valid email' }, values }
+    return { error: 'We couldn’t start the change. Please try again.', values }
+  }
+  return { done: true, values }
 }
 
 export async function signOut() {

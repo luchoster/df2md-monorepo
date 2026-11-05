@@ -32,7 +32,7 @@ export function LoginForm({
   method: initialMethod = 'password'
 }: {
   next: string
-  notice?: string
+  notice?: { tone: 'success' | 'error'; text: string }
   method?: LoginMethod
 }) {
   const [method, setMethod] = useState<LoginMethod>(initialMethod)
@@ -71,7 +71,7 @@ function PasswordLoginForm({
   onEmail
 }: {
   next: string
-  notice?: string
+  notice?: { tone: 'success' | 'error'; text: string }
   email: string
   onEmail: (email: string) => void
 }) {
@@ -79,7 +79,7 @@ function PasswordLoginForm({
   return (
     <form action={action} className="flex flex-col gap-4" noValidate>
       <input type="hidden" name="next" value={next} />
-      {notice && !state.error && <FormMessage>{notice}</FormMessage>}
+      {notice && !state.error && <FormMessage tone={notice.tone}>{notice.text}</FormMessage>}
       {state.error && <FormMessage>{state.error}</FormMessage>}
       <FormField
         name="email"

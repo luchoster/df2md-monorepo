@@ -5,7 +5,13 @@ import { accountsEnabled } from '@/lib/supabase/env'
 import { createClient } from '@/lib/supabase/server'
 import type { Profile } from '@/lib/supabase/types'
 
-export type SessionUser = { id: string; email: string; emailConfirmed: boolean }
+export type SessionUser = {
+  id: string
+  email: string
+  emailConfirmed: boolean
+  /** A new address the customer asked for and hasn't confirmed yet */
+  pendingEmail: string | null
+}
 
 /** The signed-in customer (verified with the auth server), or null. Cached per request. */
 export const getUser = cache(async (): Promise<SessionUser | null> => {
@@ -16,7 +22,8 @@ export const getUser = cache(async (): Promise<SessionUser | null> => {
   return {
     id: data.user.id,
     email: data.user.email,
-    emailConfirmed: Boolean(data.user.email_confirmed_at)
+    emailConfirmed: Boolean(data.user.email_confirmed_at),
+    pendingEmail: data.user.new_email || null
   }
 })
 

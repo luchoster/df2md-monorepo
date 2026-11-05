@@ -75,6 +75,7 @@ password = a Resend API key, from `orders@dogfood2mydoor.com` on a verified doma
 | `/account/orders`, `/account/orders/[number]` | Order history (Order History 3) and order detail (Order Summary 1) |
 | `/account/autoship` | Autoship list from Stripe: change frequency, quantities and next order date; pause, resume, cancel |
 | `/account/dogs` | The customer's dogs |
+| `/account/security` | Change email (Supabase emails confirmation links; the address changes once they're opened, then Stripe's customer email follows) and change password (asks for the current one) |
 | Payment methods | Stripe customer portal |
 | `proxy.ts` | Refreshes the auth cookie on account pages and checkout only (catalog pages stay static) |
 
