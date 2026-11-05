@@ -9,7 +9,7 @@ import { getSettings } from '@/sanity/lib/fetchers'
 
 /** The store's copy of every paid order and Autoship renewal. */
 const STORE_EMAIL = process.env.ORDER_NOTIFICATION_EMAIL || 'info@dogfood2mydoor.com'
-const FROM = process.env.EMAIL_FROM || 'Dog Food 2 My Door <orders@dogfood2mydoor.com>'
+const FROM = process.env.EMAIL_FROM || 'Dog Food 2 My Door <orders@emails.dogfood2mydoor.com>'
 
 /** Subject, HTML and text of the store's copy of a saved order. */
 export async function buildNewOrderEmail(orderId: string) {
