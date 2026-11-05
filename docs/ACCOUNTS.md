@@ -29,22 +29,27 @@ pages say "coming soon" and checkout works as guest-only.
 - Keep **Confirm email** on. Guest orders show up in an account by matching the confirmed email.
 - Minimum password length: 8
 
-**Authentication → Emails → Templates**: so the links also work when they're opened on another
-device, point them at `/auth/confirm` with a token hash. `{{ .RedirectTo }}` already carries the
-page to return to (`?next=…`):
-- Confirm signup: `<a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email">Confirm your email</a>`
-- Reset password: `<a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=recovery">Choose a new password</a>`
-- Magic Link (the emailed sign-in code; must contain `{{ .Token }}`). Subject:
-  `Your Dog Food 2 My Door sign-in code`. Body:
-  ```html
-  <h2>Your sign-in code</h2>
-  <p>Enter this code on the sign-in page:</p>
-  <p style="font-size:28px;font-weight:bold;letter-spacing:6px">{{ .Token }}</p>
-  <p>It expires in one hour. If you didn't ask for it, you can ignore this email.</p>
-  <p>Or <a href="{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=magiclink">sign in with this link</a>.</p>
-  ```
-  Codes are 8 digits (Providers → Email → Email OTP length); `LOGIN_CODE_LENGTH` in
+**Authentication → Emails → Templates**: paste each file from `supabase/templates/` into the
+matching template (same look as the order emails: green header, white card, store details).
+
+| Template | File | Subject |
+|---|---|---|
+| Magic Link | `magic-link.html` | `Your Dog Food 2 My Door sign-in code` |
+| Confirm signup | `confirm-signup.html` | `Confirm your email for Dog Food 2 My Door` |
+| Reset Password | `reset-password.html` | `Reset your Dog Food 2 My Door password` |
+| Invite user | `invite.html` | `You're invited to Dog Food 2 My Door` |
+| Change Email Address | `change-email.html` | `Confirm your new Dog Food 2 My Door email` |
+| Reauthentication | `reauthentication.html` | `Your Dog Food 2 My Door confirmation code` |
+
+- The links go to `/auth/confirm` with a token hash, so they also work when opened on another
+  device. In the sign-in code and sign-up emails, `{{ .RedirectTo }}` carries the page to return
+  to (`?next=…`), so those only work when the site sends them. Password resets, invites and email
+  changes link straight to `https://dogfood2mydoor.com/auth/confirm`, so they also work when
+  sent from the Supabase dashboard (Authentication → Users → Send password recovery).
+- Magic Link is the emailed sign-in code and must keep `{{ .Token }}`. Codes are 8 digits
+  (Providers → Email → Email OTP length); `LOGIN_CODE_LENGTH` in
   `apps/web/lib/account/login-code.ts` must match.
+- The logo and fonts load from `https://dogfood2mydoor.com`.
 
 **Authentication → Emails → SMTP**: the built-in sender only allows a few emails an hour.
 Before launch, connect a real sender (Resend works: `smtp.resend.com`, port 465, user `resend`,
