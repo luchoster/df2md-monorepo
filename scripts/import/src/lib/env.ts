@@ -11,14 +11,18 @@ const REPO_ROOT = join(ROOT, '..', '..')
 function loadRootEnv() {
   const path = join(REPO_ROOT, '.env')
   if (!existsSync(path)) return
+  // Empty placeholders never hide a real value: not an earlier empty line for the same key here,
+  // and not an empty key in scripts/import/.env (which Bun loads by itself before this runs)
+  const fromFile = new Map<string, string>()
   for (const line of readFileSync(path, 'utf8').split(/\r?\n/)) {
     const m = /^\s*(?:export\s+)?([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)?\s*$/.exec(line)
     if (!m) continue
     let value = (m[2] ?? '').trim()
     if (/^(['"]).*\1$/.test(value)) value = value.slice(1, -1)
     else value = value.replace(/\s+#.*$/, '')
-    if (process.env[m[1]!] === undefined) process.env[m[1]!] = value
+    if (value || !fromFile.has(m[1]!)) fromFile.set(m[1]!, value)
   }
+  for (const [name, value] of fromFile) if (!process.env[name]) process.env[name] = value
 }
 loadRootEnv()
 
