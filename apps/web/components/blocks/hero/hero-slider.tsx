@@ -14,7 +14,12 @@ import type { BlockOf } from '../types'
  * home_slider.js rebuilt: full-width slides (560 / 250 / 200px), background image, a text box on
  * the left or right half (optional 75% white panel), "Shop Now" button, dots from 768px.
  */
-export default function HeroSlider({ slides, autoplay, intervalMs }: BlockOf<'hero-slider'>) {
+export default function HeroSlider({
+  slides,
+  autoplay,
+  intervalMs,
+  isFirst
+}: BlockOf<'hero-slider'> & { isFirst?: boolean }) {
   const [ref, api] = useEmblaCarousel({ loop: true })
   useAutoplay(api, intervalMs ?? 8000, autoplay !== false && (slides?.length ?? 0) > 1)
   const { selected, count } = useDots(api)
@@ -26,6 +31,7 @@ export default function HeroSlider({ slides, autoplay, intervalMs }: BlockOf<'he
         <div className="flex">
           {slides.map((slide, i) => {
             const right = stegaClean(slide.textPosition) === 'right'
+            const Heading = isFirst && i === 0 ? 'h1' : 'h2'
             return (
               // biome-ignore lint/a11y/useSemanticElements: WAI-ARIA carousel pattern (group + roledescription "slide")
               <div
@@ -55,7 +61,7 @@ export default function HeroSlider({ slides, autoplay, intervalMs }: BlockOf<'he
                   >
                     <div className="max-w-[600px] p-3 text-ink-900 md:p-5">
                       {slide.title && (
-                        <h2 className="mb-2 text-base md:text-[32px]">{slide.title}</h2>
+                        <Heading className="mb-2 text-base md:text-[32px]">{slide.title}</Heading>
                       )}
                       <PortableTextRenderer
                         value={slide.text as never}

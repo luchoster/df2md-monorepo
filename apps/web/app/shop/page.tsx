@@ -8,7 +8,10 @@ type Search = { q?: string; brand?: string; page?: string; sort?: string; starts
 export async function generateMetadata({ searchParams }: PageProps<'/shop'>): Promise<Metadata> {
   const { brand } = (await searchParams) as Search
   const b = brand ? await getBrand(brand) : null
-  return { title: b?.title ? `${b.title} | Shop` : 'Shop' }
+  return {
+    title: b?.title ? `${b.title} | Shop` : 'Shop',
+    alternates: { canonical: b?.slug ? `/shop?brand=${encodeURIComponent(b.slug)}` : '/shop' }
+  }
 }
 
 export default async function ShopPage({ searchParams }: PageProps<'/shop'>) {

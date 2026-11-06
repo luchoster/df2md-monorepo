@@ -39,8 +39,27 @@ const componentMap: Record<Block['_type'], ComponentType<any>> = {
   'reviews-embed': ReviewsEmbed
 }
 
-/** Renders a page-builder array. Heading levels come from position: the first block owns the h1. */
+/** The text a block would render as its heading, if it has one. */
+function headingOf(block: Block): string | null | undefined {
+  switch (block._type) {
+    case 'hero-slider':
+      return block.slides?.[0]?.title
+    case 'rich-content-block':
+    case 'image-text':
+      return block.title
+    case 'cta-banner':
+      return null
+    default:
+      return block.heading
+  }
+}
+
+/**
+ * Renders a page-builder array. Heading levels come from position: the first block that has a
+ * heading owns the page's h1 (`isFirst`); every other heading is an h2.
+ */
 export default function Blocks({ blocks }: { blocks: Block[] | null | undefined }) {
+  const h1Index = blocks?.findIndex((block) => Boolean(headingOf(block))) ?? -1
   return (
     <>
       {blocks?.map((block, index) => {
@@ -49,7 +68,7 @@ export default function Blocks({ blocks }: { blocks: Block[] | null | undefined 
           console.warn(`No component for block type "${block._type}"`)
           return <div key={block._key} data-type={block._type} />
         }
-        return <Component key={block._key} {...block} isFirst={index === 0} />
+        return <Component key={block._key} {...block} isFirst={index === h1Index} />
       })}
     </>
   )

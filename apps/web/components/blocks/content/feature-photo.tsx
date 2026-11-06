@@ -21,8 +21,10 @@ export default function FeaturePhoto({
   overlayHeading,
   overlayLink,
   background,
-  padding
-}: BlockOf<'feature-photo'>) {
+  padding,
+  isFirst
+}: BlockOf<'feature-photo'> & { isFirst?: boolean }) {
+  const Heading = isFirst ? 'h1' : 'h2'
   const left = stegaClean(imageSide) === 'left'
   const hasOverlay = chip || overlayHeading || overlayLink
   return (
@@ -34,7 +36,7 @@ export default function FeaturePhoto({
               {badge}
             </Badge>
           )}
-          <h2 className="text-3xl tracking-tight text-pretty lg:text-5xl">{heading}</h2>
+          <Heading className="text-3xl tracking-tight text-pretty lg:text-5xl">{heading}</Heading>
           {description && (
             <PortableTextRenderer
               value={description}

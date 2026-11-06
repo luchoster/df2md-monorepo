@@ -12,8 +12,10 @@ export default function FeatureGrid({
   features,
   button,
   background,
-  padding
-}: BlockOf<'feature-grid'>) {
+  padding,
+  isFirst
+}: BlockOf<'feature-grid'> & { isFirst?: boolean }) {
+  const Heading = isFirst ? 'h1' : 'h2'
   return (
     <Section padding={padding} background={background}>
       <div className="container">
@@ -26,7 +28,9 @@ export default function FeatureGrid({
               {label}
             </Badge>
           )}
-          <h2 className="text-3xl tracking-tight text-pretty md:text-4xl lg:text-5xl">{heading}</h2>
+          <Heading className="text-3xl tracking-tight text-pretty md:text-4xl lg:text-5xl">
+            {heading}
+          </Heading>
         </div>
         <div className="mx-auto grid max-w-6xl gap-10 md:grid-cols-2 lg:grid-cols-3 lg:gap-12">
           {features?.slice(0, 6).map((f) => {

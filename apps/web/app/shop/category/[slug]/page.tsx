@@ -14,7 +14,8 @@ export async function generateMetadata({
 }: PageProps<'/shop/category/[slug]'>): Promise<Metadata> {
   const { slug } = await params
   const category = await getCategory(slug)
-  return buildMetadata(category?.seo, category?.title)
+  if (!category) return {}
+  return buildMetadata(category.seo, category.title, `/shop/category/${slug}`)
 }
 
 export default async function CategoryPage({

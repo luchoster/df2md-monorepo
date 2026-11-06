@@ -14,8 +14,10 @@ export default function FeatureRows({
   rows,
   firstImageSide,
   background,
-  padding
-}: BlockOf<'feature-rows'>) {
+  padding,
+  isFirst
+}: BlockOf<'feature-rows'> & { isFirst?: boolean }) {
+  const Heading = isFirst ? 'h1' : 'h2'
   const startRight = stegaClean(firstImageSide) === 'right'
   return (
     <Section padding={padding} background={background}>
@@ -23,7 +25,9 @@ export default function FeatureRows({
         {(heading || subheading) && (
           <div className="mx-auto mb-12 max-w-2xl text-center md:mb-16">
             {heading && (
-              <h2 className="mb-4 text-3xl tracking-tight text-balance md:text-5xl">{heading}</h2>
+              <Heading className="mb-4 text-3xl tracking-tight text-balance md:text-5xl">
+                {heading}
+              </Heading>
             )}
             {subheading && (
               <PortableTextRenderer

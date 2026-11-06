@@ -8,12 +8,14 @@ export default function ReviewsEmbed({
   provider,
   embedUrl,
   reviews,
-  padding
-}: BlockOf<'reviews-embed'>) {
+  padding,
+  isFirst
+}: BlockOf<'reviews-embed'> & { isFirst?: boolean }) {
+  const Heading = isFirst ? 'h1' : 'h2'
   return (
     <Section padding={padding}>
       <div className="container">
-        {heading && <h1 className="mb-6">{heading}</h1>}
+        {heading && <Heading className="mb-6">{heading}</Heading>}
         {provider !== 'manual' && embedUrl ? (
           <iframe
             src={embedUrl}

@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: PageProps<'/[slug]'>): Promis
   const { slug } = await params
   if (!isPageSlug(slug)) return {}
   const page = await getPage(slug)
-  return buildMetadata(page?.meta, page?.title)
+  return buildMetadata(page?.meta, page?.title, `/${slug}`)
 }
 
 export default async function Page({ params }: PageProps<'/[slug]'>) {

@@ -31,16 +31,16 @@ export async function generateMetadata({ params }: PageProps<'/shop/[slug]'>): P
   const { slug } = await params
   const product = await getProduct(slug)
   if (!product) return {}
-  const meta = buildMetadata(
+  if (product.status !== 'active') return { title: product.title, robots: { index: false } }
+  return buildMetadata(
     {
       ...product.seo,
       description: product.seo?.description || product.shortDescription,
       image: product.seo?.image?.asset ? product.seo.image : product.mainImage
     },
-    product.title
+    product.title,
+    `/shop/${slug}`
   )
-  if (product.status !== 'active') return { title: product.title, robots: { index: false } }
-  return { ...meta, alternates: { canonical: `/shop/${slug}` } }
 }
 
 export default async function ProductPage({ params }: PageProps<'/shop/[slug]'>) {

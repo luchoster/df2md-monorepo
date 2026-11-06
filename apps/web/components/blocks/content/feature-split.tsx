@@ -16,14 +16,18 @@ export default function FeatureSplit({
   imageSide,
   button,
   background,
-  padding
-}: BlockOf<'feature-split'>) {
+  padding,
+  isFirst
+}: BlockOf<'feature-split'> & { isFirst?: boolean }) {
+  const Heading = isFirst ? 'h1' : 'h2'
   const left = stegaClean(imageSide) === 'left'
   return (
     <Section padding={padding} background={background}>
       <div className="container grid items-center gap-12 lg:grid-cols-2 lg:gap-16">
         <div className={cn('flex flex-col lg:items-start', left && 'lg:order-2')}>
-          <h2 className="mb-5 text-3xl tracking-tight text-pretty lg:text-5xl">{heading}</h2>
+          <Heading className="mb-5 text-3xl tracking-tight text-pretty lg:text-5xl">
+            {heading}
+          </Heading>
           {description && (
             <PortableTextRenderer
               value={description}
