@@ -1,9 +1,8 @@
 import type { Metadata, Viewport } from 'next'
-import { AddedNotice } from '@/components/cart/added-notice'
 import { CartProvider } from '@/components/cart/cart-provider'
-import { AppToaster } from '@/components/layout/app-toaster'
 import { Footer } from '@/components/layout/footer'
 import { Header } from '@/components/layout/header'
+import { Notices } from '@/components/layout/notices'
 import { SiteJsonLd } from '@/components/layout/site-json-ld'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { siteUrl } from '@/lib/site-url'
@@ -44,8 +43,7 @@ export default function RootLayout({ children }: LayoutProps<'/'>) {
             </main>
             <Footer />
             <SiteJsonLd />
-            <AddedNotice />
-            <AppToaster />
+            <Notices />
           </CartProvider>
         </TooltipProvider>
       </body>
