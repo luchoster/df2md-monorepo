@@ -94,16 +94,18 @@ function AutoshipToggle({
   id: string
   discount?: boolean
 }) {
+  const label = discount ? 'Autoship & save 20%' : 'Autoship'
   return (
     <div className="flex items-center justify-center gap-2">
       <Switch
         id={id}
         checked={checked}
         onCheckedChange={onChange}
+        aria-label={label}
         className="data-[state=checked]:bg-sky"
       />
       <Label htmlFor={id} className="flex items-center gap-1 text-xs font-semibold text-sky">
-        <Repeat className="size-3.5" /> {discount ? 'Autoship & save 20%' : 'Autoship'}
+        <Repeat className="size-3.5" /> {label}
       </Label>
     </div>
   )
