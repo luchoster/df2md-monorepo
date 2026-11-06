@@ -17,6 +17,7 @@ import {
   type ShopSort,
   shopProductsQuery
 } from '../queries/shop'
+import { SITEMAP_QUERY } from '../queries/sitemap'
 import { client } from './client'
 import { sanityFetch } from './fetch'
 
@@ -46,6 +47,13 @@ export const getPage = cache((slug: string) =>
 )
 
 export const getPageSlugs = () => client.withConfig({ useCdn: false }).fetch(PAGES_SLUGS_QUERY)
+
+export const getSitemapEntries = () =>
+  sanityFetch({
+    query: SITEMAP_QUERY,
+    tags: ['page', 'product', 'category', 'brand'],
+    revalidate: 3600
+  })
 
 export type ShopFilters = {
   brand?: string
