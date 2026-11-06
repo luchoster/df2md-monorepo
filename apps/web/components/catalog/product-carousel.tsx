@@ -31,7 +31,14 @@ export function ProductCarousel({ products }: { products: CardProduct[] }) {
         label="products"
         className="top-[calc(50%-3rem)] -mx-3 hidden -translate-y-1/2 sm:flex md:-mx-5"
       />
-      <CarouselDots api={api} selected={selected} count={count} label="product" className="mt-8" />
+      {/* -mx-4: the row runs into the parent's side padding, so 16 tap areas fit from 384px up */}
+      <CarouselDots
+        api={api}
+        selected={selected}
+        count={count}
+        label="product"
+        className="-mx-4 mt-8"
+      />
     </div>
   )
 }

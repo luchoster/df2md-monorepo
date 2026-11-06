@@ -49,7 +49,10 @@ export function CarouselArrows({
   )
 }
 
-/** Pill dots: the active one stretches. */
+/**
+ * Pill dots: the active one stretches. Each dot sits in a 24px tap area; the row itself stays
+ * 8px tall, so the tap areas overhang it without moving anything around it.
+ */
 export function CarouselDots({
   api,
   selected,
@@ -67,7 +70,7 @@ export function CarouselDots({
 }) {
   if (count < 2) return null
   return (
-    <div className={cn('flex justify-center gap-2', className)}>
+    <div className={cn('flex h-2 items-center justify-center', className)}>
       {Array.from({ length: count }, (_, i) => (
         <button
           key={i}
@@ -75,15 +78,19 @@ export function CarouselDots({
           onClick={() => api?.scrollTo(i)}
           aria-label={`Go to ${label} ${i + 1}`}
           aria-current={i === selected}
-          className={cn(
-            'h-2 rounded-full transition-all duration-300',
-            i === selected
-              ? 'w-6 bg-primary'
-              : tone === 'light'
-                ? 'w-2 bg-white/70 hover:bg-white'
-                : 'w-2 bg-foreground/20 hover:bg-foreground/40'
-          )}
-        />
+          className="group flex h-6 min-w-0 basis-6 items-center justify-center outline-none"
+        >
+          <span
+            className={cn(
+              'h-2 rounded-full outline-offset-2 outline-sky transition-all duration-300 group-focus-visible:outline-2',
+              i === selected
+                ? 'w-6 bg-primary'
+                : tone === 'light'
+                  ? 'w-2 bg-white/70 group-hover:bg-white'
+                  : 'w-2 bg-foreground/20 group-hover:bg-foreground/40'
+            )}
+          />
+        </button>
       ))}
     </div>
   )
