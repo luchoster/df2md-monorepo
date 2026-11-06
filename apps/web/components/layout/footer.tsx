@@ -79,7 +79,7 @@ export async function Footer() {
         </div>
       </div>
       <div className="flex min-h-[100px] items-center bg-footer-bar px-4 text-xs text-subtle md:text-base">
-        <p className="mb-0">
+        <p className="mb-0 [&_a]:underline">
           {year} Dog Food 2 My Door | All Rights Reserved
           {settings?.legalLinks?.map((l) => (
             <span key={l._key}>
