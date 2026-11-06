@@ -8,11 +8,17 @@ import {
 import { Section } from '../section'
 import type { BlockOf } from '../types'
 
-export default function FaqList({ heading, items, padding }: BlockOf<'faq-list'>) {
+export default function FaqList({
+  heading,
+  items,
+  padding,
+  isFirst
+}: BlockOf<'faq-list'> & { isFirst?: boolean }) {
+  const Heading = isFirst ? 'h1' : 'h2'
   return (
     <Section padding={padding}>
       <div className="container max-w-[960px]">
-        {heading && <h2 className="mb-6">{heading}</h2>}
+        {heading && <Heading className="mb-6">{heading}</Heading>}
         <Accordion type="multiple" className="border-y">
           {items?.map((item) => (
             <AccordionItem key={item._key} value={item._key}>

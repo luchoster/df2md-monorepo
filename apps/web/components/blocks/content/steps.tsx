@@ -11,14 +11,16 @@ export default function Steps({
   steps,
   button,
   background,
-  padding
-}: BlockOf<'steps'>) {
+  padding,
+  isFirst
+}: BlockOf<'steps'> & { isFirst?: boolean }) {
+  const Heading = isFirst ? 'h1' : 'h2'
   const list = steps ?? []
   return (
     <Section padding={padding} background={background}>
       <div className="container">
         <div className="max-w-3xl">
-          <h2 className="text-3xl tracking-tight sm:text-4xl lg:text-5xl">{heading}</h2>
+          <Heading className="text-3xl tracking-tight sm:text-4xl lg:text-5xl">{heading}</Heading>
           {description && (
             <PortableTextRenderer
               value={description}

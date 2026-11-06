@@ -27,7 +27,13 @@ export function ProductCard({ product, className }: { product: CardProduct; clas
       )}
     >
       <div className="relative overflow-hidden rounded-lg border bg-white">
-        <Link href={href} className="block aspect-square" tabIndex={-1} aria-hidden>
+        <Link
+          href={href}
+          className="block aspect-square"
+          tabIndex={-1}
+          aria-hidden
+          aria-label={product.title ?? undefined}
+        >
           {product.mainImage?.asset ? (
             <SanityImage
               image={product.mainImage}
@@ -64,9 +70,9 @@ export function ProductCard({ product, className }: { product: CardProduct; clas
               {product.brand}
             </span>
           )}
-          <h3 className="line-clamp-2 text-sm leading-snug font-semibold text-foreground group-hover:text-primary">
+          <h2 className="line-clamp-2 text-sm leading-snug font-semibold text-foreground group-hover:text-primary">
             {product.title}
-          </h3>
+          </h2>
           <span className="mt-0.5 flex items-baseline gap-1.5 text-sm">
             {prices.length > 1 && new Set(prices).size > 1 && (
               <span className="text-xs text-muted-foreground">from</span>

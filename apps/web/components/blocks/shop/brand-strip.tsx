@@ -7,13 +7,15 @@ export default function BrandStrip({
   heading,
   brands,
   linkToShop,
-  padding
-}: BlockOf<'brand-strip'>) {
+  padding,
+  isFirst
+}: BlockOf<'brand-strip'> & { isFirst?: boolean }) {
+  const Heading = isFirst ? 'h1' : 'h2'
   if (!brands?.length) return null
   return (
     <Section padding={padding}>
       <div className="container">
-        {heading && <h2 className="mb-6 text-center">{heading}</h2>}
+        {heading && <Heading className="mb-6 text-center">{heading}</Heading>}
         <ul className="flex flex-wrap items-center justify-center gap-x-8 gap-y-4">
           {brands.map((b) => {
             const inner = b.logo?.asset ? (

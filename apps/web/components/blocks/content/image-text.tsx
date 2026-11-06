@@ -13,8 +13,10 @@ export default function ImageText({
   imageSide,
   cta,
   background,
-  padding
-}: BlockOf<'image-text'>) {
+  padding,
+  isFirst
+}: BlockOf<'image-text'> & { isFirst?: boolean }) {
+  const Heading = isFirst ? 'h1' : 'h2'
   const right = stegaClean(imageSide) === 'right'
   return (
     <Section padding={padding} background={background}>
@@ -27,7 +29,7 @@ export default function ImageText({
           />
         </div>
         <div>
-          {title && <h2>{title}</h2>}
+          {title && <Heading>{title}</Heading>}
           <PortableTextRenderer value={content as never} />
           {cta && <ButtonLink link={cta} className="mt-4" />}
         </div>

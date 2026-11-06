@@ -15,13 +15,15 @@ export default function CategoryGrid({
   heading,
   categories,
   columns,
-  padding
-}: BlockOf<'category-grid'>) {
+  padding,
+  isFirst
+}: BlockOf<'category-grid'> & { isFirst?: boolean }) {
+  const Heading = isFirst ? 'h1' : 'h2'
   if (!categories?.length) return null
   return (
     <Section padding={padding}>
       <div className="container">
-        {heading && <h2 className="mb-6 text-center">{heading}</h2>}
+        {heading && <Heading className="mb-6 text-center">{heading}</Heading>}
         <ul className={cn('grid gap-4', cols[columns ?? 4] ?? cols[4])}>
           {categories.map((c) => (
             <li key={c._id}>

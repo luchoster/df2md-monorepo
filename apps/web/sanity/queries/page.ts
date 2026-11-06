@@ -22,6 +22,11 @@ export const HOME_PAGE_QUERY = defineQuery(`
   }
 `)
 
+/** The home page's share image doubles as the site-wide default for pages without one. */
+export const DEFAULT_SHARE_IMAGE_QUERY = defineQuery(`
+  *[_id == "homePage"][0].meta.image{ asset->{ _id } }
+`)
+
 /** Legacy WordPress paths → current page, for middleware-free redirects in next.config. */
 export const PAGE_REDIRECTS_QUERY = defineQuery(`
   *[_type == "page" && count(oldUrls) > 0]{ "slug": slug.current, oldUrls }

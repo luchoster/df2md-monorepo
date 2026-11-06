@@ -14,8 +14,10 @@ export default function ProductGrid({
   limit,
   layout,
   source,
-  padding
-}: BlockOf<'product-grid'>) {
+  padding,
+  isFirst
+}: BlockOf<'product-grid'> & { isFirst?: boolean }) {
+  const Heading = isFirst ? 'h1' : 'h2'
   const list = ((products ?? []) as CardProduct[]).filter((p) => p?.variants?.length)
   const shown = stegaClean(source) === 'manual' ? list : list.slice(0, limit ?? 12)
   if (!shown.length) return null
@@ -25,7 +27,7 @@ export default function ProductGrid({
       <div className="px-4 md:px-6">
         {heading && (
           <div className="flex flex-wrap items-baseline gap-x-5">
-            <h2 className="mb-0 text-[32px] md:text-[40px]">{heading}</h2>
+            <Heading className="mb-0 text-[32px] md:text-[40px]">{heading}</Heading>
             {viewAll && (
               <Link href={viewAll} className="text-lg font-semibold text-primary hover:underline">
                 {viewAllLink?.title || 'View All'}

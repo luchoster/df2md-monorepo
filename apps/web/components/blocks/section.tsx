@@ -20,15 +20,17 @@ const bottom: Record<string, string> = {
 export const backgrounds: Record<string, string> = {
   white: 'bg-white',
   surface: 'bg-footer',
-  brand: 'bg-brand text-white [&_h2]:text-white [&_h3]:text-white [&_a]:text-white',
-  'brand-light': 'bg-brand-light text-white [&_h2]:text-white [&_h3]:text-white',
+  brand:
+    'bg-brand text-white [&_h1]:text-white [&_h2]:text-white [&_h3]:text-white [&_a]:text-white',
+  'brand-light': 'bg-brand-light text-white [&_h1]:text-white [&_h2]:text-white [&_h3]:text-white',
   'brand-lime': 'bg-brand-lime text-ink-900',
-  navy: 'bg-navy text-white [&_h2]:text-white [&_h3]:text-white [&_a]:text-white',
-  sky: 'bg-sky text-white [&_h2]:text-white [&_h3]:text-white [&_a]:text-white',
-  'sky-band': 'bg-sky-band text-white [&_h2]:text-white [&_h3]:text-white [&_a]:text-white',
-  teal: 'bg-teal text-white [&_h2]:text-white [&_h3]:text-white [&_a]:text-white',
-  ink: 'bg-ink text-white [&_h2]:text-white [&_h3]:text-white [&_a]:text-white',
-  accent: 'bg-orange text-white [&_h2]:text-white [&_h3]:text-white',
+  navy: 'bg-navy text-white [&_h1]:text-white [&_h2]:text-white [&_h3]:text-white [&_a]:text-white',
+  sky: 'bg-sky text-white [&_h1]:text-white [&_h2]:text-white [&_h3]:text-white [&_a]:text-white',
+  'sky-band':
+    'bg-sky-band text-white [&_h1]:text-white [&_h2]:text-white [&_h3]:text-white [&_a]:text-white',
+  teal: 'bg-teal text-white [&_h1]:text-white [&_h2]:text-white [&_h3]:text-white [&_a]:text-white',
+  ink: 'bg-ink text-white [&_h1]:text-white [&_h2]:text-white [&_h3]:text-white [&_a]:text-white',
+  accent: 'bg-orange text-white [&_h1]:text-white [&_h2]:text-white [&_h3]:text-white',
   sun: 'bg-sun text-ink-900',
   'sun-soft': 'bg-sun-soft text-ink-900'
 }

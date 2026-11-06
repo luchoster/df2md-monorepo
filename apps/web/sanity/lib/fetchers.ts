@@ -1,7 +1,12 @@
 import { cache } from 'react'
 import type { CardProduct } from '@/components/catalog/types'
 import type { PRODUCT_THUMBS_QUERY_RESULT } from '@/sanity.types'
-import { HOME_PAGE_QUERY, PAGE_QUERY, PAGES_SLUGS_QUERY } from '../queries/page'
+import {
+  DEFAULT_SHARE_IMAGE_QUERY,
+  HOME_PAGE_QUERY,
+  PAGE_QUERY,
+  PAGES_SLUGS_QUERY
+} from '../queries/page'
 import {
   MERGED_PRODUCT_QUERY,
   PRODUCT_QUERY,
@@ -17,6 +22,7 @@ import {
   type ShopSort,
   shopProductsQuery
 } from '../queries/shop'
+import { SITEMAP_QUERY } from '../queries/sitemap'
 import { client } from './client'
 import { sanityFetch } from './fetch'
 
@@ -37,6 +43,12 @@ export const getHomePage = cache(() =>
   sanityFetch({ query: HOME_PAGE_QUERY, tags: ['homePage', 'product', 'category', 'brand'] })
 )
 
+export const getDefaultShareImage = cache(() =>
+  sanityFetch({ query: DEFAULT_SHARE_IMAGE_QUERY, tags: ['homePage'], revalidate: 3600 }).catch(
+    () => null
+  )
+)
+
 export const getPage = cache((slug: string) =>
   sanityFetch({
     query: PAGE_QUERY,
@@ -46,6 +58,13 @@ export const getPage = cache((slug: string) =>
 )
 
 export const getPageSlugs = () => client.withConfig({ useCdn: false }).fetch(PAGES_SLUGS_QUERY)
+
+export const getSitemapEntries = () =>
+  sanityFetch({
+    query: SITEMAP_QUERY,
+    tags: ['page', 'product', 'category', 'brand'],
+    revalidate: 3600
+  })
 
 export type ShopFilters = {
   brand?: string
