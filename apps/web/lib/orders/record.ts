@@ -88,7 +88,7 @@ export async function recordCheckoutOrder(stripe: Stripe, sessionId: string) {
     {
       user_id: m.user_id || null,
       email: session.customer_details?.email ?? session.customer_email ?? '',
-      customer_name: session.customer_details?.name ?? null,
+      customer_name: m.customer_name || session.customer_details?.name || null,
       phone: m.phone || session.customer_details?.phone || null,
       kind: 'order',
       fulfillment: m.fulfillment === 'pickup' ? 'pickup' : 'delivery',

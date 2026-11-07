@@ -74,6 +74,8 @@ export async function POST(req: NextRequest) {
       quote.taxRatePercent > 0 ? await getTaxRateId(stripe, quote.taxRatePercent) : null
     const f = input.fulfillment
     const metadata: Record<string, string> = {
+      // The on-page Payment Element collects no name, so the one typed in the form travels here
+      customer_name: input.customer.name,
       fulfillment: f.method,
       delivery_date: quote.deliveryDate,
       phone: input.customer.phone,
