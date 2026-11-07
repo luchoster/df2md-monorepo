@@ -44,9 +44,14 @@ export async function POST(req: NextRequest) {
           })
         }
         // Name the Stripe customer after the checkout form when Stripe has none (the Payment
-        // Element doesn't ask for one), so receipts and Autoship renewals carry it
+        // Element doesn't ask for one), so receipts and Autoship renewals carry it. The order
+        // itself keeps the name from the metadata, so a failure here must not hold it up.
         if (customerId && session.metadata?.customer_name && !session.customer_details?.name) {
-          await stripe.customers.update(customerId, { name: session.metadata.customer_name })
+          try {
+            await stripe.customers.update(customerId, { name: session.metadata.customer_name })
+          } catch (error) {
+            console.error(`could not name Stripe customer ${customerId}`, error)
+          }
         }
         const saved = await recordCheckoutOrder(stripe, session.id)
         if ('orderId' in saved && saved.orderId) await sendNewOrderEmail(saved.orderId)
