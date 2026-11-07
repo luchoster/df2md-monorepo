@@ -43,6 +43,11 @@ export async function POST(req: NextRequest) {
             metadata: { [FIRST_AUTOSHIP_FLAG]: 'true' }
           })
         }
+        // Name the Stripe customer after the checkout form when Stripe has none (the Payment
+        // Element doesn't ask for one), so receipts and Autoship renewals carry it
+        if (customerId && session.metadata?.customer_name && !session.customer_details?.name) {
+          await stripe.customers.update(customerId, { name: session.metadata.customer_name })
+        }
         const saved = await recordCheckoutOrder(stripe, session.id)
         if ('orderId' in saved && saved.orderId) await sendNewOrderEmail(saved.orderId)
         break
