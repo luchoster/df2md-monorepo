@@ -4,6 +4,7 @@ import { getProfile, getUser } from '@/lib/account/session'
 import { getStripeCustomerId } from '@/lib/account/stripe-customer'
 import { hadAutoshipBefore } from '@/lib/checkout/first-autoship'
 import { quoteCart } from '@/lib/checkout/quote'
+import { findRecentMatchingOrder } from '@/lib/checkout/recent-order'
 import { type CheckoutResponse, checkoutRequestSchema, type SavedCard } from '@/lib/checkout/schema'
 import { formatDeliveryDate, formatSlot } from '@/lib/delivery'
 import { clampSchedule, describeSchedule } from '@/lib/pricing'
@@ -66,7 +67,16 @@ export async function POST(req: NextRequest) {
 
     // Signed in: the cards on the account's Stripe profile, made redisplayable so Checkout offers
     // them (done before the session is created, which is when Stripe decides what to list)
-    const savedCards = accountCustomerId && customer ? await listSavedCards(stripe, customer) : []
+    const [savedCards, recentOrder] = await Promise.all([
+      accountCustomerId && customer ? listSavedCards(stripe, customer) : [],
+      // Same items paid for in the last day: warn, so a lost thank-you page doesn't become a
+      // second charge. The customer can still go ahead.
+      findRecentMatchingOrder({
+        emails: [input.customer.email, user?.email ?? ''],
+        userId: user?.id,
+        items: input.items
+      })
+    ])
 
     const origin = siteOrigin(req.nextUrl.origin)
     const hasAutoship = quote.lines.some((l) => l.autoship)
@@ -164,7 +174,7 @@ export async function POST(req: NextRequest) {
       return_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`
     })
     if (!session.client_secret) throw new Error('Stripe did not return a client secret')
-    return reply({ ok: true, clientSecret: session.client_secret, quote, savedCards })
+    return reply({ ok: true, clientSecret: session.client_secret, quote, savedCards, recentOrder })
   } catch (error) {
     console.error('checkout failed', error)
     return reply(

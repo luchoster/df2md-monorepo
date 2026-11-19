@@ -80,8 +80,18 @@ export type SavedCard = {
   isDefault: boolean
 }
 
+/** An order with these exact items that the same customer paid for in the last day. */
+export type RecentOrder = { number: number; placedAt: string; total: number }
+
 export type CheckoutResponse =
-  | { ok: true; clientSecret: string; quote: CheckoutQuote; savedCards: SavedCard[] }
+  | {
+      ok: true
+      clientSecret: string
+      quote: CheckoutQuote
+      savedCards: SavedCard[]
+      /** Shown as a "you already ordered this" warning before the card form */
+      recentOrder: RecentOrder | null
+    }
   | { ok: false; error: 'invalid'; issues: { path: string; message: string }[] }
   | { ok: false; error: 'cart_changed'; message: string; problems: string[] }
   | { ok: false; error: 'payments_not_configured'; quote: CheckoutQuote }

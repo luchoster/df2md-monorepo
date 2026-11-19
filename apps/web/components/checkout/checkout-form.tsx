@@ -23,6 +23,7 @@ import type {
   CheckoutQuote,
   CheckoutRequest,
   CheckoutResponse,
+  RecentOrder,
   SavedCard
 } from '@/lib/checkout/schema'
 import { formatDeliveryDate, formatSlot, timeSlots } from '@/lib/delivery'
@@ -80,12 +81,16 @@ export function CheckoutForm({
   /** Set once the server has verified the order and created the Stripe session */
   const [clientSecret, setClientSecret] = useState<string | null>(null)
   const [savedCards, setSavedCards] = useState<SavedCard[]>([])
+  /** The same items, paid for by this customer in the last day */
+  const [recentOrder, setRecentOrder] = useState<RecentOrder | null>(null)
   /** Guests pick "sign in" or "continue as guest" before the form shows */
   const [guest, setGuest] = useState(false)
   const chooseFirst = accountsEnabled && !customer && !guest
 
   if (!ready) return <CartSkeleton />
-  if (!items.length)
+  // The cart empties the moment a payment confirms, while the thank-you page is still loading:
+  // keep the form (and the payment step) mounted until then
+  if (!items.length && !clientSecret)
     return (
       <section className="container max-w-lg py-24 text-center">
         <h1 className="mb-3 text-3xl">Your cart is empty</h1>
@@ -156,6 +161,7 @@ export function CheckoutForm({
       if (data.ok) {
         setVerified(data.quote)
         setSavedCards(data.savedCards)
+        setRecentOrder(data.recentOrder)
         setClientSecret(data.clientSecret)
         requestAnimationFrame(() =>
           document.getElementById('payment')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -341,6 +347,22 @@ export function CheckoutForm({
               <Panel title="Payment" id="payment">
                 {clientSecret ? (
                   <>
+                    {recentOrder && (
+                      <div className="mb-5">
+                        <Notice>
+                          <p className="font-semibold">You already placed this order</p>
+                          <p>
+                            Order #{recentOrder.number} with these same items was paid{' '}
+                            {formatPlacedAt(recentOrder.placedAt)} for{' '}
+                            {formatPrice(recentOrder.total / 100)}. Only pay again if you want a
+                            second one.
+                          </p>
+                          <Link href="/cart" className="underline">
+                            Review your cart
+                          </Link>
+                        </Notice>
+                      </div>
+                    )}
                     <PaymentStep
                       clientSecret={clientSecret}
                       savedCards={savedCards}
@@ -608,6 +630,14 @@ function Row({ label, value, className }: { label: string; value: string; classN
       <span className="font-semibold text-foreground">{value}</span>
     </div>
   )
+}
+
+/** "today at 3:42 PM" / "yesterday at 9:54 PM", in the customer's own time zone */
+function formatPlacedAt(iso: string) {
+  const at = new Date(iso)
+  const time = at.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })
+  const day = at.toDateString() === new Date().toDateString() ? 'today' : 'yesterday'
+  return `${day} at ${time}`
 }
 
 function Notice({ children }: { children: React.ReactNode }) {

@@ -9,6 +9,7 @@ import { loadStripe } from '@stripe/stripe-js'
 import { AlertTriangle, CreditCard, Loader2, Lock, Plus } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { useMemo, useState } from 'react'
+import { useCart } from '@/components/cart/cart-provider'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
@@ -88,6 +89,7 @@ export function PaymentStep({
 function PayForm({ sessionId, savedCards }: { sessionId: string; savedCards: SavedCard[] }) {
   const result = useCheckoutElements()
   const router = useRouter()
+  const { clear } = useCart()
   const [paying, setPaying] = useState(false)
   const [error, setError] = useState<string | null>(null)
   // null until the customer picks: the default (first) saved card, otherwise a new card
@@ -123,6 +125,9 @@ function PayForm({ sessionId, savedCards }: { sessionId: string; savedCards: Sav
       setPaying(false)
       return
     }
+    // The card is charged: empty the cart now, not on the thank-you page, so a closed tab or a
+    // failed navigation can't leave the paid items in the cart to be ordered again
+    clear()
     router.push(`/checkout/success?session_id=${encodeURIComponent(sessionId)}`)
   }
 
